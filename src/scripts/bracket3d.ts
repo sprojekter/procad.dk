@@ -60,6 +60,10 @@ export function initBracket(root: HTMLElement) {
   const stage = root.querySelector('.m3d__stage') as HTMLElement;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Render-tilstand skal findes, før resize() kalder kick() første gang.
+  let visible = true;
+  let raf = 0;
+  let prev = performance.now();
   let renderer: THREE.WebGLRenderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -98,8 +102,12 @@ export function initBracket(root: HTMLElement) {
   model.add(part);
   scene.add(model);
 
+  // "Tegning"-visning: hvid flade med sorte kanter, som en isometrisk arbejdstegning
+  const paperMat = new THREE.MeshBasicMaterial({ color: cssColor('--c-white', '#ffffff'), polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const meshes: THREE.Mesh[] = [];
   const addMesh = (geo: THREE.BufferGeometry, parent: THREE.Object3D) => {
     const m = new THREE.Mesh(geo, steel);
+    meshes.push(m);
     m.castShadow = true;
     m.receiveShadow = true;
     const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edgeMat);
@@ -166,6 +174,9 @@ export function initBracket(root: HTMLElement) {
     part.position.set(-f.cx, -f.minY, -f.cz);
     ground.position.y = -0.01;
     controls.target.set(0, f.h * 0.4, 0);
+    const deg = Math.round((i / STEPS) * 90);
+    if (angleOut) angleOut.textContent = `${deg}°`;
+    if (range && document.activeElement !== range && !intro.length) range.value = String(deg);
   }
 
   // Kamera og kontrol
@@ -176,8 +187,8 @@ export function initBracket(root: HTMLElement) {
   controls.dampingFactor = 0.08;
   controls.autoRotate = !reduce;
   controls.autoRotateSpeed = 0.7;
-  controls.minPolarAngle = 0.35;
-  controls.maxPolarAngle = 1.35;
+  controls.minPolarAngle = 0.01; // tillader "ovenfra"
+  controls.maxPolarAngle = Math.PI / 2 - 0.02; // aldrig under gulvet
   controls.target.set(0, 20, 0);
   canvas.style.touchAction = 'pan-y'; // lodret swipe scroller siden på mobil
 
@@ -199,9 +210,10 @@ export function initBracket(root: HTMLElement) {
   const intro = reduce ? [] : [0, 1];
   let introAt = performance.now() + 1200;
   const buttons = root.querySelectorAll<HTMLButtonElement>('[data-fold]');
-  const setTarget = (t: number) => {
+  const setTarget = (t: number, fromRange = false) => {
     target = t;
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.fold) === t)));
+    if (!fromRange && range) range.value = String(Math.round(t * 90));
     kick();
   };
   buttons.forEach((b) => b.addEventListener('click', () => { intro.length = 0; setTarget(Number(b.dataset.fold)); }));
@@ -209,15 +221,114 @@ export function initBracket(root: HTMLElement) {
   window.setTimeout(() => { controls.autoRotate = false; }, 9000); // drej kun i starten
 
   // Kantfarve følger temaet
-  new MutationObserver(() => { edgeMat.color.copy(cssColor('--c-ink', '#0e0e10')); kick(); })
+  new MutationObserver(() => { edgeMat.color.copy(cssColor('--c-ink', '#0e0e10')); if (drawing) applyDrawing(); kick(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // ---------- Mål (HTML-etiketter, der følger modellen) ----------
+  const fmt = (n: number) => n.toLocaleString('da-DK', { maximumFractionDigits: 1 });
+  const FLAT = LB + LF + BA; // udfoldet længde målt på neutralaksen (forenklet: flanger målt fra bukkestart)
+  const dimsEl = root.querySelector<HTMLElement>('[data-dims]');
+  type Dim = { el: HTMLElement; obj: THREE.Object3D; p: THREE.Vector3; when: (t: number) => boolean };
+  const dims: Dim[] = [];
+  const mkDim = (text: string, obj: THREE.Object3D, p: THREE.Vector3, when: (t: number) => boolean, accent = false) => {
+    if (!dimsEl) return;
+    const el = document.createElement('span');
+    el.className = 'm3d__dim' + (accent ? ' m3d__dim--accent' : '');
+    el.textContent = text;
+    dimsEl.append(el);
+    dims.push({ el, obj, p, when });
+  };
+  mkDim(`${LB}`, part, new THREE.Vector3(LB / 2, 0, W + 6), (t) => t > 0.5);
+  mkDim(`${W}`, part, new THREE.Vector3(LB + 6, 0, W / 2), () => true);
+  mkDim(`${LF}`, flange, new THREE.Vector3(-LF / 2, T, W + 6), (t) => t > 0.5);
+  mkDim(`${fmt(FLAT)} udfoldet`, part, new THREE.Vector3(-BA / 2, 0, W + 10), (t) => t <= 0.5, true);
+  mkDim(`R${R0}`, part, new THREE.Vector3(-BA / 2, T, -6), (t) => t > 0.05);
+  let showDims = false;
+  const v3 = new THREE.Vector3();
+  function placeDims() {
+    if (!dimsEl) return;
+    dimsEl.hidden = !showDims;
+    if (!showDims) return;
+    const w = stage.clientWidth, h = stage.clientHeight;
+    part.updateMatrixWorld(true);
+    for (const d of dims) {
+      const on = d.when(fold);
+      d.el.style.opacity = on ? '1' : '0';
+      if (!on) continue;
+      v3.copy(d.p);
+      d.obj.localToWorld(v3);
+      v3.project(camera);
+      d.el.style.transform = `translate(${((v3.x + 1) / 2) * w}px, ${((1 - v3.y) / 2) * h}px) translate(-50%, -50%)`;
+    }
+  }
+
+  // ---------- Visninger (kamera-forudindstillinger) ----------
+  const VIEWS: Record<string, [number, number, number]> = {
+    iso: [330, 250, 380],
+    front: [0, 95, 560],
+    side: [560, 95, 0.01],
+    top: [0.01, 560, 30],
+  };
+  let camFrom: THREE.Vector3 | null = null;
+  let camTo: THREE.Vector3 | null = null;
+  let camT = 1;
+  const viewBtns = root.querySelectorAll<HTMLButtonElement>('[data-view]');
+  const setView = (name: string) => {
+    const v = VIEWS[name];
+    if (!v) return;
+    controls.autoRotate = false;
+    camFrom = camera.position.clone().sub(controls.target);
+    camTo = new THREE.Vector3(...v).setLength(camFrom.length());
+    camT = reduce ? 1 : 0;
+    if (reduce) camera.position.copy(controls.target).add(camTo);
+    viewBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
+    kick();
+  };
+  viewBtns.forEach((b) => b.addEventListener('click', () => setView(b.dataset.view!)));
+  canvas.addEventListener('pointerdown', () => viewBtns.forEach((b) => b.setAttribute('aria-pressed', 'false')));
+  function stepCamera(dt: number) {
+    if (!camFrom || !camTo || camT >= 1) return false;
+    camT = Math.min(1, camT + dt / 0.7);
+    const e = 1 - Math.pow(1 - camT, 3);
+    const r = camFrom.length();
+    v3.copy(camFrom).lerp(camTo, e).setLength(r); // bevæg langs kuglen, ikke gennem modellen
+    camera.position.copy(controls.target).add(v3);
+    return true;
+  }
+
+  // ---------- Værktøjer: mål og tegning ----------
+  const toolBtns = root.querySelectorAll<HTMLButtonElement>('[data-tool]');
+  let drawing = false;
+  const applyDrawing = () => {
+    paperMat.color.copy(cssColor('--c-white', '#ffffff'));
+    meshes.forEach((m) => (m.material = drawing ? paperMat : steel));
+    edgeMat.opacity = drawing ? 0.9 : 0.32;
+    ground.visible = !drawing;
+    renderer.toneMapping = drawing ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
+    root.classList.toggle('is-drawing', drawing);
+  };
+  toolBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', String(on));
+      if (b.dataset.tool === 'dims') showDims = on;
+      if (b.dataset.tool === 'draw') { drawing = on; applyDrawing(); }
+      kick();
+    }),
+  );
+
+  // ---------- Bukkevinkel (skyder) ----------
+  const range = root.querySelector<HTMLInputElement>('[data-angle]');
+  const angleOut = root.querySelector<HTMLElement>('[data-angle-out]');
+  range?.addEventListener('input', () => {
+    intro.length = 0;
+    controls.autoRotate = false;
+    setTarget(Number(range.value) / 90, true);
+  });
 
   setFold(1);
 
   // Tegn kun når noget ændrer sig (sparer CPU/batteri)
-  let visible = true;
-  let raf = 0;
-  let prev = performance.now();
   new IntersectionObserver((es) => { visible = es.some((e) => e.isIntersecting); if (visible) kick(); }).observe(root);
   controls.addEventListener('change', () => kick());
   function kick() { if (!raf) { prev = performance.now(); raf = requestAnimationFrame(frame); } }
@@ -233,9 +344,11 @@ export function initBracket(root: HTMLElement) {
       setFold(fold);
       moving = true;
     }
+    const camMoving = stepCamera(dt);
     const changed = controls.update();
     renderer.render(scene, camera);
-    if (visible && !document.hidden && (moving || changed || controls.autoRotate || intro.length)) kick();
+    placeDims();
+    if (visible && !document.hidden && (moving || camMoving || changed || controls.autoRotate || intro.length)) kick();
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
 

@@ -1,12 +1,29 @@
 ---
 // Interaktiv 3D-model af et bukket stålbeslag (three.js), som kan drejes og foldes ud.
-// Indlæses først, når den er synlig. Uden WebGL eller med reduceret bevægelse vises stregtegningen.
+// Kun på computer. Kan drejes, bukkes trinløst (skyder), vises med mål, som stregtegning og fra 4 vinkler.
 import HeroVisual from './HeroVisual.astro';
 ---
 <figure class="m3d" data-m3d>
   <div class="m3d__stage">
     <div class="m3d__fallback"><HeroVisual /></div>
     <canvas class="m3d__canvas" role="img" aria-label="3D-model af et bukket stålbeslag, der kan drejes og foldes ud til sin udfoldning."></canvas>
+    <div class="m3d__dims" data-dims hidden aria-hidden="true"></div>
+    <div class="m3d__tools" role="toolbar" aria-label="Visning af 3D-modellen">
+      <div class="seg seg--sm" role="group" aria-label="Kameravinkel">
+        <button type="button" data-view="iso" aria-pressed="true" title="Isometrisk">3D</button>
+        <button type="button" data-view="front" aria-pressed="false" title="Set forfra">Front</button>
+        <button type="button" data-view="side" aria-pressed="false" title="Set fra siden">Side</button>
+        <button type="button" data-view="top" aria-pressed="false" title="Set ovenfra">Top</button>
+      </div>
+      <button type="button" class="tool" data-tool="dims" aria-pressed="false" title="Vis mål">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h18v8H3zM7 8v3M11 8v4M15 8v3M19 8v4"/></svg>
+        Mål
+      </button>
+      <button type="button" class="tool" data-tool="draw" aria-pressed="false" title="Vis som stregtegning">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>
+        Streg
+      </button>
+    </div>
     <span class="m3d__hint" aria-hidden="true">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4"/></svg>
       Træk for at dreje
@@ -17,7 +34,12 @@ import HeroVisual from './HeroVisual.astro';
       <button type="button" data-fold="1" aria-pressed="true">Bukket</button>
       <button type="button" data-fold="0" aria-pressed="false">Udfoldet</button>
     </div>
-    <span class="m3d__meta">S235, t = 3 mm, buk 90° R3</span>
+    <label class="m3d__angle">
+      <span class="sr-only">Bukkevinkel</span>
+      <input type="range" min="0" max="90" step="2.5" value="90" data-angle />
+      <output data-angle-out>90°</output>
+    </label>
+    <span class="m3d__meta">S235 · t 3 mm · R3</span>
   </figcaption>
 </figure>
 
@@ -33,6 +55,21 @@ import HeroVisual from './HeroVisual.astro';
   .m3d.is-ready .m3d__hint { opacity: 1; }
   .m3d.is-touched .m3d__hint { opacity: 0; }
   .m3d__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem .9rem; border-top: 1px solid var(--c-line); }
+  .m3d__tools { position: absolute; top: .9rem; right: .9rem; display: flex; gap: .4rem; opacity: 0; transition: opacity .4s ease; }
+  .m3d.is-ready .m3d__tools { opacity: 1; }
+  .m3d__tools .seg, .tool { background: color-mix(in srgb, var(--c-white) 82%, transparent); backdrop-filter: blur(8px); }
+  .seg--sm button { padding: .3rem .6rem; font-size: .8125rem; }
+  .tool { display: inline-flex; align-items: center; gap: .35rem; font: 500 .8125rem var(--font-sans); color: var(--c-muted); border: 1px solid var(--c-line); border-radius: 10px; padding: .3rem .65rem; cursor: pointer; transition: color .2s ease, border-color .2s ease, background-color .2s ease; }
+  .tool:hover { color: var(--c-ink); }
+  .tool[aria-pressed="true"] { color: var(--c-ink); border-color: var(--c-orange); }
+  .tool[aria-pressed="true"] svg { color: var(--c-orange); }
+  .m3d__dims { position: absolute; inset: 0; pointer-events: none; }
+  .m3d__dims :global(.m3d__dim) { position: absolute; left: 0; top: 0; font: 500 .75rem var(--font-mono); color: var(--c-ink); background: var(--c-white); border: 1px solid var(--c-line-strong); padding: .1rem .4rem; border-radius: 6px; white-space: nowrap; transition: opacity .25s ease; will-change: transform; }
+  .m3d__dims :global(.m3d__dim--accent) { border-color: var(--c-orange); color: var(--c-orange); }
+  .m3d:not(.is-ready) .m3d__angle { visibility: hidden; }
+  .m3d__angle { display: inline-flex; align-items: center; gap: .6rem; flex: 1 1 9rem; min-width: 8rem; max-width: 14rem; }
+  .m3d__angle input { flex: 1; accent-color: var(--c-orange); min-height: 2rem; cursor: pointer; }
+  .m3d__angle output { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-ink); min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
   .m3d__meta { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-muted); }
   .seg { display: inline-flex; padding: 3px; background: var(--c-paper); border: 1px solid var(--c-line); border-radius: 10px; }
   .seg button { font: 500 .875rem var(--font-sans); color: var(--c-muted); background: transparent; border: 0; padding: .4rem .85rem; border-radius: 7px; cursor: pointer; transition: background-color .2s ease, color .2s ease; }
@@ -51,8 +88,9 @@ import HeroVisual from './HeroVisual.astro';
       const { initBracket } = await import('../scripts/bracket3d');
       initBracket(root);
     };
-    const idle = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 600));
-    if (document.readyState === 'complete') idle(start);
-    else window.addEventListener('load', () => idle(start), { once: true });
+    const idle = (cb: () => void) => ('requestIdleCallback' in window ? (window as any).requestIdleCallback(cb, { timeout: 1500 }) : setTimeout(cb, 300));
+    const go = () => idle(() => start().catch((e) => console.warn('[3D] kunne ikke starte – viser stregtegning', e)));
+    if (document.readyState === 'complete') go();
+    else window.addEventListener('load', go, { once: true });
   }
 </script>
