@@ -212,7 +212,7 @@ const f = (n: string) => `${id}-${n}`;
         (window as any).dataLayer = (window as any).dataLayer || [];
         (window as any).dataLayer.push({ event: 'generate_lead', form_id: form.id, ydelse, side: location.pathname });
         try { sessionStorage.setItem('procad-lead', '1'); } catch {}
-        setTimeout(() => { location.href = '/tak/'; }, 300);
+        setTimeout(() => { location.href = (document.documentElement.dataset.base || '') + '/tak/'; }, 300);
       } catch (err) {
         if (status) status.textContent = `Forespørgslen blev ikke sendt: ${(err as Error).message} Prøv igen, eller skriv direkte til kontakt@procad.dk.`;
         if (btn) { btn.disabled = false; btn.textContent = label; }

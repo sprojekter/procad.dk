@@ -7,7 +7,8 @@ import tailwindcss from '@tailwindcss/vite';
 // Alle URL'er ender på "/" (fx /ydelser/arbejdstegninger/).
 // Det virker ens på Simply.com (Apache), Vercel og Netlify.
 export default defineConfig({
-  site: 'https://procad.dk',
+  site: process.env.SITE_URL || 'https://procad.dk',
+  base: process.env.SITE_BASE || undefined,
   trailingSlash: 'always',
   build: { format: 'directory' },
   integrations: [

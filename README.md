@@ -125,6 +125,19 @@ Ved opdateringer: byg igen og upload `dist/` igen (overskriv). Slet gamle filer 
 6. Vent på DNS (minutter til få timer). SSL udstedes automatisk.
 7. Hver gang der pushes til `main`, bygges og udgives sitet automatisk.
 
+### Mulighed C – GitHub Pages (gratis, god til forhåndsvisning)
+
+Workflowet `.github/workflows/deploy.yml` bygger og udgiver sitet ved hvert push til `main`.
+
+1. GitHub → **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Uden eget domæne ligger sitet på `https://sprojekter.github.io/procad.dk/` (base-stien sættes automatisk).
+3. Eget domæne: opret filen `public/CNAME` med indholdet `procad.dk`, og sæt i Simply.com → DNS:
+   `A @ 185.199.108.153`, `A @ 185.199.109.153`, `A @ 185.199.110.153`, `A @ 185.199.111.153` og `CNAME www sprojekter.github.io`.
+   Skriv domænet under Settings → Pages → Custom domain, og slå **Enforce HTTPS** til.
+4. PHP kører ikke på GitHub Pages: sæt formularen til Formspree/Basin under
+   **Settings → Secrets and variables → Actions → Variables** → `PUBLIC_FORM_ENDPOINT`.
+   Samme sted kan `PUBLIC_GTM_ID` og `PUBLIC_TURNSTILE_SITE_KEY` sættes.
+
 ## Google Tag Manager, GA4 og Consent Mode v2
 
 - Sæt `PUBLIC_GTM_ID`. Indtil brugeren har givet samtykke, indlæses GTM **ikke** ("basic" Consent Mode – den sikre løsning i Danmark).
