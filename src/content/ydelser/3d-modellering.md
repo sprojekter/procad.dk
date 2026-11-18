@@ -23,7 +23,7 @@ deliverables:
   - Filer i STEP, IGES og native format
 formats: [STEP, IGES, native fil, PDF]
 image:
-  src: https://images.unsplash.com/photo-1769147339214-076740872485
+  src: /images/ydelser/3d-modellering.webp
   alt: Bearbejdede metaldele på tekniske tegninger
   spec: 3:2, 1600×1067 px, JPG/PNG
   motif: Gulnet papirtegning med blyantsrettelser til venstre, samme emne som 3D-model på en skærm til højre

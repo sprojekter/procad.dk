@@ -23,7 +23,7 @@ deliverables:
   - Jeres tegningsramme, logo og nummerering
 formats: [PDF, DWG, DXF, STEP, native fil]
 image:
-  src: https://images.unsplash.com/photo-1581092160562-40aa08e78837
+  src: /images/ydelser/arbejdstegninger.webp
   alt: Skydelære på en teknisk tegning
   spec: 3:2, 1600×1067 px, JPG/PNG (konverteres til AVIF/WebP)
   motif: Udsnit af en rigtig ProCAD-arbejdstegning på skærm eller print, med målpile og svejsesymboler i fokus

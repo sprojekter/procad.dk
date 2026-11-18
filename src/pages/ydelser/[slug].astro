@@ -1,6 +1,6 @@
 ---
-// Ydelsesside – fungerer også som landingsside til Google Ads:
-// én handling (formularen), som ligger over folden på mobil. Kompakt: alt vigtigt på 2–3 skærme.
+// Ydelsesside = Google Ads-landingsside. Én handling: formularen (trin 1 synligt over folden).
+// Mål: ≤ 2,5 skærme på computer, ≤ 3,5 på mobil. Detaljer bag faner og "Læs mere".
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
@@ -19,8 +19,13 @@ interface Props { entry: CollectionEntry<'ydelser'> }
 const { entry } = Astro.props;
 const d = entry.data;
 const { Content } = await render(entry);
-const related = (await getCollection('cases')).filter((c) => c.data.service === entry.id).slice(0, 2);
+const related = (await getCollection('cases')).filter((c) => c.data.service === entry.id).slice(0, 1);
 const others = (await getCollection('ydelser')).filter((s) => s.id !== entry.id).sort((a, b) => a.data.order - b.data.order);
+const tabs = [
+  { id: 'faar', label: 'Du får', items: d.deliverables, kind: 'ticks' },
+  { id: 'hvem', label: 'Til hvem', items: d.audience, kind: 'dots' },
+  { id: 'brug', label: 'Det skal jeg bruge', items: d.needs, kind: 'nums' },
+];
 
 const serviceSchema = {
   '@context': 'https://schema.org',
@@ -34,119 +39,137 @@ const serviceSchema = {
 };
 ---
 <BaseLayout title={d.metaTitle} description={d.metaDescription} schema={[serviceSchema]}>
-  <section class="lp grid-paper">
-    <div class="container lp__grid">
+  <section class="lp">
+    <div class="wrap lp__grid">
       <div class="lp__copy">
-        <Breadcrumbs items={[{ label: 'Ydelser', href: '/ydelser/' }, { label: d.navTitle, href: `/ydelser/${entry.id}/` }]} />
+        <div class="lp__crumbs"><Breadcrumbs items={[{ label: 'Ydelser', href: '/ydelser/' }, { label: d.navTitle, href: `/ydelser/${entry.id}/` }]} /></div>
+        <a href="/ydelser/" class="lp__back">‹ Ydelser</a>
         <p class="kicker lp__kicker">{d.problem}</p>
         <h1>{d.h1}</h1>
         <p class="lead">{d.intro}</p>
         <ul class="lp__usp">
-          <li><Icon icon="clock" tile={false} size={18} /> Svar inden {site.responseHours} timer</li>
-          <li><Icon icon="price" tile={false} size={18} /> Fast pris før start</li>
-          <li><Icon icon="lock" tile={false} size={18} /> NDA ved behov</li>
+          <li><Icon icon="clock" tile={false} size={16} /> Svar inden {site.responseHours} timer</li>
+          <li><Icon icon="price" tile={false} size={16} /> Fast pris</li>
+          <li><Icon icon="lock" tile={false} size={16} /> NDA</li>
         </ul>
-        <div class="lp__photo">
-          <Media src={d.image.src} alt={d.image.alt} spec={d.image.spec} ratio="16 / 9" eager sizes="(min-width: 64rem) 50vw, 100vw" />
-        </div>
+        <div class="lp__photo"><Media src={d.image.src} alt={d.image.alt} ratio="16 / 9" sizes="50vw" /></div>
       </div>
       <div class="lp__form" id="tilbud">
-        <QuoteForm id={`tilbud-${entry.id}`} compact preselect={entry.id} heading="Få en fast pris" submitLabel="Send og få en pris" />
+        <QuoteForm id={`tilbud-${entry.id}`} preselect={entry.id} heading="Få en fast pris" />
       </div>
     </div>
   </section>
 
   <section class="section section--tight">
-    <div class="container">
-      <div class="facts">
-        <div class="card fact">
-          <h2 class="fact__h">Du får</h2>
-          <ul class="ticks">{d.deliverables.map((x) => <li>{x}</li>)}</ul>
-          {d.formats.length > 0 && <p class="fact__formats">{d.formats.join(' / ')}</p>}
+    <div class="wrap lp__more">
+      <div>
+        <div class="seg" role="tablist" aria-label={d.navTitle} data-seg>
+          {tabs.map((t, i) => <button type="button" role="tab" id={`t-${t.id}`} aria-controls={`p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{t.label}</button>)}
         </div>
-        <div class="card fact">
-          <h2 class="fact__h">Til hvem</h2>
-          <ul class="dots">{d.audience.map((x) => <li>{x}</li>)}</ul>
-        </div>
-        <div class="card fact">
-          <h2 class="fact__h">Det skal jeg bruge</h2>
-          <ol class="nums">{d.needs.map((x) => <li>{x}</li>)}</ol>
-          <a href="#tilbud" class="link fact__cta">Send det, du har</a>
-        </div>
+        {tabs.map((t, i) => (
+          <div class="seg__panel" role="tabpanel" id={`p-${t.id}`} aria-labelledby={`t-${t.id}`} hidden={i !== 0}>
+            {t.kind === 'nums' ? <ol class="list nums">{t.items.map((x) => <li>{x}</li>)}</ol> : <ul class:list={['list', t.kind]}>{t.items.map((x) => <li>{x}</li>)}</ul>}
+            {t.id === 'faar' && d.formats.length > 0 && <p class="formats">{d.formats.join(' / ')}</p>}
+          </div>
+        ))}
+        <details class="readmore">
+          <summary>Læs mere om {d.navTitle.replace(' (DXF/STEP)', '').toLowerCase()}</summary>
+          <div class="prose"><Content /></div>
+        </details>
       </div>
-      <div class="prose lp__body"><Content /></div>
+      {related[0] && <div class="lp__case"><CaseCard entry={related[0]} /></div>}
     </div>
   </section>
 
-  {(related.length > 0 || d.faq.length > 0) && (
-    <section class="section section--tight bg-white border-y">
-      <div class="container lp__more">
-        {d.faq.length > 0 && (
-          <div>
-            <h2 class="lp__h2">Spørgsmål og svar</h2>
-            <FaqList items={d.faq} />
-          </div>
-        )}
-        {related.length > 0 && (
-          <div>
-            <h2 class="lp__h2">Eksempel</h2>
-            <CaseCard entry={related[0]} />
-          </div>
-        )}
+  {d.faq.length > 0 && (
+    <section class="section section--tight bg-surface rule-y">
+      <div class="wrap lp__faq">
+        <h2 class="h2">Spørgsmål og svar</h2>
+        <FaqList items={d.faq.slice(0, 3)} />
       </div>
     </section>
   )}
 
   <section class="section section--tight">
-    <div class="container">
-      <h2 class="lp__h2">Andre ydelser</h2>
+    <div class="wrap">
+      <p class="others__label">Andre ydelser</p>
       <ul class="others">
-        {others.map((s) => (
-          <li><a href={`/ydelser/${s.id}/`} class="card card--hover other"><strong>{s.data.navTitle}</strong><span>{s.data.navDescription}</span></a></li>
-        ))}
+        {others.map((s) => <li><a href={`/ydelser/${s.id}/`}>{s.data.navTitle}</a></li>)}
       </ul>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .lp { padding-block: 1.5rem clamp(2.5rem, 2rem + 3vw, 4.5rem); }
-  .lp__grid { display: grid; gap: 2rem; }
-  @media (min-width: 64rem) { .lp__grid { grid-template-columns: 1.1fr 1fr; gap: 3.5rem; align-items: start; } }
-  .lp__kicker { margin: clamp(1.5rem, 1rem + 2vw, 3rem) 0 0; }
-  .lp h1 { margin-top: .75rem; font-size: clamp(2.2rem, 1.4rem + 3vw, 3.5rem); }
-  .lp .lead { margin-top: 1rem; }
-  .lp__usp { list-style: none; padding: 0; margin: 1.5rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; font-size: var(--fs-sm); color: var(--c-ink); }
-  .lp__usp li { display: flex; align-items: center; gap: .45rem; }
+  .lp { padding-block: 1rem clamp(1.5rem, 1rem + 2vw, 3rem); }
+  .lp__grid { display: grid; gap: 1.25rem; }
+  @media (min-width: 64rem) { .lp__grid { grid-template-columns: 1.1fr 1fr; gap: 3.5rem; align-items: start; padding-top: 1rem; } }
+  .lp__crumbs { display: none; }
+  .lp__back { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--c-muted); text-decoration: none; font-size: var(--fs-sm); }
+  @media (min-width: 64rem) { .lp__crumbs { display: block; } .lp__back { display: none; } }
+  .lp__kicker { margin: .25rem 0 0; }
+  @media (min-width: 64rem) { .lp__kicker { margin-top: 2rem; } }
+  .lp h1 { margin-top: .5rem; font-size: clamp(1.9rem, 1.2rem + 2.8vw, 3.25rem); }
+  .lp .lead { margin-top: .75rem; }
+  .lp__usp { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: var(--fs-sm); color: var(--c-ink); }
+  .lp__usp li { display: inline-flex; align-items: center; gap: .35rem; }
   .lp__usp :global(svg) { color: var(--c-orange); }
-  .lp__photo { margin-top: 2rem; display: none; }
-  @media (min-width: 64rem) { .lp__photo { display: block; } }
-  .lp__form { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); padding: clamp(1.25rem, 3vw, 2rem); }
-  @media (min-width: 64rem) { .lp__form { position: sticky; top: calc(var(--header-h) + 1rem); } }
-  /* Mobil: formularen kommer højt op */
-  @media (max-width: 39.99rem) { .lp__usp { display: none; } .lp .lead { font-size: var(--fs-base); } }
+  .lp__photo { display: none; }
+  @media (min-width: 64rem) { .lp__photo { display: block; margin-top: 2rem; } }
+  .lp__form { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-md); padding: 1.25rem; }
+  @media (min-width: 64rem) { .lp__form { position: sticky; top: calc(var(--header-h) + 1rem); padding: 2rem; box-shadow: var(--shadow-lg); } }
+  @media (max-width: 39.99rem) { .lp .lead { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } }
 
-  .facts { display: grid; gap: 1rem; }
-  @media (min-width: 56rem) { .facts { grid-template-columns: repeat(3, 1fr); } }
-  .fact { padding: 1.5rem; display: grid; gap: 1rem; align-content: start; }
-  .fact__h { font-size: var(--fs-lg); letter-spacing: -0.02em; }
-  .fact__formats { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-muted); border-top: 1px solid var(--c-line); padding-top: .75rem; }
-  .fact__cta { font-size: var(--fs-sm); }
-  .ticks, .dots, .nums { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; font-size: var(--fs-sm); color: var(--c-body); }
-  .ticks li, .dots li { position: relative; padding-left: 1.5rem; }
-  .ticks li::before { content: ""; position: absolute; left: .15rem; top: .38em; width: .7rem; height: .38rem; border-left: 1.6px solid var(--c-orange); border-bottom: 1.6px solid var(--c-orange); transform: rotate(-45deg); }
-  .dots li::before { content: ""; position: absolute; left: .2rem; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
+  .lp__more { display: grid; gap: 2rem; }
+  @media (min-width: 64rem) { .lp__more { grid-template-columns: 1.4fr 1fr; gap: 4rem; align-items: start; } }
+  .seg { display: flex; gap: .25rem; padding: 4px; background: var(--c-white); border: 1px solid var(--c-line); border-radius: 14px; overflow-x: auto; scrollbar-width: none; }
+  .seg button { flex: 1 0 auto; min-height: 2.75rem; padding: 0 1rem; border: 0; border-radius: 10px; background: transparent; color: var(--c-muted); font: 500 .9375rem var(--font-sans); cursor: pointer; white-space: nowrap; }
+  .seg button[aria-selected="true"] { background: var(--c-ink); color: var(--c-on-ink); }
+  .seg__panel { padding: 1.25rem .25rem 0; }
+  .seg__panel[hidden] { display: none; }
+  .list { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; color: var(--c-body); }
+  .ticks li, .dots li { position: relative; padding-left: 1.6rem; }
+  .ticks li::before { content: ""; position: absolute; left: .15rem; top: .4em; width: .7rem; height: .38rem; border-left: 1.6px solid var(--c-orange); border-bottom: 1.6px solid var(--c-orange); transform: rotate(-45deg); }
+  .dots li::before { content: ""; position: absolute; left: .25rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
   .nums { counter-reset: n; }
-  .nums li { counter-increment: n; display: grid; grid-template-columns: 1.5rem 1fr; }
+  .nums li { counter-increment: n; display: grid; grid-template-columns: 1.6rem 1fr; }
   .nums li::before { content: counter(n); font: 500 var(--fs-xs)/1.9 var(--font-mono); color: var(--c-muted); }
-  .lp__body { margin-top: 2rem; color: var(--c-muted); }
-
-  .lp__more { display: grid; gap: 3rem; }
-  @media (min-width: 64rem) { .lp__more { grid-template-columns: 1.3fr 1fr; gap: 4rem; } }
-  .lp__h2 { font-size: var(--fs-2xl); letter-spacing: -0.03em; margin-bottom: 1.25rem; }
-  .others { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
-  @media (min-width: 48rem) { .others { grid-template-columns: repeat(3, 1fr); } }
-  .other { display: grid; gap: .2rem; padding: 1.1rem 1.25rem; text-decoration: none; color: inherit; }
-  .other strong { color: var(--c-ink); font-weight: 500; }
-  .other span { font-size: var(--fs-sm); color: var(--c-muted); }
+  .formats { margin-top: 1rem; font: 500 var(--fs-xs) var(--font-mono); color: var(--c-muted); }
+  .readmore { margin-top: 1.5rem; border-top: 1px solid var(--c-line); }
+  .readmore summary { list-style: none; cursor: pointer; min-height: 3rem; display: flex; align-items: center; font-weight: 500; color: var(--c-ink); }
+  .readmore summary::-webkit-details-marker { display: none; }
+  .readmore summary::after { content: "+"; margin-left: auto; font-size: 1.25rem; color: var(--c-muted); }
+  .readmore[open] summary::after { content: "–"; }
+  .readmore .prose { padding-bottom: 1rem; color: var(--c-muted); font-size: var(--fs-sm); }
+  .h2 { font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); letter-spacing: -0.03em; margin-bottom: 1rem; }
+  .lp__faq { max-width: 52rem; }
+  .others__label { font-size: var(--fs-sm); color: var(--c-muted); margin-bottom: .6rem; }
+  .others { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .others a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-white); color: var(--c-ink); text-decoration: none; font-size: var(--fs-sm); }
+  .others a:hover { border-color: var(--c-line-strong); }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-seg]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role=tab]'));
+    const select = (t: HTMLButtonElement, focus = false) => {
+      tabs.forEach((x) => {
+        const on = x === t;
+        x.setAttribute('aria-selected', String(on));
+        x.tabIndex = on ? 0 : -1;
+        const p = document.getElementById(x.getAttribute('aria-controls')!);
+        if (p) p.hidden = !on;
+      });
+      if (focus) t.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          select(tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length], true);
+        }
+      });
+    });
+  });
+</script>

@@ -19,17 +19,12 @@ const schema = {
   <PageHeader
     crumbs={[{ label: 'FAQ', href: '/faq/' }]}
     title="Spørgsmål og svar"
-    lead="Find svaret hurtigt – søg, eller vælg et emne."
+    lead="Vælg et emne – eller send dit spørgsmål med din fil."
   />
 
-  <section class="section section--tight">
-    <div class="container faqp" data-faq>
+  <section class="section section--tight faqs">
+    <div class="wrap faqp" data-faq>
       <div class="faqp__tools">
-        <label class="faqp__search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <span class="sr-only">Søg i spørgsmål</span>
-          <input type="search" class="input" placeholder="Søg, fx DXF, pris eller NDA" data-faq-search />
-        </label>
         <div class="faqp__cats" role="group" aria-label="Emner">
           <button type="button" class="faqp__cat" aria-pressed="true" data-cat="alle">Alle</button>
           {cats.map(([k, v]) => <button type="button" class="faqp__cat" aria-pressed="false" data-cat={k}>{v}</button>)}
@@ -43,7 +38,7 @@ const schema = {
             <div class="faq-answer"><p>{i.a}</p></div>
           </details>
         ))}
-        <p class="faqp__empty" hidden data-faq-empty>Ingen spørgsmål matcher. <a href="/kontakt/" class="link">Spørg mig direkte</a></p>
+        <p class="faqp__empty" hidden data-faq-empty>Ingen spørgsmål her. <a href="/kontakt/" class="link" data-open-quote>Spørg mig direkte</a></p>
       </div>
     </div>
   </section>
@@ -55,12 +50,11 @@ const schema = {
   .faqp { display: grid; gap: 2rem; }
   @media (min-width: 64rem) { .faqp { grid-template-columns: 18rem 1fr; gap: 4rem; align-items: start; } .faqp__tools { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
   .faqp__tools { display: grid; gap: 1rem; }
-  .faqp__search { position: relative; display: block; }
-  .faqp__search svg { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--c-muted); pointer-events: none; }
-  .faqp__search .input { padding-left: 2.6rem; }
-  .faqp__cats { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .faqp__cats { display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * clamp(1.25rem, .5rem + 3vw, 2.5rem)); padding: .5rem clamp(1.25rem, .5rem + 3vw, 2.5rem); position: sticky; top: 0; z-index: 5; background: var(--c-paper); }
+  .faqp__cats::-webkit-scrollbar { display: none; }
+  @media (min-width: 64rem) { .faqp__cats { margin: 0; padding: 0; position: static; background: none; } }
   @media (min-width: 64rem) { .faqp__cats { flex-direction: column; align-items: stretch; } }
-  .faqp__cat { text-align: left; font: 500 .9375rem var(--font-sans); color: var(--c-muted); background: transparent; border: 1px solid var(--c-line); border-radius: 999px; padding: .45rem .9rem; cursor: pointer; }
+  .faqp__cat { flex: 0 0 auto; min-height: 2.75rem; text-align: left; font: 500 .9375rem var(--font-sans); color: var(--c-muted); background: var(--c-white); border: 1px solid var(--c-line); border-radius: 999px; padding: 0 1rem; cursor: pointer; white-space: nowrap; }
   @media (min-width: 64rem) { .faqp__cat { border-radius: 10px; border-color: transparent; } }
   .faqp__cat:hover { color: var(--c-ink); }
   .faqp__cat[aria-pressed="true"] { color: var(--c-ink); background: var(--c-white); border-color: var(--c-line); box-shadow: var(--shadow-sm); }
@@ -72,13 +66,12 @@ const schema = {
   const root = document.querySelector<HTMLElement>('[data-faq]');
   if (root) {
     const items = Array.from(root.querySelectorAll<HTMLDetailsElement>('.faq-item'));
-    const search = root.querySelector<HTMLInputElement>('[data-faq-search]')!;
     const empty = root.querySelector<HTMLElement>('[data-faq-empty]')!;
     const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-cat]')).filter((b) => b.tagName === 'BUTTON');
     let cat = 'alle';
     const norm = (s: string) => s.toLowerCase().normalize('NFKD');
     const apply = () => {
-      const q = norm(search.value.trim());
+      const q = '';
       let shown = 0;
       items.forEach((it) => {
         const okCat = cat === 'alle' || it.dataset.cat === cat;
@@ -94,6 +87,5 @@ const schema = {
       buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       apply();
     }));
-    search.addEventListener('input', apply);
   }
 </script>

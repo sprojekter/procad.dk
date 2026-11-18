@@ -1,10 +1,9 @@
-# Bygger Astro-sitet og udgiver det på GitHub Pages ved hvert push til main.
-# Kræver: Settings → Pages → Build and deployment → Source: "GitHub Actions".
-name: Deploy til GitHub Pages
+# Forhåndsvisning på GitHub Pages (sprojekter.github.io/procad.dk/) – kun manuelt.
+# Den rigtige side bygges af deploy-simply.yml. Forhåndsvisningen er noindex.
+# Kør: Actions → "Forhåndsvisning (GitHub Pages)" → Run workflow.
+name: Forhåndsvisning (GitHub Pages)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -29,6 +28,9 @@ jobs:
       - name: Installér afhængigheder
         run: npm install --no-audit --no-fund
 
+      - name: Hent fotos lokalt
+        run: npm run photos
+
       # Med eget domæne (public/CNAME) ligger sitet i roden.
       # Uden ligger det under /<repo-navn>/ på sprojekter.github.io.
       - name: Find base-sti
@@ -47,6 +49,7 @@ jobs:
           PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
           PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          PUBLIC_NOINDEX: 'true'
 
       - name: Tilpas links til base-sti
         run: node scripts/apply-base.mjs

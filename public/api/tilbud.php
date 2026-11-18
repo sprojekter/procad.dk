@@ -15,7 +15,7 @@ $config = [
     'to'               => 'kontakt@procad.dk',
     'from'             => 'noreply@procad.dk',   // skal være en adresse på jeres eget domæne
     'subject_prefix'   => '[procad.dk] Tilbudsforespørgsel',
-    'max_total_bytes'  => 25 * 1024 * 1024,
+    'max_total_bytes'  => 15 * 1024 * 1024,   // base64 i mail ≈ +35 %; større filer via link
     'min_seconds'      => 3,                      // tidsfælde mod bots
     'turnstile_secret' => '',                     // udfyld for at aktivere Cloudflare Turnstile
     'allowed_origins'  => ['https://procad.dk', 'https://www.procad.dk'],
@@ -54,7 +54,7 @@ if ($origin !== '' && !in_array($origin, $config['allowed_origins'], true)) {
 
 // Hvis uploads overstiger post_max_size, er $_POST tom
 if (empty($_POST) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
-    respond(false, 'Filerne er for store. Maks. 25 MB i alt.', 413);
+    respond(false, 'Filerne er for store. Maks. 15 MB i alt – brug et link til større filer.', 413);
 }
 
 // --- Spam: honeypot + tidsfælde ---
@@ -99,13 +99,15 @@ $ydelse      = $clean('Ydelse', 60);
 $dato        = $clean('Tidsplan', 40);
 $beskrivelse = trim(mb_substr((string)($_POST['Beskrivelse'] ?? ''), 0, 8000));
 $side        = $clean('Side', 200);
-$samtykke    = in_array($_POST['Samtykke'] ?? '', ['Ja', 'ja'], true);
+$link        = $clean('Link', 500);
+$kontaktform = $clean('Kontakt', 40);
 
 $errors = [];
 if ($navn === '') $errors[] = 'navn';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'e-mail';
-if ($beskrivelse === '') $errors[] = 'beskrivelse';
-if (!$samtykke) $errors[] = 'samtykke';
+$harFiler = false;
+foreach ($_FILES as $fx) { $e = is_array($fx['error']) ? $fx['error'] : [$fx['error']]; if (in_array(UPLOAD_ERR_OK, $e, true)) $harFiler = true; }
+if ($beskrivelse === '' && $link === '' && !$harFiler) $errors[] = 'beskrivelse, fil eller link';
 if ($errors) {
     respond(false, 'Udfyld venligst: ' . implode(', ', $errors) . '.', 422);
 }
@@ -133,7 +135,7 @@ foreach ($incoming as $i => $fil) {
     $ext  = strtolower(pathinfo($name, PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExt, true)) respond(false, "Filtypen .$ext er ikke tilladt.", 415);
     $total += (int)$fil['size'];
-    if ($total > $config['max_total_bytes']) respond(false, 'Filerne fylder mere end 25 MB.', 413);
+    if ($total > $config['max_total_bytes']) respond(false, 'Filerne fylder mere end 15 MB. Indsæt et link (fx WeTransfer) i stedet.', 413);
     if (!is_uploaded_file($fil['tmp'])) continue;
     $safe = preg_replace('/[^A-Za-z0-9._-]+/', '_', $name) ?: "fil-$i.$ext";
     $attachments[] = ['name' => $safe, 'data' => (string)file_get_contents($fil['tmp'])];
@@ -157,17 +159,19 @@ $body .= "E-mail:      $email\n";
 $body .= "Telefon:     " . ($telefon ?: '-') . "\n";
 $body .= "Ydelse:      $ydelseTxt\n";
 $body .= "Tidsplan:    " . ($dato ?: '-') . "\n";
+$body .= "Svar via:    " . ($kontaktform ?: '-') . "\n";
+$body .= "Fil-link:    " . ($link ?: '-') . "\n";
 $body .= "Sendt fra:   " . ($side ?: '-') . "\n";
 $body .= "Filer:       " . (count($attachments) ? implode(', ', array_column($attachments, 'name')) : 'ingen') . "\n\n";
 $body .= "Beskrivelse:\n" . str_repeat('-', 40) . "\n$beskrivelse\n\n";
-$body .= "Samtykke til behandling: ja (" . date('d-m-Y H:i') . ")\n";
+$body .= "Modtaget: " . date('d-m-Y H:i') . "\n";
 
 $subject  = $config['subject_prefix'] . ' – ' . $navn . ($firma ? " ($firma)" : '');
 $encSubj  = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 $boundary = 'procad_' . bin2hex(random_bytes(12));
 
 $headers  = "From: ProCAD hjemmeside <{$config['from']}>\r\n";
-$headers .= "Reply-To: " . (preg_replace('/[\r\n<>]/', '', $navn)) . " <$email>\r\n";
+$headers .= "Reply-To: " . mb_encode_mimeheader(preg_replace('/[\r\n<>"]/', '', $navn), 'UTF-8', 'B') . " <$email>\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
 

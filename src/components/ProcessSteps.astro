@@ -5,7 +5,7 @@ const { detailed = false } = Astro.props;
 ---
 <ol class:list={['steps', { 'steps--detailed': detailed }]}>
   {processSteps.map((s, i) => (
-    <li class="step reveal" style={`transition-delay:${i * 60}ms`}>
+    <li class="step" style={`transition-delay:${i * 60}ms`}>
       <div class="step__head">
         <span class="step__num">{String(i + 1).padStart(2, '0')}</span>
         <span class="step__line" aria-hidden="true"></span>

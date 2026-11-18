@@ -1,0 +1,71 @@
+# Bygger sitet til procad.dk og uploader indholdet af dist/ til Simply.com via FTPS.
+# Kører ved hvert push til main (og manuelt under Actions).
+#
+# Opsætning (én gang) – GitHub → Settings → Secrets and variables → Actions:
+#   Secrets:   SIMPLY_FTP_HOST, SIMPLY_FTP_USER, SIMPLY_FTP_PASSWORD  (fra Simply-kontrolpanelet → FTP)
+#   Variables: SIMPLY_SERVER_DIR (valgfri, standard ./public_html/), PUBLIC_GTM_ID (valgfri),
+#              BLOCK_PLACEHOLDERS=true  (når alle [UDFYLD] er udfyldt – stopper deploy, hvis der er nogen tilbage)
+name: Deploy til Simply.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: simply
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installér afhængigheder
+        run: if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+
+      - name: Hent fotos lokalt (ingen tredjepartskald før samtykke)
+        run: npm run photos
+
+      - name: Typetjek (advarer kun)
+        run: npx astro check
+        continue-on-error: true
+
+      - name: Byg til procad.dk (rod, PHP-formular)
+        run: npm run build
+        env:
+          SITE_URL: https://procad.dk
+          SITE_BASE: ''
+          PUBLIC_FORM_ENDPOINT: /api/tilbud.php
+          PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+
+      - name: Kontrollér build
+        run: |
+          test -f dist/index.html && test -f dist/404.html
+          test -f dist/.htaccess && test -f dist/api/.htaccess && test -f dist/api/tilbud.php
+          if grep -rq 'href="/procad.dk/' dist; then echo "::error::Base-sti i build"; exit 1; fi
+          if [ "${{ vars.BLOCK_PLACEHOLDERS }}" = "true" ] && grep -rl '\[UDFYLD' dist --include=*.html; then
+            echo "::error::Der står stadig [UDFYLD] på sitet"; exit 1; fi
+          rm -f dist/.nojekyll dist/api/config.sample.php
+
+      - name: Upload via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SIMPLY_FTP_HOST }}
+          username: ${{ secrets.SIMPLY_FTP_USER }}
+          password: ${{ secrets.SIMPLY_FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./dist/
+          server-dir: ${{ vars.SIMPLY_SERVER_DIR || './public_html/' }}
+          exclude: |
+            **/api/config.php

@@ -23,7 +23,7 @@ deliverables:
   - Konvertering mellem formater
 formats: [DXF, DWG, STEP, IGES, PDF]
 image:
-  src: https://images.unsplash.com/photo-1738162837451-2041c1418f54
+  src: /images/ydelser/filklargoering.webp
   alt: Laserskærer skærer en stålplade
   spec: 3:2, 1600×1067 px, JPG/PNG
   motif: Skærm med udfoldning (stiplede bukkelinjer) og den færdige bukkede stålplade foran skærmen

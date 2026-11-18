@@ -30,17 +30,17 @@ const service = await getEntry('ydelser', d.service);
   </PageHeader>
 
   {d.example && (
-    <div class="container"><p class="example-note">Eksempel-case: teksten og billederne viser skabelonen og skal erstattes med en rigtig opgave.</p></div>
+    <div class="wrap"><p class="example-note">Eksempel-case: teksten og billederne viser skabelonen og skal erstattes med en rigtig opgave.</p></div>
   )}
 
   <section class="section">
-    <div class="container">
+    <div class="wrap">
       <div class="ba">
-        <figure class="ba__item reveal">
+        <figure class="ba__item">
           <Media src={d.before.src} alt={d.before.alt} spec={d.before.spec} motif={d.before.motif} ratio="4 / 3" eager />
           <figcaption><span class="ba__tag">Før</span> {d.before.alt}</figcaption>
         </figure>
-        <figure class="ba__item reveal">
+        <figure class="ba__item">
           <Media src={d.after.src} alt={d.after.alt} spec={d.after.spec} motif={d.after.motif} ratio="4 / 3" />
           <figcaption><span class="ba__tag ba__tag--after">Efter</span> {d.after.alt}</figcaption>
         </figure>

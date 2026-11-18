@@ -1,60 +1,55 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/PageHeader.astro';
 import QuoteForm from '../components/QuoteForm.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
-const pre = '';
 ---
 <BaseLayout
   title="Få et tilbud – send din tegning, skitse eller fil | ProCAD"
   description="Upload DXF, STEP, PDF eller et foto af din skitse og få en fast pris på CAD-tegninger og filer. Svar inden for 24 timer på hverdage."
 >
-  <PageHeader
-    crumbs={[{ label: 'Kontakt', href: '/kontakt/' }]}
-    title="Send din fil og få en fast pris"
-    lead="DXF, STEP, PDF eller et foto af en skitse – send det, du har. Du får svar inden for 24 timer på hverdage."
-  />
-
-  <section class="section section--tight">
-    <div class="container contact">
-      <div class="contact__form">
-        <QuoteForm id="tilbud" preselect={pre} />
-      </div>
-      <aside class="contact__aside">
-        <div class="card contact__box">
-          <h2 class="contact__h">Direkte kontakt</h2>
-          <p><span class="muted">Telefon</span><br /><a href={site.phoneHref} class="contact__big">{site.phone}</a></p>
-          <p><span class="muted">E-mail</span><br /><a href={`mailto:${site.email}`} class="contact__big">{site.email}</a></p>
-          <dl class="titleblock">
-            <dt>Firma</dt><dd>ProCAD</dd>
-            <dt>CVR</dt><dd>{site.cvr}</dd>
-            <dt>Adresse</dt><dd>{site.address.street}, {site.address.postalCode} {site.address.city}</dd>
+  <section class="ct">
+    <div class="wrap ct__grid">
+      <div class="ct__intro">
+        <h1>Send din fil – få en fast pris.</h1>
+        <ul class="ct__chips">
+          <li><Icon icon="clock" tile={false} size={16} /> Svar inden 24 timer</li>
+          <li><Icon icon="price" tile={false} size={16} /> Fast pris</li>
+          <li><Icon icon="lock" tile={false} size={16} /> Fortroligt</li>
+        </ul>
+        <div class="ct__direct">
+          <p class="muted">Hellere tale sammen?</p>
+          <div class="ct__btns">
+            <a href={site.phoneHref} class="btn btn-secondary"><Icon icon="chat" tile={false} size={16} /> Ring</a>
+            <a href={`mailto:${site.email}`} class="btn btn-secondary"><Icon icon="file" tile={false} size={16} /> Skriv en mail</a>
+          </div>
+          <dl class="titleblock ct__info">
+            <dt>Telefon</dt><dd>{site.phone}</dd>
+            <dt>E-mail</dt><dd>{site.email}</dd>
             <dt>Åbent</dt><dd>[UDFYLD: Hverdage 7–16]</dd>
           </dl>
         </div>
-        <ul class="contact__points">
-          <li><Icon icon="clock" /> Svar inden for {site.responseHours} timer på hverdage</li>
-          <li><Icon icon="price" /> Fast pris, før jeg går i gang</li>
-          <li><Icon icon="lock" /> Filer behandles fortroligt – NDA ved behov</li>
-          <li><Icon icon="file" /> Store filer? Indsæt et WeTransfer-link i beskrivelsen</li>
-        </ul>
-      </aside>
+      </div>
+      <div class="ct__form">
+        <QuoteForm id="tilbud" />
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .contact { display: grid; gap: 3rem; }
-  @media (min-width: 64rem) { .contact { grid-template-columns: 1.6fr 1fr; gap: 4rem; align-items: start; } }
-  .contact__form { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); padding: clamp(1.5rem, 3vw, 2.75rem); box-shadow: var(--shadow-md); }
-  .contact__aside { display: grid; gap: 2rem; }
-  @media (min-width: 64rem) { .contact__aside { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
-  .contact__box { padding: 1.75rem; display: grid; gap: 1.25rem; }
-  .contact__h { font-size: var(--fs-xl); letter-spacing: -0.025em; }
-  .contact__box p { font-size: var(--fs-sm); }
-  .contact__big { font-size: var(--fs-lg); font-weight: 500; color: var(--c-ink); text-decoration: none; letter-spacing: -0.015em; }
-  .contact__big:hover { text-decoration: underline; text-decoration-color: var(--c-orange); text-underline-offset: 4px; }
-  .contact__points { list-style: none; padding: 0; margin: 0; display: grid; gap: .9rem; font-size: var(--fs-sm); }
-  .contact__points li { display: flex; align-items: center; gap: .85rem; }
+  .ct { padding-block: clamp(1.25rem, 1rem + 2vw, 3.5rem) clamp(2rem, 1.5rem + 3vw, 4rem); }
+  .ct__grid { display: grid; gap: 1.5rem; }
+  @media (min-width: 64rem) { .ct__grid { grid-template-columns: 1fr 1.3fr; gap: 4rem; align-items: start; } .ct__intro { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
+  .ct h1 { font-size: clamp(1.9rem, 1.2rem + 2.8vw, 3.25rem); }
+  .ct__chips { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem 1rem; font-size: var(--fs-sm); color: var(--c-ink); }
+  .ct__chips li { display: inline-flex; align-items: center; gap: .35rem; }
+  .ct__chips :global(svg) { color: var(--c-orange); }
+  .ct__direct { margin-top: 1.25rem; display: grid; gap: .6rem; }
+  .ct__direct .muted { font-size: var(--fs-sm); }
+  .ct__btns { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .ct__btns .btn { min-height: 3rem; }
+  .ct__info { display: none; margin-top: 1rem; }
+  @media (min-width: 64rem) { .ct__info { display: grid; } .ct__btns { grid-template-columns: auto auto; justify-content: start; } }
+  .ct__form { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); padding: clamp(1.25rem, 3vw, 2.25rem); box-shadow: var(--shadow-md); }
 </style>

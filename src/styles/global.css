@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none); /* kun preflight – sitet bruger egne klasser, ingen Tailwind-utilities */
 
 /* ============================================================
    ProCAD design tokens – se brandmanualen (docs/brandmanual.pdf)
@@ -6,11 +6,8 @@
    Orange er en accent – ikke en flade.
    ============================================================ */
 @theme {
-  --color-ink: #0e0e10;
-  --color-orange: #ff7621;
-  --color-paper: #f7f7f5;
-  --color-line: #e7e6e2;
-  --color-muted: #6b6b70;
+  /* Kun fonte her. Farver ligger som CSS-variabler i :root, så Tailwind ikke laver
+     utility-klasser (fx .bg-white), der kolliderer med sitets egne klasser. */
   --font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
 }
@@ -53,7 +50,7 @@
   --fs-4xl: clamp(2.75rem, 1.5rem + 4.6vw, 5rem);
 
   /* Spacing (4 px) */
-  --section-y: clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
+  --section-y: clamp(2.5rem, 1.5rem + 4vw, 6rem);
 
   /* Radius */
   --r-sm: 8px;    /* små elementer, tags */
@@ -121,8 +118,18 @@
   :focus-visible { outline: 2px solid var(--c-orange); outline-offset: 3px; border-radius: 4px; }
 }
 
+@layer base {
+  /* Mobil: plads til bundbjælken, mindre overskrifter */
+  @media (max-width: 63.99rem) {
+    body { padding-bottom: calc(4.25rem + env(safe-area-inset-bottom)); }
+    h1 { font-size: clamp(2rem, 1.4rem + 3vw, 2.4rem); letter-spacing: -0.035em; }
+    h2 { font-size: clamp(1.6rem, 1.2rem + 2.4vw, 2.1rem); }
+    .lead { font-size: 1.0625rem; }
+  }
+}
+
 @layer components {
-  .container { width: 100%; max-width: 75rem; margin-inline: auto; padding-inline: clamp(1.25rem, .5rem + 3vw, 2.5rem); }
+  .wrap { width: 100%; max-width: 75rem; margin-inline: auto; padding-inline: clamp(1.25rem, .5rem + 3vw, 2.5rem); }
   .section { padding-block: var(--section-y); }
   .section--tight { padding-block: calc(var(--section-y) * .6); }
   .measure { max-width: var(--measure); }
@@ -132,13 +139,13 @@
   .skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 100; background: var(--c-ink); color: var(--c-on-ink); padding: .75rem 1rem; border-radius: var(--r-md); }
   .skip-link:focus { top: 1rem; }
 
-  .bg-white { background: var(--c-white); }
+  .bg-surface { background: var(--c-white); }
   .bg-paper { background: var(--c-paper); }
   .bg-dark { background: var(--c-inverse); color: var(--c-dark-text); }
   :root[data-theme="dark"] .bg-dark { border-block: 1px solid var(--c-dark-line); }
   .bg-dark h1, .bg-dark h2, .bg-dark h3 { color: #fff; }
   .bg-dark .muted, .bg-dark .lead { color: var(--c-dark-muted); }
-  .border-y { border-block: 1px solid var(--c-line); }
+  .rule-y { border-block: 1px solid var(--c-line); }
 
   /* Blød baggrund til hero/sidehoveder (afløser det gamle gitter) */
   .grid-paper {
@@ -291,13 +298,10 @@
 }
 
 @layer utilities {
-  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
-  .reveal.is-visible { opacity: 1; transform: none; }
-  .no-js .reveal { opacity: 1; transform: none; }
+  /* .reveal: tidligere scroll-animation – fjernet (indhold må aldrig afhænge af JS for at blive synligt) */
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-  .reveal { opacity: 1; transform: none; }
 }

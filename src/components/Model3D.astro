@@ -41,15 +41,18 @@ import HeroVisual from './HeroVisual.astro';
 </style>
 
 <script>
+  // Kun på computer (≥ 64rem), ikke ved "Spar data", og først når browseren er ledig efter load.
   const root = document.querySelector<HTMLElement>('[data-m3d]');
+  const desktop = window.matchMedia('(min-width: 64rem)').matches;
+  const saveData = (navigator as any).connection?.saveData === true;
   const canWebGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
-  if (root && canWebGL) {
-    const io = new IntersectionObserver(async (entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return;
-      io.disconnect();
+  if (root && desktop && !saveData && canWebGL) {
+    const start = async () => {
       const { initBracket } = await import('../scripts/bracket3d');
       initBracket(root);
-    }, { rootMargin: '200px' });
-    io.observe(root);
+    };
+    const idle = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 600));
+    if (document.readyState === 'complete') idle(start);
+    else window.addEventListener('load', () => idle(start), { once: true });
   }
 </script>

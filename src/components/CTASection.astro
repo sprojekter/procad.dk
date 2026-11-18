@@ -1,58 +1,39 @@
 ---
-// Afsluttende CTA – mørkt panel nederst på alle sider (ingen blindgyder).
-import QuoteForm from './QuoteForm.astro';
-import Icon from './Icon.astro';
+// Kompakt afsluttende CTA-stribe. Åbner den globale tilbudsdialog (uden JS: /kontakt/).
+// Erstatter den tidligere store mørke sektion med formular (for meget scroll, gentagelser).
 import { site } from '../data/site';
-interface Props { heading?: string; text?: string; withForm?: boolean; preselect?: string; ctaHref?: string }
+interface Props { heading?: string; text?: string; service?: string }
 const {
-  heading = 'Send din tegning, skitse eller fil.',
-  text = 'DXF, STEP, PDF eller et foto af en skitse. Du får en fast pris, før jeg går i gang.',
-  withForm = false,
-  preselect = '',
-  ctaHref = '/kontakt/',
+  heading = 'Klar til at sende din fil?',
+  text = 'Skitse, foto, PDF, DXF eller STEP. Du får en fast pris inden for 24 timer.',
+  service,
 } = Astro.props;
 ---
-<section class="cta section" aria-labelledby="cta-heading">
-  <div class="container">
-    <div class:list={['cta__panel bg-dark', { 'cta__panel--form': withForm }]}>
+<section class="cta" aria-labelledby="cta-heading">
+  <div class="wrap">
+    <div class="cta__strip">
       <div class="cta__copy">
         <h2 id="cta-heading">{heading}</h2>
-        <p class="lead">{text}</p>
-        <ul class="cta__points">
-          <li><Icon icon="clock" /> Svar inden for {site.responseHours} timer på hverdage</li>
-          <li><Icon icon="price" /> Fast pris – ingen overraskelser</li>
-          <li><Icon icon="lock" /> Fortroligt. NDA, hvis du har brug for det</li>
-        </ul>
-        {!withForm && (
-          <div class="cta__actions">
-            <a href={ctaHref} class="btn btn-primary">Få et tilbud</a>
-            <a href={`mailto:${site.email}`} class="btn btn-secondary">Skriv en mail</a>
-          </div>
-        )}
+        <p>{text}</p>
       </div>
-      {withForm && (
-        <div class="cta__form">
-          <QuoteForm id="tilbud-cta" preselect={preselect} submitLabel="Send og få en fast pris" />
-        </div>
-      )}
+      <div class="cta__actions">
+        <a href="/kontakt/" class="btn cta__primary" data-open-quote data-service={service}>Send fil – få fast pris</a>
+        <a href={site.phoneHref} class="btn cta__secondary">Ring {site.phone}</a>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .cta__panel { position: relative; overflow: hidden; border-radius: var(--r-xl); padding: clamp(1.5rem, 1rem + 4vw, 4rem); display: grid; gap: 2.5rem; }
-  .cta__panel::before { content: ""; position: absolute; inset: auto -20% -60% auto; width: 60rem; height: 40rem; background: radial-gradient(closest-side, rgba(255,118,33,.16), transparent); pointer-events: none; }
-  .cta__panel > * { position: relative; }
-  @media (min-width: 64rem) { .cta__panel--form { grid-template-columns: 4fr 6fr; align-items: start; } }
-  .cta__copy h2 { max-width: 16ch; }
-  .cta__copy .lead { margin-top: 1.25rem; }
-  .cta__points { list-style: none; padding: 0; margin: 2.25rem 0 0; display: grid; gap: .9rem; font-size: var(--fs-sm); color: var(--c-dark-text); }
-  .cta__points li { display: flex; align-items: center; gap: .85rem; }
-  .cta__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.25rem; }
-  .cta__form { background: var(--c-white); color: var(--c-body); border: 1px solid var(--c-line); border-radius: var(--r-lg); padding: clamp(1.25rem, 3vw, 2rem); }
-  /* Formularen er en lys flade inde i det mørke panel: nulstil de mørke regler */
-  .cta__form :global(h2), .cta__form :global(label), .cta__form :global(legend) { color: var(--c-ink); }
-  .cta__form :global(.btn-primary) { background: var(--c-ink); color: var(--c-on-ink); }
-  .cta__form :global(.field-error) { color: var(--c-danger); }
-  .cta__form :global(.hint) { color: var(--c-muted); }
+  .cta { padding-block: clamp(2rem, 1.5rem + 3vw, 4rem); }
+  .cta__strip { display: grid; gap: 1.25rem; align-items: center; padding: clamp(1.5rem, 1rem + 2.5vw, 2.5rem); border-radius: var(--r-xl); background: var(--c-ink); color: var(--c-on-ink); }
+  @media (min-width: 56rem) { .cta__strip { grid-template-columns: 1fr auto; gap: 2.5rem; } }
+  .cta__copy h2 { color: var(--c-on-ink); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); letter-spacing: -0.03em; }
+  .cta__copy p { margin-top: .4rem; opacity: .72; font-size: var(--fs-sm); max-width: 42ch; }
+  .cta__actions { display: grid; gap: .5rem; }
+  @media (min-width: 36rem) { .cta__actions { grid-auto-flow: column; } }
+  .cta__primary { background: var(--c-orange); color: #0e0e10; min-height: 3rem; }
+  .cta__primary:hover { background: #ff8a40; }
+  .cta__secondary { background: transparent; color: var(--c-on-ink); border-color: color-mix(in srgb, var(--c-on-ink) 30%, transparent); min-height: 3rem; }
+  .cta__secondary:hover { border-color: var(--c-on-ink); }
 </style>

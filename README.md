@@ -84,19 +84,17 @@ Kopiér en fil i `src/content/ydelser/`, giv den et nyt filnavn (uden æøå, fx
 
 ## Tilbudsformularen
 
-Formularen sender som almindelig formular (med filer) til `PUBLIC_FORM_ENDPOINT`. Ved succes sendes brugeren til `/tak/`, og `generate_lead` lægges i `dataLayer`.
+Formularen bruges tre steder:
+- som ark, der glider op fra knappen "Send fil" i bunden på mobil eller "Få et tilbud" i headeren på computer;
+- indlejret på `/kontakt/`;
+- indlejret øverst på hver ydelsesside.
 
-**Standard: FormSubmit (virker på GitHub Pages, Vercel og Netlify – gratis, ingen konto):**
-1. Sæt variablen `PUBLIC_FORM_ENDPOINT` til `https://formsubmit.co/DIN@EMAIL.DK`
-   (GitHub: Settings → Secrets and variables → Actions → Variables. Lokalt: `.env`).
-2. Byg/push, og send én testforespørgsel fra sitet.
-3. FormSubmit sender en **aktiveringsmail** til adressen – klik på linket. Først derefter kommer forespørgsler igennem (filer fra før aktivering gemmes ikke).
-4. Valgfrit: FormSubmit giver dig bagefter en tilfældig kode, som kan bruges i stedet for e-mailen i URL'en.
-Grænse: 10 MB filer i alt pr. forespørgsel (formularen viser en måler og advarer).
+Den har to trin: **1. Hvad skal laves** (ydelse, beskrivelse **eller** fil **eller** link, tidsplan) og **2. Hvem er du** (navn, e-mail, evt. telefon). Der er ingen samtykke-afkrydsning; der står i stedet en linje om behandling af oplysninger, da behandlingen sker for at besvare henvendelsen.
 
-**Simply.com (PHP 8.1+, op til 25 MB):** sæt `PUBLIC_FORM_ENDPOINT=/api/tilbud.php`, kopiér `public/api/config.sample.php` til `config.php`, udfyld og upload via FTP.
+- **På Simply (standard ved deploy):** `PUBLIC_FORM_ENDPOINT=/api/tilbud.php` sættes automatisk af workflowet. PHP-maileren tager op til 15 MB og 15 filer, har honeypot og tidstjek mod spam og kræver `api/config.php` (se Deploy).
+- **Andre steder (Pages/Vercel/Netlify):** FormSubmit `https://formsubmit.co/kontakt@procad.dk`. Første gang sendes en aktiveringsmail, som skal klikkes. Grænsen er 10 MB.
 
-UX: ydelse vælges med knapper, filer kan trækkes ind og fjernes enkeltvis, felter valideres, når man forlader dem, og en kladde gemmes lokalt i browseren, hvis siden lukkes.
+Ved succes sendes brugeren til `/tak/`, og `generate_lead` lægges i `dataLayer`.
 
 ## Lyst og mørkt tema
 
@@ -104,49 +102,48 @@ Sitet følger brugerens systemindstilling (lyst/mørkt) og har en temaknap i hea
 
 ## 3D-model og fotos
 
-- Forsidens 3D-model (`src/components/Model3D.astro` + `src/scripts/bracket3d.ts`, three.js) indlæses først, når den er synlig. Uden WebGL eller med "reducer bevægelse" vises stregtegningen.
-- Ydelsesbillederne er midlertidige fotos fra Unsplash (gratis licens) – se `src/data/photos.ts`. Erstat dem med egne billeder ved at ændre `image.src` i `src/content/ydelser/*.md`.
+- Forsidens 3D-model (`src/components/Model3D.astro` + `src/scripts/bracket3d.ts`, three.js) indlæses kun på computer (≥1024 px), efter siden er færdig, og kun med WebGL. På mobil, med datasparetilstand eller "reducer bevægelse" vises stregtegningen.
+- Ydelsesbillederne er midlertidige fotos fra Unsplash (gratis licens) – se `src/data/photos.ts`. De hentes ved build (`npm run photos`) og ligger lokalt på serveren, så der kaldes ikke eksterne servere før samtykke. Erstat dem med egne billeder ved at ændre `image.src` i `src/content/ydelser/*.md`.
 
-## Deploy
+## Deploy – Simply.com webhotel (automatisk fra GitHub)
 
-### Mulighed A – Simply.com webhotel via FTP
+**Upload ikke hele projektmappen til Simply.** Mappen er kildekode. Webserveren skal kun have det færdigbyggede site (indholdet af `dist/`), og det klarer GitHub automatisk.
 
-1. `npm run build`
-2. Åbn FileZilla (eller anden FTP-klient). FTP-oplysninger findes i Simply.com-kontrolpanelet under **Webhotel → FTP**.
-3. Upload **indholdet** af `dist/` til `public_html/` (ikke selve mappen `dist`). Husk de skjulte filer `.htaccess` og `api/.htaccess`.
-4. Upload `api/config.php` (se ovenfor).
-5. Slå SSL til i kontrolpanelet (Let's Encrypt er gratis hos Simply).
-6. Test: https://procad.dk, http→https, www→uden www, formularen, 404-siden.
+Sådan virker det: Du pusher til `main` → workflowet `.github/workflows/deploy-simply.yml` bygger sitet → uploader kun ændrede filer til `public_html/` via krypteret FTP (FTPS).
 
-Ved opdateringer: byg igen og upload `dist/` igen (overskriv). Slet gamle filer i `_astro/` en gang imellem.
+### Engangsopsætning (ca. 15 min)
 
-### Mulighed B – Vercel eller Netlify med DNS fra Simply.com
+1. **Simply-kontrolpanel → Webhotel → FTP:** notér FTP-server, brugernavn og adgangskode. Opret evt. en separat FTP-bruger kun til deploy.
+2. **GitHub → repoet → Settings → Secrets and variables → Actions:**
+   - Under *Secrets*: `SIMPLY_FTP_HOST`, `SIMPLY_FTP_USER`, `SIMPLY_FTP_PASSWORD`
+   - Under *Variables* (valgfrit):
+     - `SIMPLY_SERVER_DIR`: standard er `./public_html/`. Ret hvis Simply viser en anden webrod, fx `./procad.dk/public_html/`.
+     - `PUBLIC_GTM_ID`
+     - `BLOCK_PLACEHOLDERS=true`: stopper deploy, så længe der står `[UDFYLD]` på sitet. Slå den til før lancering.
+3. **Formularens mailopsætning:** kopiér `public/api/config.sample.php` til `config.php`, udfyld modtager- og afsenderadresse, og upload den **manuelt én gang** via Simplys filhåndtering/FTP til `public_html/api/config.php`. Den ligger aldrig i Git, og deploy overskriver den aldrig.
+4. **Opret mailkontoen** `noreply@procad.dk` hos Simply (bruges som afsender), og tjek at domænets SPF-record inkluderer Simply. Ellers kan tilbudsmails havne i spam.
+5. **Slå SSL til** (Let's Encrypt, gratis) i kontrolpanelet.
+6. GitHub → **Actions → "Deploy til Simply.com" → Run workflow**. Første upload tager et par minutter.
+7. **Test:**
+   - https://procad.dk, at http sendes videre til https, og www til uden www.
+   - Send en tilbudsforespørgsel med en fil på 10–15 MB.
+   - 404-siden.
+   - Mobil og mørkt tema.
+8. **Hvis store filer fejler:** upload en fil `info.php` med `<?php phpinfo();` til `api/`, og tjek `upload_max_filesize`/`post_max_size`. **Slet filen igen bagefter.** Simply tillader normalt de værdier, `public/api/.htaccess` sætter (16M/20M). Ellers ret grænsen i Simply-kontrolpanelet under PHP-indstillinger.
 
-1. Push repoet til GitHub.
-2. **Vercel:** "Add New Project" → vælg repoet → framework Astro registreres automatisk.
-   **Netlify:** "Add new site" → "Import from Git" → `netlify.toml` sørger for resten.
-3. Sæt miljøvariabler (`PUBLIC_GTM_ID`, `PUBLIC_FORM_ENDPOINT`, `PUBLIC_TURNSTILE_SITE_KEY`).
-4. Tilføj domænet `procad.dk` og `www.procad.dk` i Vercel/Netlify.
-5. I Simply.com-kontrolpanelet → **DNS**: ret records som Vercel/Netlify angiver. Typisk:
-   - Vercel: `A @ 76.76.21.21` og `CNAME www cname.vercel-dns.com`
-   - Netlify: `A @ 75.2.60.5` og `CNAME www <dit-site>.netlify.app`
-   (Brug altid de værdier, platformen viser – de kan ændre sig.)
-   **Rør ikke MX-records**, så e-mail hos Simply bliver ved med at virke.
-6. Vent på DNS (minutter til få timer). SSL udstedes automatisk.
-7. Hver gang der pushes til `main`, bygges og udgives sitet automatisk.
+### Hvorfor ikke bare uploade mappen eller hoste lokalt?
 
-### Mulighed C – GitHub Pages (gratis, god til forhåndsvisning)
+- **Hele mappen ville ikke virke.** Der er ingen `index.html` i roden, kun `.astro`-kildefiler.
+- **Det kan lække filer:** `.git`-historik, `.env`, docs og `node_modules` (op til flere hundrede MB).
+- **Lokal hosting** (fra egen pc) kræver, at pc'en altid er tændt. Det giver også fast IP, sikkerhedsopdateringer og ingen SLA. Det er et webhotel til ~30 kr./md. bedre til.
 
-Workflowet `.github/workflows/deploy.yml` bygger og udgiver sitet ved hvert push til `main`.
+### GitHub Pages (kun forhåndsvisning)
 
-1. GitHub → **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Uden eget domæne ligger sitet på `https://sprojekter.github.io/procad.dk/` (base-stien sættes automatisk).
-3. Eget domæne: opret filen `public/CNAME` med indholdet `procad.dk`, og sæt i Simply.com → DNS:
-   `A @ 185.199.108.153`, `A @ 185.199.109.153`, `A @ 185.199.110.153`, `A @ 185.199.111.153` og `CNAME www sprojekter.github.io`.
-   Skriv domænet under Settings → Pages → Custom domain, og slå **Enforce HTTPS** til.
-4. PHP kører ikke på GitHub Pages: sæt formularen til Formspree/Basin under
-   **Settings → Secrets and variables → Actions → Variables** → `PUBLIC_FORM_ENDPOINT`.
-   Samme sted kan `PUBLIC_GTM_ID` og `PUBLIC_TURNSTILE_SITE_KEY` sættes.
+`.github/workflows/deploy.yml` kører kun manuelt (Actions → "Forhåndsvisning (GitHub Pages)" → Run workflow). Forhåndsvisningen er sat til `noindex`, så Google ikke indekserer en kopi. Formularen bruger FormSubmit der (10 MB).
+
+### Vercel/Netlify (alternativ)
+
+`vercel.json` og `netlify.toml` ligger klar. Peg DNS i Simply derhen, men **rør ikke MX-records** (e-mail). Formularen skal så bruge FormSubmit, da PHP ikke kører der.
 
 ## Google Tag Manager, GA4 og Consent Mode v2
 

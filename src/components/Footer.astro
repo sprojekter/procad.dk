@@ -6,20 +6,20 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
 const year = new Date().getFullYear();
 ---
 <footer class="ftr">
-  <div class="container ftr__grid">
+  <div class="wrap ftr__grid">
     <div class="ftr__brand">
       <Logo />
       <p class="ftr__tagline">{site.tagline}</p>
       <p class="muted ftr__desc">CAD-tegninger og teknisk dokumentation til metalbearbejdning. Tegnet i Danmark efter DS/EN ISO.</p>
     </div>
-    <nav aria-label="Ydelser">
+    <nav aria-label="Ydelser" class="ftr__nav">
       <h2 class="ftr__h">Ydelser</h2>
       <ul>
         {services.map((s) => <li><a href={`/ydelser/${s.id}/`}>{s.data.navTitle}</a></li>)}
         <li><a href="/priser/">Priser</a></li>
       </ul>
     </nav>
-    <nav aria-label="ProCAD">
+    <nav aria-label="ProCAD" class="ftr__nav">
       <h2 class="ftr__h">ProCAD</h2>
       <ul>
         <li><a href="/cases/">Cases</a></li>
@@ -37,7 +37,7 @@ const year = new Date().getFullYear();
       </ul>
     </div>
   </div>
-  <div class="container ftr__bottom">
+  <div class="wrap ftr__bottom">
     <p>© {year} ProCAD</p>
     <ul>
       <li><a href="/privatlivspolitik/">Privatlivspolitik</a></li>
@@ -48,6 +48,17 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
+  /* Mobil: navigation ligger i menu-arket i bunden, så footeren viser kun kontakt + jura (mindre scroll) */
+  .ftr__nav { display: none; }
+  @media (min-width: 48rem) { .ftr__nav { display: block; } }
+  @media (max-width: 47.99rem) {
+    .ftr { padding-block: 2.5rem 1.5rem; }
+    .ftr__desc { display: none; }
+    .ftr ul { gap: 0; }
+    .ftr li > a, .ftr__cookie { display: inline-flex; align-items: center; min-height: 2.75rem; }
+    .ftr__bottom { margin-top: 1.5rem; }
+    .ftr__bottom ul { gap: 0 1.25rem; }
+  }
   .ftr { padding-block: 4.5rem 2rem; border-top: 1px solid var(--c-line); background: var(--c-paper); font-size: var(--fs-sm); }
   .ftr__grid { display: grid; gap: 2.5rem; }
   @media (min-width: 48rem) { .ftr__grid { grid-template-columns: 1.6fr 1fr 1fr 1.1fr; } }

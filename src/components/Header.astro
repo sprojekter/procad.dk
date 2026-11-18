@@ -11,7 +11,7 @@ const path = Astro.url.pathname;
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 ---
 <header class="hdr">
-  <div class="container hdr__inner">
+  <div class="wrap hdr__inner">
     <a href="/" class="hdr__logo" aria-label="ProCAD – til forsiden"><Logo /></a>
 
     <nav id="hovedmenu" class="nav" aria-label="Hovedmenu">
@@ -38,7 +38,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
             </ul>
             <div class="mega__foot">
               <span class="muted">Ved du ikke, hvad du skal bruge?</span>
-              <a href="/kontakt/" class="link">Send det, du har</a>
+              <a href="/kontakt/" class="link" data-open-quote>Send det, du har</a>
             </div>
           </div>
         </li>
@@ -51,17 +51,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
       <div class="nav__actions">
         <span class="nav__theme"><ThemeToggle /></span>
         <a href="/kontakt/" class="nav__link nav__contact">Kontakt</a>
-        <a href="/kontakt/" class="btn btn-primary btn-sm">Få et tilbud</a>
+        <a href="/kontakt/" class="btn btn-primary btn-sm" data-open-quote>Få et tilbud</a>
       </div>
     </nav>
 
-    <div class="hdr__mobile">
-      <ThemeToggle />
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="hovedmenu">
-      <span class="sr-only">Menu</span>
-      <span class="menu-toggle__bars" aria-hidden="true"></span>
-    </button>
-    </div>
   </div>
 </header>
 
@@ -70,19 +63,14 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .hdr.is-scrolled { border-bottom-color: var(--c-line); }
   .hdr__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); }
   .hdr__logo :global(svg) { height: 28px; width: auto; }
-  .hdr__mobile { display: flex; align-items: center; gap: .25rem; }
   .nav__theme { display: none; }
+  @media (max-width: 63.99rem) { .hdr__inner { min-height: 3.5rem; } .hdr__logo :global(svg) { height: 24px; } }
 
-  .menu-toggle { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; background: transparent; cursor: pointer; border-radius: 10px; }
-  .menu-toggle__bars, .menu-toggle__bars::before { display: block; width: 18px; height: 1.5px; background: var(--c-ink); position: relative; transition: transform .25s var(--ease); }
-  .menu-toggle__bars::before { content: ""; position: absolute; top: 6px; }
-  .menu-toggle__bars { transform: translateY(-3px); }
-  .menu-toggle[aria-expanded="true"] .menu-toggle__bars { transform: rotate(45deg); }
-  .menu-toggle[aria-expanded="true"] .menu-toggle__bars::before { transform: translateY(-6px) rotate(-90deg); }
-
-  /* Mobil */
-  .nav { display: none; position: absolute; inset: 100% 0 auto 0; background: var(--c-paper); border-bottom: 1px solid var(--c-line); padding: .5rem clamp(1.25rem, 3vw, 2.5rem) 1.5rem; max-height: calc(100dvh - var(--header-h)); overflow-y: auto; }
-  .nav.is-open { display: block; }
+  /* Mobil: kun logo – navigation ligger i bundbjælkens menu-ark */
+  .hdr { transition: transform .3s var(--ease), border-color .2s ease; }
+  .hdr.is-away { transform: translateY(-100%); }
+  @media (min-width: 64rem) { .hdr.is-away { transform: none; } }
+  .nav { display: none; }
   .nav__list { list-style: none; margin: 0; padding: 0; }
   .nav__item { display: flex; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--c-line); }
   .nav__link { flex: 1; display: block; padding: .95rem 0; text-decoration: none; font-size: 1.0625rem; font-weight: 500; color: var(--c-ink); }
@@ -100,9 +88,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .nav__contact { display: none; }
 
   @media (min-width: 64rem) {
-    .hdr__mobile { display: none; }
     .nav__theme { display: inline-flex; }
-    .nav { display: flex; flex: 1; justify-content: space-between; align-items: center; position: static; padding: 0 0 0 2.5rem; border: 0; max-height: none; overflow: visible; background: none; }
+    .nav { display: flex; flex: 1; justify-content: space-between; align-items: center; padding: 0 0 0 2.5rem; }
     .nav__list { display: flex; align-items: center; gap: .25rem; }
     .nav__item { border: 0; position: relative; flex-wrap: nowrap; }
     .nav__link { padding: .45rem .7rem; font-size: .9375rem; font-weight: 450; color: var(--c-muted); border-radius: 8px; transition: color .15s ease; }
@@ -121,16 +108,15 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 <script>
   const hdr = document.querySelector<HTMLElement>('.hdr');
-  const onScroll = () => hdr?.classList.toggle('is-scrolled', window.scrollY > 8);
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    const y = window.scrollY;
+    hdr?.classList.toggle('is-scrolled', y > 8);
+    hdr?.classList.toggle('is-away', y > 120 && y > lastY); // skjul ved scroll ned, vis ved scroll op
+    lastY = y;
+  };
   onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
 
-  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
-  const nav = document.getElementById('hovedmenu');
-  toggle?.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!open));
-    nav?.classList.toggle('is-open', !open);
-  });
   const sub = document.querySelector<HTMLButtonElement>('.nav__subtoggle');
   const mega = document.getElementById('submenu-ydelser');
   sub?.addEventListener('click', () => {
@@ -141,6 +127,5 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (mega?.classList.contains('is-open')) { mega.classList.remove('is-open'); sub?.setAttribute('aria-expanded', 'false'); sub?.focus(); }
-    else if (nav?.classList.contains('is-open')) { nav.classList.remove('is-open'); toggle?.setAttribute('aria-expanded', 'false'); toggle?.focus(); }
   });
 </script>

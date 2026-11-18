@@ -1,9 +1,11 @@
 ---
 // Billede eller pladsholder.
-// - Lokale billeder: læg fx /public/images/cases/beslag-foer.jpg, kør `npm run images`
-//   (laver .avif og .webp ved siden af) og angiv src="/images/cases/beslag-foer.jpg".
-// - Unsplash-URL'er (images.unsplash.com) får automatisk srcset i AVIF/WebP via deres CDN.
-// - Uden src vises en pladsholder med specifikationen.
+// - Lokale billeder i public/ (fx /images/ydelser/arbejdstegninger.webp). Findes en "-800"-version
+//   ved siden af, bruges den til små skærme.
+// - Findes filen ikke ved build, vises en pladsholder med specifikationen (aldrig et ødelagt billede).
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 interface Props {
   src?: string;
   alt: string;
@@ -15,30 +17,26 @@ interface Props {
   class?: string;
 }
 const { src, alt, spec, motif, ratio = '4 / 3', eager = false, sizes = '(min-width: 64rem) 33vw, 100vw', class: cls = '' } = Astro.props;
-const remote = !!src && /^https:\/\/images\.unsplash\.com\//.test(src);
+const pub = (p: string) => join(process.cwd(), 'public', p); // build køres fra projektroden
+const exists = !!src && src.startsWith('/') && existsSync(pub(src));
+const small = exists ? src!.replace(/(\.\w+)$/, '-800$1') : '';
+const hasSmall = exists && existsSync(pub(small));
 const [rw, rh] = ratio.split('/').map((n) => parseFloat(n));
-const u = (w: number) => `${src}?auto=format&fit=crop&q=70&w=${w}&h=${Math.round((w * rh) / rw)}`;
-const base = src?.replace(/\.(jpe?g|png)$/i, '');
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
-{remote ? (
+{exists ? (
   <img
     class:list={['media', cls]}
-    src={u(1200)}
-    srcset={[480, 800, 1200, 1600].map((w) => `${u(w)} ${w}w`).join(', ')}
-    sizes={sizes}
+    src={base + src}
+    srcset={hasSmall ? `${base + small} 800w, ${base + src} 1600w` : undefined}
+    sizes={hasSmall ? sizes : undefined}
     alt={alt}
-    width={1200}
-    height={Math.round((1200 * rh) / rw)}
+    width={1600}
+    height={Math.round((1600 * rh) / rw)}
     loading={eager ? 'eager' : 'lazy'}
     decoding="async"
     style={`aspect-ratio:${ratio}`}
   />
-) : src ? (
-  <picture class={cls}>
-    <source srcset={`${base}.avif`} type="image/avif" />
-    <source srcset={`${base}.webp`} type="image/webp" />
-    <img class="media" src={src} alt={alt} width={1200} height={Math.round((1200 * rh) / rw)} loading={eager ? 'eager' : 'lazy'} decoding="async" style={`aspect-ratio:${ratio}`} />
-  </picture>
 ) : (
   <div class:list={['ph', cls]} style={`aspect-ratio:${ratio}`} role="img" aria-label={`Pladsholder: ${alt}`}>
     <div class="ph__label">

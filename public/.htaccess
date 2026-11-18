@@ -2,6 +2,11 @@
 Options -Indexes
 ErrorDocument 404 /404.html
 
+# Spær interne filer (FTP-deployets statefil, markdown, eksempelkonfiguration)
+<FilesMatch "^(\.ftp-deploy-sync-state\.json|.*\.md|config\.sample\.php)$">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   # Tving HTTPS
@@ -22,13 +27,17 @@ ErrorDocument 404 /404.html
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
-  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
-  <FilesMatch "\.(css|js|woff2?|svg|png|jpe?g|webp|avif|ico|mp4|webm)$">
+  Header always set Strict-Transport-Security "max-age=31536000"
+  # Kun filer med hash i navnet (/_astro/) må caches "for evigt"
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
-  </FilesMatch>
-  <FilesMatch "\.(html|xml|txt)$">
-    Header set Cache-Control "public, max-age=0, must-revalidate"
-  </FilesMatch>
+  </If>
+  <ElseIf "%{REQUEST_URI} =~ m#\.(png|jpe?g|webp|avif|svg|ico|woff2?)$#">
+    Header set Cache-Control "public, max-age=604800"
+  </ElseIf>
+  <Else>
+    Header set Cache-Control "no-cache"
+  </Else>
 </IfModule>
 
 <IfModule mod_deflate.c>

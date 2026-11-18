@@ -16,7 +16,7 @@ const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.dat
     lead="Hver case viser udgangspunktet, det jeg leverede, og hvad det betød for kunden. Kundenavne vises kun med tilladelse."
   />
   <section class="section section--tight">
-    <div class="container">
+    <div class="wrap">
       <div class="case-grid">
         {cases.map((c) => <CaseCard entry={c} headingLevel="h2" />)}
       </div>
@@ -26,7 +26,7 @@ const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.dat
 </BaseLayout>
 
 <style>
-  .case-grid { display: grid; gap: 1.5rem; }
+  .case-grid { display: grid; gap: 1rem; }
   @media (min-width: 48rem) { .case-grid { grid-template-columns: 1fr 1fr; } }
   @media (min-width: 72rem) { .case-grid { grid-template-columns: repeat(3, 1fr); } }
 </style>

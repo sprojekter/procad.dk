@@ -15,7 +15,7 @@
       </form>
     </div>
     <div class="cookie__actions">
-      <button type="button" class="btn btn-primary btn-sm" data-consent="all">Accepter alle</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-consent="all">Accepter alle</button>
       <button type="button" class="btn btn-secondary btn-sm" data-consent="necessary">Kun nødvendige</button>
       <button type="button" class="btn btn-secondary btn-sm" data-consent="toggle" aria-expanded="false" aria-controls="cookie-prefs">Vælg selv</button>
       <button type="button" class="btn btn-secondary btn-sm" data-consent="save" hidden>Gem mit valg</button>
@@ -61,7 +61,6 @@
       (prefs.elements.namedItem('marketing') as HTMLInputElement).checked = c.marketing;
     }
     banner.hidden = false;
-    btn('all')?.focus();
   }
 
   if (!read()) open();

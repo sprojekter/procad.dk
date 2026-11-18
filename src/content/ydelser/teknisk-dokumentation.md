@@ -23,7 +23,7 @@ deliverables:
   - PDF-pakker til kunder og underleverandører
 formats: [PDF, XLSX, CSV, DWG]
 image:
-  src: https://images.unsplash.com/photo-1769152683420-f4eff91cb30b
+  src: /images/ydelser/teknisk-dokumentation.webp
   alt: Metalkomponenter på tekniske tegninger
   spec: 3:2, 1600×1067 px, JPG/PNG
   motif: Print af en samlingstegning med eksploderet visning, positionsnumre og stykliste, lagt på et bord med en ringbind-mappe

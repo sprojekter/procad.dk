@@ -131,30 +131,41 @@ export function initBracket(root: HTMLElement) {
   ground.receiveShadow = true;
   scene.add(ground);
 
+  // Forudberegn bukket i STEPS trin (0 = fladt, STEPS = 90°), så intet bygges om under animationen.
+  const STEPS = 36;
   const box = new THREE.Box3();
   const center = new THREE.Vector3();
   const size = new THREE.Vector3();
-
-  function setFold(theta: number) {
-    bendGroup.children.forEach((c) => {
-      const o = c as THREE.Mesh;
-      o.geometry.dispose();
-    });
-    bendGroup.clear();
+  type Frame = { mesh: THREE.Mesh; edges: THREE.LineSegments; ox: number; oy: number; cx: number; cz: number; minY: number; h: number };
+  const frames: Frame[] = [];
+  for (let i = 0; i <= STEPS; i++) {
+    const theta = (i / STEPS) * (Math.PI / 2);
     const b = bend(theta);
-    addMesh(b.geo, bendGroup);
+    const [mesh, edges] = addMesh(b.geo, bendGroup);
     flange.position.set(b.ox, b.oy, 0);
     flange.rotation.z = -theta;
-    bendLineMat.opacity = Math.max(0, 1 - theta / (Math.PI / 4)) * 0.9;
-
-    // Centrér emnet over jorden
     part.position.set(0, 0, 0);
+    bendGroup.children.forEach((c) => (c.visible = c === mesh || c === edges));
     box.setFromObject(part);
     box.getCenter(center);
     box.getSize(size);
-    part.position.set(-center.x, -box.min.y, -center.z);
+    frames.push({ mesh, edges, ox: b.ox, oy: b.oy, cx: center.x, cz: center.z, minY: box.min.y, h: size.y });
+  }
+
+  let shown = -1;
+  function setFold(t: number) {
+    // t: 0 (fladt) … 1 (bukket)
+    const i = Math.round(t * STEPS);
+    if (i === shown) return;
+    shown = i;
+    const f = frames[i];
+    bendGroup.children.forEach((c) => (c.visible = c === f.mesh || c === f.edges));
+    flange.position.set(f.ox, f.oy, 0);
+    flange.rotation.z = -(i / STEPS) * (Math.PI / 2);
+    bendLineMat.opacity = Math.max(0, 1 - (i / STEPS) * 2) * 0.9;
+    part.position.set(-f.cx, -f.minY, -f.cz);
     ground.position.y = -0.01;
-    controls.target.set(0, size.y * 0.4, 0);
+    controls.target.set(0, f.h * 0.4, 0);
   }
 
   // Kamera og kontrol
@@ -177,55 +188,59 @@ export function initBracket(root: HTMLElement) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    kick();
   };
   new ResizeObserver(resize).observe(stage);
   resize();
 
-  // Fold-animation
+  // Fold-animation: én intro (fold ud og tilbage), derefter kun når brugeren vælger.
   let fold = 1; // 1 = bukket, 0 = udfoldet
   let target = 1;
-  let auto = !reduce;
-  let lastSwitch = performance.now();
+  const intro = reduce ? [] : [0, 1];
+  let introAt = performance.now() + 1200;
   const buttons = root.querySelectorAll<HTMLButtonElement>('[data-fold]');
   const setTarget = (t: number) => {
     target = t;
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.fold) === t)));
+    kick();
   };
-  buttons.forEach((b) => b.addEventListener('click', () => { auto = false; setTarget(Number(b.dataset.fold)); }));
-  const stopAuto = () => { auto = false; controls.autoRotate = false; root.classList.add('is-touched'); };
-  canvas.addEventListener('pointerdown', stopAuto, { once: true });
+  buttons.forEach((b) => b.addEventListener('click', () => { intro.length = 0; setTarget(Number(b.dataset.fold)); }));
+  canvas.addEventListener('pointerdown', () => { intro.length = 0; controls.autoRotate = false; root.classList.add('is-touched'); }, { once: true });
+  window.setTimeout(() => { controls.autoRotate = false; }, 9000); // drej kun i starten
 
   // Kantfarve følger temaet
-  new MutationObserver(() => edgeMat.color.copy(cssColor('--c-ink', '#0e0e10')))
+  new MutationObserver(() => { edgeMat.color.copy(cssColor('--c-ink', '#0e0e10')); kick(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  setFold(Math.PI / 2);
+  setFold(1);
 
-  // Render kun når modellen er synlig og fanen er aktiv
+  // Tegn kun når noget ændrer sig (sparer CPU/batteri)
   let visible = true;
-  new IntersectionObserver((es) => { visible = es.some((e) => e.isIntersecting); if (visible) loop(); }).observe(root);
   let raf = 0;
   let prev = performance.now();
-  function loop() {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame((now) => {
-      const dt = Math.min(0.05, (now - prev) / 1000);
-      prev = now;
-      if (auto && now - lastSwitch > 3800) { setTarget(target ? 0 : 1); lastSwitch = now; }
-      if (Math.abs(fold - target) > 0.001) {
-        const k = reduce ? 1 : 1 - Math.pow(0.002, dt); // blød easing
-        fold += (target - fold) * k;
-        if (Math.abs(fold - target) < 0.002) fold = target;
-        setFold(fold * (Math.PI / 2));
-      }
-      controls.update();
-      renderer.render(scene, camera);
-      if (visible && !document.hidden) loop();
-    });
+  new IntersectionObserver((es) => { visible = es.some((e) => e.isIntersecting); if (visible) kick(); }).observe(root);
+  controls.addEventListener('change', () => kick());
+  function kick() { if (!raf) { prev = performance.now(); raf = requestAnimationFrame(frame); } }
+  function frame(now: number) {
+    raf = 0;
+    const dt = Math.min(0.05, (now - prev) / 1000);
+    prev = now;
+    if (intro.length && now > introAt && Math.abs(fold - target) < 0.001) { setTarget(intro.shift()!); introAt = now + 2200; }
+    let moving = false;
+    if (Math.abs(fold - target) > 0.001) {
+      fold += (target - fold) * (reduce ? 1 : 1 - Math.pow(0.004, dt));
+      if (Math.abs(fold - target) < 0.004) fold = target;
+      setFold(fold);
+      moving = true;
+    }
+    const changed = controls.update();
+    renderer.render(scene, camera);
+    if (visible && !document.hidden && (moving || changed || controls.autoRotate || intro.length)) kick();
   }
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && visible) loop(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
 
   renderer.render(scene, camera);
+  pmrem.dispose();
   requestAnimationFrame(() => root.classList.add('is-ready'));
-  loop();
+  kick();
 }

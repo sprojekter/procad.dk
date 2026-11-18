@@ -3,7 +3,7 @@
 
 export const site = {
   name: 'ProCAD',
-  url: 'https://procad.dk',
+  url: 'https://procad.dk', // canonical peger altid på det rigtige domæne
   tagline: 'Lad dine idéer blive til virkelighed',
   description:
     'Produktionsklare CAD-tegninger, DXF/STEP-filer og teknisk dokumentation til metalbearbejdning. Fast pris og svar inden for 24 timer.',
