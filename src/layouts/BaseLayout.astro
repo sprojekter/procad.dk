@@ -41,9 +41,6 @@ const orgSchema = {
   areaServed: { '@type': 'Country', name: 'Danmark' },
   address: {
     '@type': 'PostalAddress',
-    streetAddress: site.address.street,
-    postalCode: site.address.postalCode,
-    addressLocality: site.address.city,
     addressCountry: site.address.country,
   },
   founder: { '@type': 'Person', name: site.owner.name, jobTitle: site.owner.role },

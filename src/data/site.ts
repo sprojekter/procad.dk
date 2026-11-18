@@ -9,14 +9,11 @@ export const site = {
     'Produktionsklare CAD-tegninger, DXF/STEP-filer og teknisk dokumentation til metalbearbejdning. Fast pris og svar inden for 24 timer.',
 
   email: 'kontakt@procad.dk', // [UDFYLD] bekræft adresse
-  phone: '+45 00 00 00 00', // [UDFYLD]
-  phoneHref: 'tel:+4500000000', // [UDFYLD]
-  cvr: '[UDFYLD: CVR-nr.]',
+  phone: '42 71 22 71',
+  phoneHref: 'tel:+4542712271',
+  cvr: '35272089',
+  // Adressen vises bevidst ikke på sitet (privat bopæl). Kun land bruges i schema.
   address: {
-    street: '[UDFYLD: Adresse]',
-    postalCode: '[UDFYLD]',
-    city: '[UDFYLD: By]',
-    region: '[UDFYLD: Region]',
     country: 'DK',
   },
   owner: {
