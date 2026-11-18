@@ -1,9 +1,11 @@
-# Forhåndsvisning på GitHub Pages (sprojekter.github.io/procad.dk/) – kun manuelt.
+# Forhåndsvisning på GitHub Pages (sprojekter.github.io/procad.dk/) – opdateres ved hvert push til main.
 # Den rigtige side bygges af deploy-simply.yml. Forhåndsvisningen er noindex.
-# Kør: Actions → "Forhåndsvisning (GitHub Pages)" → Run workflow.
+# Kræver: Settings → Pages → Source: GitHub Actions.
 name: Forhåndsvisning (GitHub Pages)
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

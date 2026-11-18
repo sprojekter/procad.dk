@@ -1,5 +1,6 @@
 # Bygger sitet til procad.dk og uploader indholdet af dist/ til Simply.com via FTPS.
-# Kører ved hvert push til main (og manuelt under Actions).
+# Kører KUN manuelt: Actions → "Deploy til Simply.com" → Run workflow → skriv UDGIV.
+# (Ikke automatisk ved push, så intet går live, før kunden har godkendt.)
 #
 # Opsætning (én gang) – GitHub → Settings → Secrets and variables → Actions:
 #   Secrets:   SIMPLY_FTP_HOST, SIMPLY_FTP_USER, SIMPLY_FTP_PASSWORD  (fra Simply-kontrolpanelet → FTP)
@@ -8,9 +9,11 @@
 name: Deploy til Simply.com
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Skriv UDGIV for at lægge sitet live på procad.dk'
+        required: true
 
 concurrency:
   group: simply
@@ -21,6 +24,7 @@ permissions:
 
 jobs:
   deploy:
+    if: ${{ inputs.confirm == 'UDGIV' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

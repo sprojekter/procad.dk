@@ -109,7 +109,7 @@ Sitet følger brugerens systemindstilling (lyst/mørkt) og har en temaknap i hea
 
 **Upload ikke hele projektmappen til Simply.** Mappen er kildekode. Webserveren skal kun have det færdigbyggede site (indholdet af `dist/`), og det klarer GitHub automatisk.
 
-Sådan virker det: Du pusher til `main` → workflowet `.github/workflows/deploy-simply.yml` bygger sitet → uploader kun ændrede filer til `public_html/` via krypteret FTP (FTPS).
+Sådan virker det: Når kunden har godkendt, kører du **Actions → "Deploy til Simply.com" → Run workflow** og skriver `UDGIV`. Workflowet `.github/workflows/deploy-simply.yml` bygger sitet og uploader kun ændrede filer til `public_html/` via krypteret FTP (FTPS). Almindelige push opdaterer kun forhåndsvisningen på GitHub Pages – intet går live af sig selv.
 
 ### Engangsopsætning (ca. 15 min)
 
@@ -123,7 +123,7 @@ Sådan virker det: Du pusher til `main` → workflowet `.github/workflows/deploy
 3. **Formularens mailopsætning:** kopiér `public/api/config.sample.php` til `config.php`, udfyld modtager- og afsenderadresse, og upload den **manuelt én gang** via Simplys filhåndtering/FTP til `public_html/api/config.php`. Den ligger aldrig i Git, og deploy overskriver den aldrig.
 4. **Opret mailkontoen** `noreply@procad.dk` hos Simply (bruges som afsender), og tjek at domænets SPF-record inkluderer Simply. Ellers kan tilbudsmails havne i spam.
 5. **Slå SSL til** (Let's Encrypt, gratis) i kontrolpanelet.
-6. GitHub → **Actions → "Deploy til Simply.com" → Run workflow**. Første upload tager et par minutter.
+6. GitHub → **Actions → "Deploy til Simply.com" → Run workflow**, skriv `UDGIV`. Første upload tager et par minutter.
 7. **Test:**
    - https://procad.dk, at http sendes videre til https, og www til uden www.
    - Send en tilbudsforespørgsel med en fil på 10–15 MB.
@@ -139,7 +139,7 @@ Sådan virker det: Du pusher til `main` → workflowet `.github/workflows/deploy
 
 ### GitHub Pages (kun forhåndsvisning)
 
-`.github/workflows/deploy.yml` kører kun manuelt (Actions → "Forhåndsvisning (GitHub Pages)" → Run workflow). Forhåndsvisningen er sat til `noindex`, så Google ikke indekserer en kopi. Formularen bruger FormSubmit der (10 MB).
+`.github/workflows/deploy.yml` opdaterer forhåndsvisningen ved hvert push til `main` (kræver Settings → Pages → Source: **GitHub Actions**). Forhåndsvisningen er sat til `noindex`, så Google ikke indekserer en kopi. Formularen bruger FormSubmit der (10 MB).
 
 ### Vercel/Netlify (alternativ)
 
