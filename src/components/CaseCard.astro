@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Media from './Media.astro';
+interface Props { entry: CollectionEntry<'cases'>; headingLevel?: 'h2' | 'h3' }
+const { entry, headingLevel = 'h3' } = Astro.props;
+const d = entry.data;
+const H = headingLevel;
+---
+<article class="case-card">
+  <a href={`/cases/${entry.id}/`} class="case-card__link">
+    <div class="case-card__pair">
+      <div class="case-card__half">
+        <Media src={d.before.src} alt={d.before.alt} spec={d.before.spec} ratio="4 / 3" />
+        <span class="case-card__tag mono">Før</span>
+      </div>
+      <div class="case-card__half">
+        <Media src={d.after.src} alt={d.after.alt} spec={d.after.spec} ratio="4 / 3" />
+        <span class="case-card__tag case-card__tag--after mono">Efter</span>
+      </div>
+    </div>
+    <div class="case-card__body">
+      <p class="mono muted">{d.industry}{d.example && ' (eksempel)'}</p>
+      <H class="case-card__title">{d.title}</H>
+      <p>{d.summary}</p>
+      <span class="link">Læs casen</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .case-card { border: 2px solid #000; background: #fff; }
+  .case-card__link { display: grid; text-decoration: none; color: inherit; height: 100%; }
+  .case-card__pair { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid #000; }
+  .case-card__half { position: relative; }
+  .case-card__half + .case-card__half { border-left: 2px solid #000; }
+  .case-card__half :global(.ph__label) { font-size: 10px; }
+  .case-card__half :global(.ph__label span) { display: none; }
+  .case-card__tag { position: absolute; top: .5rem; left: .5rem; background: #fff; border: 1px solid #000; padding: .1rem .45rem; font-size: var(--fs-xs); }
+  .case-card__tag--after { background: var(--c-orange); }
+  .case-card__body { padding: 1.25rem; display: grid; gap: .6rem; align-content: start; }
+  .case-card__title { font-size: var(--fs-xl); }
+  .case-card__link:hover .link { text-decoration-thickness: 4px; }
+  .case-card__link:hover { box-shadow: var(--shadow-hard-orange); }
+</style>

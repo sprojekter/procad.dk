@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Media from '../components/Media.astro';
+import CTASection from '../components/CTASection.astro';
+import { site } from '../data/site';
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.owner.name,
+  jobTitle: site.owner.role,
+  worksFor: { '@id': `${site.url}/#organization` },
+  image: `${site.url}/images/om/portraet.jpg`,
+};
+---
+<BaseLayout
+  title="Om ProCAD – CAD-tegner med baggrund fra værkstedet"
+  description="ProCAD er en dansk enkeltmandsvirksomhed, der laver CAD-tegninger og teknisk dokumentation til metalbearbejdning. Mød tegneren bag."
+  schema={[personSchema]}
+>
+  <PageHeader
+    crumbs={[{ label: 'Om', href: '/om/' }]}
+    title="Jeg ved, hvad der sker med tegningen, når den rammer værkstedet"
+    lead={`ProCAD er ${site.owner.firstName} – én tegner, én kontaktperson og et ansvar for, at tegningerne kan bruges i produktionen.`}
+  />
+
+  <section class="section">
+    <div class="container about">
+      <div class="about__photo">
+        <Media
+          alt={`Portræt af ${site.owner.name}, indehaver af ProCAD`}
+          spec="4:5, 1200×1500 px, JPG – rigtigt foto (ikke AI)"
+          motif="Ejeren i arbejdstøj ved en kantpresser eller arbejdsbænk, kigger mod kameraet, naturligt lys"
+          ratio="4 / 5"
+        />
+        <dl class="titleblock about__tb">
+          <dt>Navn</dt><dd>{site.owner.name}</dd>
+          <dt>Rolle</dt><dd>{site.owner.role}</dd>
+          <dt>Baggrund</dt><dd>[UDFYLD: fx Uddannet smed, 12 år på værksted]</dd>
+          <dt>Software</dt><dd>{site.software.join(', ')}</dd>
+        </dl>
+      </div>
+      <div class="prose">
+        <h2>Fra værkstedsgulvet til tegnebordet</h2>
+        <p>[UDFYLD: Fortæl din historie med dine egne ord. Fx: Jeg startede som lærling hos …, har arbejdet med laser, kantbuk og svejsning i X år, og har set, hvad der sker, når en tegning mangler et mål eller en tolerance.]</p>
+        <p>Den erfaring bruger jeg hver dag. Når jeg tegner, tænker jeg på, hvordan emnet skal skæres, bukkes, spændes op og kontrolleres. Derfor sætter jeg mål ud fra produktionen, og jeg spørger hellere én gang for meget end at sende en tegning, der skal rettes på gulvet.</p>
+
+        <h2>Hvorfor ProCAD</h2>
+        <p>[UDFYLD: Hvorfor startede du ProCAD? Fx: Jeg så mange værksteder vente på tegninger – eller lave dem selv om aftenen.] {site.tagline}: det er det, jeg hjælper med.</p>
+
+        <h2>Det kan du forvente</h2>
+        <ul>
+          <li><strong>Én kontaktperson.</strong> Du taler med den, der tegner – på dansk.</li>
+          <li><strong>Svar inden for 24 timer</strong> på hverdage, også hvis svaret er nej.</li>
+          <li><strong>Fast pris</strong> før jeg går i gang.</li>
+          <li><strong>Danske standarder</strong> og gerne jeres egen tegningsramme.</li>
+          <li><strong>Fortrolighed.</strong> NDA, hvis du har brug for det.</li>
+        </ul>
+
+        <h2>Uddannelse og erfaring</h2>
+        <table>
+          <thead><tr><th>År</th><th>Hvad</th></tr></thead>
+          <tbody>
+            <tr><td>[UDFYLD]</td><td>[UDFYLD: Uddannelse, fx smed / maskinarbejder / maskintekniker]</td></tr>
+            <tr><td>[UDFYLD]</td><td>[UDFYLD: Arbejdsplads og rolle]</td></tr>
+            <tr><td>[UDFYLD]</td><td>[UDFYLD: Kurser/certificeringer, fx SolidWorks CSWA]</td></tr>
+            <tr><td>2026</td><td>Starter ProCAD</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <CTASection heading={`Skriv direkte til ${site.owner.firstName}`} text="Send en fil, en skitse eller bare et spørgsmål. Du får svar inden for 24 timer på hverdage." />
+</BaseLayout>
+
+<style>
+  .about { display: grid; gap: 3rem; }
+  @media (min-width: 56rem) { .about { grid-template-columns: 1fr 1.5fr; gap: 4rem; align-items: start; } }
+  .about__photo { display: grid; gap: 1rem; }
+  @media (min-width: 56rem) { .about__photo { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
+  .about .prose h2:first-child { margin-top: 0; }
+</style>

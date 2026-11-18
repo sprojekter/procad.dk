@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { site } from '../data/site';
+const updated = '[UDFYLD: dato]';
+---
+<BaseLayout title="Privatlivspolitik | ProCAD" description="Sådan behandler ProCAD dine personoplysninger og de filer, du sender, når du beder om et tilbud.">
+  <PageHeader crumbs={[{ label: 'Privatlivspolitik', href: '/privatlivspolitik/' }]} title="Privatlivspolitik" lead={`Senest opdateret: ${updated}`} />
+  <section class="section">
+    <div class="container prose">
+      <p><em>Skabelon – skal gennemgås af ejeren før lancering. Det er ikke juridisk rådgivning.</em></p>
+
+      <h2>Dataansvarlig</h2>
+      <p>ProCAD, CVR {site.cvr}, {site.address.street}, {site.address.postalCode} {site.address.city}. E-mail: <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+
+      <h2>Hvilke oplysninger jeg behandler</h2>
+      <ul>
+        <li><strong>Kontaktoplysninger</strong> du skriver i formularen: navn, firma, e-mail og telefon.</li>
+        <li><strong>Oplysninger om opgaven</strong>: beskrivelse, ønsket dato og de filer, du uploader.</li>
+        <li><strong>Tekniske oplysninger</strong> om dit besøg (fx side, browser, omtrentlig placering) – kun hvis du har sagt ja til statistik- eller marketingcookies.</li>
+      </ul>
+
+      <h2>Formål og retsgrundlag</h2>
+      <ul>
+        <li>At besvare din forespørgsel og give et tilbud – GDPR art. 6, stk. 1, litra b (forberedelse af en aftale).</li>
+        <li>At løse opgaven og fakturere – litra b og c (bogføringsloven).</li>
+        <li>Statistik og annoncemåling – litra a (dit samtykke), som du kan trække tilbage via <em>Cookie-indstillinger</em> nederst på siden.</li>
+      </ul>
+
+      <h2>Dine filer og tegninger</h2>
+      <p>Filer, du sender, bruges kun til at vurdere og løse din opgave. De deles ikke med andre og behandles fortroligt. Ønsker du en fortrolighedsaftale (NDA), skriver jeg gerne under.</p>
+
+      <h2>Hvor længe oplysningerne gemmes</h2>
+      <ul>
+        <li>Forespørgsler, der ikke bliver til en opgave: slettes efter [UDFYLD: fx 12 måneder].</li>
+        <li>Opgaver og fakturaer: gemmes i 5 år efter regnskabsårets udløb (bogføringsloven).</li>
+        <li>Tegninger og filer: gemmes efter aftale med dig [UDFYLD].</li>
+      </ul>
+
+      <h2>Databehandlere</h2>
+      <p>Jeg bruger leverandører til at drive sitet og min e-mail. De behandler kun oplysninger efter mine instrukser: [UDFYLD: fx Simply.com (hosting og e-mail), Google (Analytics/Ads – kun med samtykke), Formspree/Basin hvis brugt, Cloudflare Turnstile hvis brugt].</p>
+
+      <h2>Dine rettigheder</h2>
+      <p>Du har ret til indsigt, berigtigelse, sletning, begrænsning, dataportabilitet og til at gøre indsigelse. Skriv til <a href={`mailto:${site.email}`}>{site.email}</a>. Du kan klage til Datatilsynet, <a href="https://www.datatilsynet.dk" rel="noopener">datatilsynet.dk</a>.</p>
+    </div>
+  </section>
+</BaseLayout>

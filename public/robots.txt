@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /tak/
+
+Sitemap: https://procad.dk/sitemap-index.xml

@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+---
+<BaseLayout title="Cookiepolitik | ProCAD" description="Hvilke cookies procad.dk bruger, hvorfor, og hvordan du ændrer dit samtykke.">
+  <PageHeader crumbs={[{ label: 'Cookiepolitik', href: '/cookiepolitik/' }]} title="Cookiepolitik" lead="Senest opdateret: [UDFYLD: dato]" />
+  <section class="section">
+    <div class="container prose">
+      <p><em>Skabelon – gennemgå listen, når Google Tag Manager er sat op, så den passer til de cookies, der faktisk sættes.</em></p>
+      <h2>Hvad er cookies?</h2>
+      <p>Cookies er små tekstfiler, som gemmes i din browser. procad.dk sætter kun cookies til statistik og marketing, hvis du siger ja.</p>
+
+      <h2>Sådan ændrer du dit samtykke</h2>
+      <p><button type="button" class="btn btn-secondary btn-sm" data-cookie-settings>Åbn cookie-indstillinger</button></p>
+
+      <h2>Cookies og lagring på sitet</h2>
+      <table>
+        <thead><tr><th>Navn</th><th>Udbyder</th><th>Formål</th><th>Kategori</th><th>Udløb</th></tr></thead>
+        <tbody>
+          <tr><td>procad-consent</td><td>procad.dk</td><td>Husker dit cookievalg (localStorage)</td><td>Nødvendig</td><td>Indtil du sletter det</td></tr>
+          <tr><td>_ga, _ga_*</td><td>Google Analytics</td><td>Skelner mellem besøgende og måler brugen af sitet</td><td>Statistik</td><td>2 år</td></tr>
+          <tr><td>_gcl_au</td><td>Google Ads</td><td>Måler konverteringer fra annoncer</td><td>Marketing</td><td>90 dage</td></tr>
+          <tr><td>[UDFYLD]</td><td>Cloudflare Turnstile</td><td>Spambeskyttelse af formularen (kun hvis aktiveret)</td><td>Nødvendig</td><td>Session</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Google Consent Mode</h2>
+      <p>Sitet bruger Google Consent Mode v2. Indtil du har givet samtykke, indlæses Google Tag Manager ikke, og der sættes ingen statistik- eller marketingcookies.</p>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,47 @@
+// Centrale oplysninger om ProCAD. Ret her – så opdateres hele sitet.
+// Alt markeret [UDFYLD] skal ejeren levere/bekræfte før lancering.
+
+export const site = {
+  name: 'ProCAD',
+  url: 'https://procad.dk',
+  tagline: 'Lad dine idéer blive til virkelighed',
+  description:
+    'Produktionsklare CAD-tegninger, DXF/STEP-filer og teknisk dokumentation til metalbearbejdning. Fast pris og svar inden for 24 timer.',
+
+  email: 'kontakt@procad.dk', // [UDFYLD] bekræft adresse
+  phone: '+45 00 00 00 00', // [UDFYLD]
+  phoneHref: 'tel:+4500000000', // [UDFYLD]
+  cvr: '[UDFYLD: CVR-nr.]',
+  address: {
+    street: '[UDFYLD: Adresse]',
+    postalCode: '[UDFYLD]',
+    city: '[UDFYLD: By]',
+    region: '[UDFYLD: Region]',
+    country: 'DK',
+  },
+  owner: {
+    name: '[UDFYLD: Fornavn Efternavn]',
+    firstName: '[UDFYLD: Fornavn]',
+    role: 'Indehaver og CAD-tegner',
+  },
+  linkedin: '', // [UDFYLD] fx https://www.linkedin.com/company/procad-dk
+
+  // [UDFYLD] Bekræft hvilke programmer der faktisk bruges
+  software: ['SolidWorks', 'Inventor', 'AutoCAD'],
+  formatsIn: ['PDF', 'DXF', 'DWG', 'STEP', 'IGES', 'Skitse/foto'],
+  formatsOut: ['PDF', 'DXF', 'DWG', 'STEP', 'IGES'],
+  responseHours: 24,
+
+  formEndpoint: import.meta.env.PUBLIC_FORM_ENDPOINT || '/api/tilbud.php',
+  turnstileSiteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '',
+  gtmId: import.meta.env.PUBLIC_GTM_ID || '',
+};
+
+export const mainNav = [
+  { href: '/cases/', label: 'Cases' },
+  { href: '/proces/', label: 'Proces' },
+  { href: '/priser/', label: 'Priser' },
+  { href: '/om/', label: 'Om' },
+  { href: '/faq/', label: 'FAQ' },
+  { href: '/kontakt/', label: 'Kontakt' },
+];

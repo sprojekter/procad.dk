@@ -1,0 +1,279 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ProCAD design tokens
+   Se docs/03-design-tokens.md for begrundelser og kontrastværdier.
+   ============================================================ */
+@theme {
+  --color-orange: #ff7621;
+  --color-black: #000000;
+  --color-graphite: #111111;
+  --color-white: #ffffff;
+  --color-paper: #f4f4f2;
+  --color-rule: #dcdcd6;
+  --color-steel: #55595d;
+  --color-steel-light: #a9adb1;
+
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+
+:root {
+  --c-orange: #ff7621;
+  --c-black: #000;
+  --c-graphite: #111111;
+  --c-white: #fff;
+  --c-paper: #f4f4f2;
+  --c-rule: #dcdcd6;
+  --c-grid: #e6e6e1;
+  --c-steel: #55595d;
+  --c-steel-light: #a9adb1;
+
+  /* Typeskala ~1.25 (major third), afrundet */
+  --fs-xs: 0.8125rem;   /* 13 */
+  --fs-sm: 0.9375rem;   /* 15 */
+  --fs-base: 1.0625rem; /* 17 */
+  --fs-lg: 1.25rem;     /* 20 */
+  --fs-xl: 1.5rem;      /* 24 */
+  --fs-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
+  --fs-3xl: clamp(2.125rem, 1.6rem + 2.4vw, 3.25rem);
+  --fs-4xl: clamp(2.625rem, 1.7rem + 4.2vw, 4.75rem);
+
+  /* Spacing (4 px-basis) */
+  --sp-1: 0.25rem; --sp-2: 0.5rem; --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-6: 1.5rem; --sp-8: 2rem; --sp-12: 3rem; --sp-16: 4rem;
+  --sp-24: 6rem; --sp-32: 8rem;
+  --section-y: clamp(4rem, 3rem + 5vw, 7.5rem);
+
+  /* Radius: tegninger har skarpe hjørner. Kun formfelter får 2 px. */
+  --radius-none: 0;
+  --radius-field: 2px;
+
+  /* Skygge: hård forskudt skygge som logoets tykke konturer – ingen bløde skygger */
+  --shadow-hard: 4px 4px 0 0 #000;
+  --shadow-hard-orange: 4px 4px 0 0 var(--c-orange);
+
+  --stroke: 2px;
+  --stroke-heavy: 3px;
+  --header-h: 4.5rem;
+  --measure: 68ch;
+}
+
+/* ---------- Grundlag ---------- */
+@layer base {
+  html { scroll-padding-top: calc(var(--header-h) + 1rem); -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--fs-base);
+    line-height: 1.6;
+    color: var(--c-graphite);
+    background: var(--c-white);
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    color: var(--c-black);
+  }
+  h1 { font-size: var(--fs-4xl); }
+  h2 { font-size: var(--fs-3xl); }
+  h3 { font-size: var(--fs-xl); line-height: 1.1; font-weight: 600; }
+  p { text-wrap: pretty; }
+  a { color: inherit; }
+  img, svg, video { display: block; max-width: 100%; height: auto; }
+  ::selection { background: var(--c-orange); color: #000; }
+
+  :focus-visible {
+    outline: 3px solid var(--c-black);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px var(--c-orange);
+  }
+  .on-dark :focus-visible { outline-color: var(--c-orange); box-shadow: none; }
+}
+
+/* ---------- Layout ---------- */
+@layer components {
+  .container { width: 100%; max-width: 76rem; margin-inline: auto; padding-inline: clamp(1rem, 0.5rem + 3vw, 2.5rem); }
+  .section { padding-block: var(--section-y); }
+  .section--tight { padding-block: calc(var(--section-y) * 0.6); }
+  .measure { max-width: var(--measure); }
+  .lead { font-size: var(--fs-lg); line-height: 1.5; color: var(--c-graphite); max-width: 60ch; }
+  .muted { color: var(--c-steel); }
+  .mono { font-family: var(--font-mono); font-size: var(--fs-sm); letter-spacing: 0; }
+  .skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 100; background: #000; color: #fff; padding: .75rem 1rem; }
+  .skip-link:focus { top: 1rem; }
+
+  .bg-paper { background: var(--c-paper); }
+  .bg-dark { background: var(--c-graphite); color: #e9e9e6; }
+  .bg-dark h1, .bg-dark h2, .bg-dark h3 { color: #fff; }
+  .bg-dark .muted { color: var(--c-steel-light); }
+
+  /* Tegningspapir: fint gitter med kraftigere linje hver 5. felt */
+  .grid-paper {
+    background-color: var(--c-paper);
+    background-image:
+      linear-gradient(var(--c-rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--c-rule) 1px, transparent 1px),
+      linear-gradient(var(--c-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+    background-position: -1px -1px;
+  }
+
+  /* Overskrift-gruppe: målepil-linje under kicker-tekst */
+  .kicker {
+    display: inline-flex; align-items: center; gap: .75rem;
+    font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--c-steel);
+    margin-bottom: var(--sp-4);
+  }
+  .kicker::before {
+    content: ""; width: 2.5rem; height: 2px; background: var(--c-orange);
+  }
+  .bg-dark .kicker { color: var(--c-steel-light); }
+
+  /* ---------- Knapper ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+    min-height: 3rem; padding: .75rem 1.375rem;
+    font-family: var(--font-sans); font-weight: 700; font-size: 1rem; line-height: 1.2;
+    text-decoration: none; border: var(--stroke) solid var(--c-black);
+    border-radius: 0; cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+  }
+  .btn-primary { background: var(--c-orange); color: var(--c-black); }
+  .btn-primary:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-hard); }
+  .btn-secondary { background: var(--c-white); color: var(--c-black); }
+  .btn-secondary:hover { background: var(--c-black); color: var(--c-white); }
+  .bg-dark .btn-primary { border-color: var(--c-orange); }
+  .bg-dark .btn-primary:hover { box-shadow: 4px 4px 0 0 #fff; }
+  .bg-dark .btn-secondary { background: transparent; color: #fff; border-color: #fff; }
+  .bg-dark .btn-secondary:hover { background: #fff; color: #000; }
+  .btn-sm { min-height: 2.5rem; padding: .5rem 1rem; font-size: .9375rem; }
+  .btn-block { width: 100%; }
+
+  /* Tekstlink med orange understregning (orange tekst på hvid er ikke tilladt) */
+  .link {
+    color: var(--c-black); font-weight: 600; text-decoration: underline;
+    text-decoration-color: var(--c-orange); text-decoration-thickness: 2px; text-underline-offset: 4px;
+  }
+  .link:hover { text-decoration-thickness: 4px; }
+  .bg-dark .link { color: #fff; }
+
+  /* ---------- Tegningsark-ramme ---------- */
+  .sheet { position: relative; border: var(--stroke) solid var(--c-black); background: var(--c-white); }
+  .sheet::before, .sheet::after {
+    content: ""; position: absolute; width: 14px; height: 14px; border-color: var(--c-orange); border-style: solid;
+  }
+  .sheet::before { top: -8px; left: -8px; border-width: 3px 0 0 3px; }
+  .sheet::after { bottom: -8px; right: -8px; border-width: 0 3px 3px 0; }
+
+  /* Tegningshoved (title block) */
+  .titleblock { font-family: var(--font-mono); font-size: var(--fs-xs); border: var(--stroke) solid #000; display: grid; grid-template-columns: auto 1fr; background: #fff; }
+  .titleblock dt, .titleblock dd { padding: .35rem .6rem; border-bottom: 1px solid #000; margin: 0; }
+  .titleblock dt { color: var(--c-steel); border-right: 1px solid #000; }
+  .titleblock dt:nth-last-of-type(1), .titleblock dd:nth-last-of-type(1) { border-bottom: 0; }
+
+  /* ---------- Breadcrumbs ---------- */
+  .breadcrumbs ol { display: flex; flex-wrap: wrap; gap: .25rem .5rem; list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--c-steel); }
+  .breadcrumbs li + li::before { content: "/"; margin-right: .5rem; color: var(--c-steel-light); }
+  .breadcrumbs a { text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; text-decoration-color: var(--c-orange); }
+
+  /* ---------- Prosa (markdown) ---------- */
+  .prose { max-width: var(--measure); }
+  .prose > * + * { margin-top: 1.1em; }
+  .prose h2 { font-size: var(--fs-2xl); margin-top: 2.2em; }
+  .prose h3 { margin-top: 1.8em; }
+  .prose ul, .prose ol { padding-left: 1.25rem; }
+  .prose ul { list-style: none; padding-left: 0; }
+  .prose ul li { position: relative; padding-left: 1.5rem; }
+  .prose ul li + li { margin-top: .5rem; }
+  .prose ul li::before { content: ""; position: absolute; left: 0; top: .7em; width: .75rem; height: 2px; background: var(--c-orange); }
+  .prose ol { list-style: decimal; }
+  .prose ol li + li { margin-top: .5rem; }
+  .prose ol li::marker { font-family: var(--font-mono); color: var(--c-steel); }
+  .prose a { color: var(--c-black); font-weight: 600; text-decoration-color: var(--c-orange); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  .prose strong { font-weight: 700; }
+  .prose table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+  .prose th, .prose td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--c-rule); vertical-align: top; }
+  .prose th { font-family: var(--font-mono); font-weight: 500; border-bottom: 2px solid #000; }
+  .prose code { font-family: var(--font-mono); font-size: .9em; background: var(--c-paper); padding: .1em .35em; }
+
+  /* ---------- Formularer ---------- */
+  .field { display: grid; gap: .4rem; }
+  .field label, .field legend { font-weight: 600; font-size: var(--fs-sm); }
+  .field .hint { font-size: var(--fs-xs); color: var(--c-steel); }
+  .input {
+    width: 100%; min-height: 3rem; padding: .7rem .85rem;
+    font: inherit; color: var(--c-black); background: #fff;
+    border: var(--stroke) solid var(--c-black); border-radius: var(--radius-field);
+  }
+  .input:focus-visible { outline: 3px solid var(--c-orange); outline-offset: 0; box-shadow: none; }
+  textarea.input { min-height: 8rem; resize: vertical; }
+  select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .9rem center; padding-right: 2.5rem; }
+  .input[aria-invalid="true"] { border-color: #b00020; box-shadow: inset 0 0 0 1px #b00020; }
+  .field-error { color: #b00020; font-size: var(--fs-xs); font-weight: 600; }
+  .bg-dark .field-error { color: #ff9f9f; }
+  .bg-dark .field .hint { color: var(--c-steel-light); }
+  .hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
+  .dropzone {
+    position: relative; display: grid; place-items: center; gap: .35rem; text-align: center;
+    padding: 1.5rem 1rem; border: var(--stroke) dashed var(--c-black); background: var(--c-paper);
+    cursor: pointer; transition: background-color .15s ease;
+  }
+  .dropzone:hover, .dropzone.is-dragover { background: #ffe9db; }
+  .dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .dropzone:focus-within { outline: 3px solid var(--c-orange); outline-offset: 2px; }
+  .bg-dark .dropzone { background: #1d1d1d; border-color: #fff; }
+  .bg-dark .dropzone:hover, .bg-dark .dropzone.is-dragover { background: #2a1a10; }
+  .bg-dark .input { border-color: #fff; }
+  .file-list { list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: var(--fs-xs); display: grid; gap: .25rem; }
+
+  .check { display: grid; grid-template-columns: 1.375rem 1fr; gap: .75rem; align-items: start; font-size: var(--fs-sm); }
+  .check input { width: 1.375rem; height: 1.375rem; margin-top: .1rem; accent-color: var(--c-orange); }
+
+  /* ---------- FAQ (native details) ---------- */
+  .faq-item { border-top: var(--stroke) solid #000; }
+  .faq-item:last-child { border-bottom: var(--stroke) solid #000; }
+  .faq-item summary {
+    list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr 2rem; gap: 1rem; align-items: center;
+    padding: 1.15rem 0; font-family: var(--font-display); font-weight: 600; font-size: var(--fs-xl); line-height: 1.15;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: "+"; font-family: var(--font-mono); font-size: 1.5rem; width: 2rem; height: 2rem; display: grid; place-items: center;
+    border: var(--stroke) solid #000; transition: transform .2s ease, background-color .2s ease;
+  }
+  .faq-item[open] summary::after { content: "–"; background: var(--c-orange); }
+  .faq-item .faq-answer { padding: 0 3rem 1.5rem 0; max-width: var(--measure); color: var(--c-graphite); }
+
+  /* ---------- Billedpladsholder ---------- */
+  .ph {
+    position: relative; display: grid; align-content: end; gap: .25rem;
+    padding: 1rem; background-color: #e9e9e5; overflow: hidden;
+    background-image:
+      linear-gradient(45deg, transparent 49.6%, #c9c9c3 49.6%, #c9c9c3 50.4%, transparent 50.4%),
+      linear-gradient(-45deg, transparent 49.6%, #c9c9c3 49.6%, #c9c9c3 50.4%, transparent 50.4%);
+    border: 1px solid #c9c9c3;
+  }
+  .ph__label { position: relative; background: #fff; border: 1px solid #000; padding: .5rem .65rem; font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.4; color: #000; max-width: 34rem; }
+  .ph__label strong { display: block; font-weight: 500; color: #000; }
+}
+
+/* ---------- Bevægelse ---------- */
+@layer utilities {
+  .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  .no-js .reveal { opacity: 1; transform: none; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+}

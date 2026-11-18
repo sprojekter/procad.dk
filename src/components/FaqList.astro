@@ -1,0 +1,19 @@
+---
+// FAQ som native <details>. Udsender FAQPage-schema, medmindre schema={false}.
+interface Props { items: { q: string; a: string }[]; schema?: boolean }
+const { items, schema = true } = Astro.props;
+const json = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((i) => ({ '@type': 'Question', name: i.q, acceptedAnswer: { '@type': 'Answer', text: i.a } })),
+};
+---
+<div class="faq-list">
+  {items.map((i) => (
+    <details class="faq-item">
+      <summary>{i.q}</summary>
+      <div class="faq-answer"><p>{i.a}</p></div>
+    </details>
+  ))}
+</div>
+{schema && <script type="application/ld+json" set:html={JSON.stringify(json)} />}

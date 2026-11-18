@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import FaqList from '../components/FaqList.astro';
+import CTASection from '../components/CTASection.astro';
+import { faq, faqCategories, type FaqItem } from '../data/faq';
+
+const cats = Object.entries(faqCategories) as [FaqItem['cat'], string][];
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((i) => ({ '@type': 'Question', name: i.q, acceptedAnswer: { '@type': 'Answer', text: i.a } })),
+};
+---
+<BaseLayout
+  title="Spørgsmål og svar – pris, leveringstid, filformater og NDA | ProCAD"
+  description="Hvad koster en arbejdstegning? Hvilke filformater leverer I? Skriver I under på NDA? Svar på de spørgsmål, kunderne oftest stiller."
+  schema={[schema]}
+>
+  <PageHeader
+    crumbs={[{ label: 'FAQ', href: '/faq/' }]}
+    title="Spørgsmål og svar"
+    lead="Kan du ikke finde svaret? Skriv eller ring – du får svar inden for 24 timer på hverdage."
+  >
+    <nav class="faq-nav" aria-label="Emner">
+      {cats.map(([k, v]) => <a href={`#${k}`} class="btn btn-secondary btn-sm">{v}</a>)}
+    </nav>
+  </PageHeader>
+
+  <section class="section">
+    <div class="container faq-page">
+      {cats.map(([k, v]) => (
+        <section id={k} class="faq-group" aria-labelledby={`${k}-h`}>
+          <h2 id={`${k}-h`}>{v}</h2>
+          <FaqList items={faq.filter((f) => f.cat === k)} schema={false} />
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <CTASection heading="Har du et spørgsmål, der ikke står her?" text="Send det sammen med din fil – så får du både svar og en pris." />
+</BaseLayout>
+
+<style>
+  .faq-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 2rem; }
+  .faq-page { max-width: 56rem; display: grid; gap: 4rem; }
+  .faq-group h2 { font-size: var(--fs-2xl); margin-bottom: 1.25rem; }
+</style>

@@ -1,0 +1,11 @@
+# Bloker direkte adgang til konfigurationsfiler
+<FilesMatch "^(config|config\.sample)\.php$">
+  Require all denied
+</FilesMatch>
+
+# Tillad uploads op til 25 MB (virker kun hvis hosten tillader php_value i .htaccess)
+<IfModule mod_php.c>
+  php_value upload_max_filesize 26M
+  php_value post_max_size 30M
+  php_value max_file_uploads 15
+</IfModule>

@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import CTASection from '../components/CTASection.astro';
+---
+<BaseLayout
+  title="Priser – sådan prissætter ProCAD CAD-tegninger og filer"
+  description="Fast pris pr. opgave, timepris eller timebank. Se hvad der påvirker prisen på arbejdstegninger, DXF-filer og 3D-modeller – og hvad der er med."
+>
+  <PageHeader
+    crumbs={[{ label: 'Priser', href: '/priser/' }]}
+    title="Sådan prissætter jeg"
+    lead="Du får altid prisen, før jeg går i gang. Ingen timer, der løber, og ingen overraskelser på fakturaen."
+  />
+
+  <section class="section">
+    <div class="container">
+      <ul class="models">
+        <li class="model model--main">
+          <h2>Fast pris pr. opgave</h2>
+          <p class="model__fit mono">Til de fleste opgaver</p>
+          <p>Du sender materialet, jeg giver en fast pris og en leveringsdato. Mindre rettelser inden for opgaven er med.</p>
+        </li>
+        <li class="model">
+          <h2>Timepris</h2>
+          <p class="model__fit mono">Til løbende og uafklarede opgaver</p>
+          <p class="model__price">[UDFYLD] kr./time</p>
+          <p>Når omfanget ikke kan fastlægges på forhånd. Du får et estimat og besked, før det overskrides.</p>
+        </li>
+        <li class="model">
+          <h2>Timebank</h2>
+          <p class="model__fit mono">Til ekstra kapacitet</p>
+          <p class="model__price">[UDFYLD] timer til [UDFYLD] kr.</p>
+          <p>Køb et antal timer til en lavere timepris og brug dem, når tegnestuen har travlt.</p>
+        </li>
+      </ul>
+      <p class="muted vat">Alle priser er ekskl. moms.</p>
+
+      <div class="price-grid">
+        <div class="prose">
+          <h2>Prisen afhænger af</h2>
+          <ul>
+            <li><strong>Udgangspunktet.</strong> En 3D-model er hurtigere at tegne efter end en håndskitse.</li>
+            <li><strong>Kompleksiteten.</strong> Antal dele, bukninger, svejsninger og kritiske tolerancer.</li>
+            <li><strong>Leverancen.</strong> Kun DXF, eller også arbejdstegning, 3D-model og stykliste.</li>
+            <li><strong>Tidsfristen.</strong> Hasteopgaver kan lade sig gøre, men kan koste et tillæg.</li>
+          </ul>
+          <h2>Altid med i prisen</h2>
+          <ul>
+            <li>Kort afklaring før start</li>
+            <li>Kontrol af mål og filer før levering</li>
+            <li>Mindre rettelser inden for opgaven [UDFYLD: antal runder]</li>
+            <li>Filer i de aftalte formater</li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="ex-h">Eksempler på priser</h2>
+          <table class="ex">
+            <thead><tr><th>Opgave</th><th>Typisk pris</th></tr></thead>
+            <tbody>
+              <tr><td>DXF-oprydning af én pladedel</td><td>[UDFYLD]</td></tr>
+              <tr><td>Arbejdstegning + DXF, enkel bukket del</td><td>[UDFYLD]</td></tr>
+              <tr><td>Samlingstegning med stykliste (5–10 dele)</td><td>[UDFYLD]</td></tr>
+              <tr><td>3D-model ud fra gammel papirtegning</td><td>[UDFYLD]</td></tr>
+            </tbody>
+          </table>
+          <p class="muted ex-note">Vejledende priser ekskl. moms. Din pris afhænger af opgaven.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTASection heading="Få en fast pris på din opgave" />
+</BaseLayout>
+
+<style>
+  .models { list-style: none; padding: 0; margin: 0; display: grid; border: 2px solid #000; }
+  @media (min-width: 56rem) { .models { grid-template-columns: 1.2fr 1fr 1fr; } }
+  .model { padding: clamp(1.5rem, 3vw, 2.25rem); display: grid; gap: .75rem; align-content: start; }
+  .model + .model { border-top: 2px solid #000; }
+  @media (min-width: 56rem) { .model + .model { border-top: 0; border-left: 2px solid #000; } }
+  .model--main { background: var(--c-orange); }
+  .model h2 { font-size: var(--fs-2xl); }
+  .model__fit { font-size: var(--fs-xs); }
+  .model__price { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-xl); }
+  .vat { margin-top: 1rem; font-size: var(--fs-sm); }
+  .price-grid { display: grid; gap: 3rem; margin-top: 4rem; }
+  @media (min-width: 64rem) { .price-grid { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+  .price-grid .prose h2:first-child { margin-top: 0; }
+  .ex-h { font-size: var(--fs-2xl); margin-bottom: 1.25rem; }
+  .ex { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: var(--fs-sm); }
+  .ex th, .ex td { padding: .75rem 1rem; text-align: left; border-bottom: 1px solid #000; }
+  .ex th { font-family: var(--font-mono); font-weight: 500; background: var(--c-paper); }
+  .ex td:last-child { font-family: var(--font-mono); white-space: nowrap; }
+  .ex-note { margin-top: .75rem; font-size: var(--fs-xs); }
+</style>

@@ -1,0 +1,23 @@
+---
+// ProCAD-logo, forslag A: "Det bukkede P".
+// Et P tegnet som én bukket pladestrimmel i en sekskant (skjoldformen fra det oprindelige logo).
+// Ordmærke: PRO massiv + CAD i outline. Valgfri målelinje under ordmærket.
+// Selvstændige filer: /public/logo.svg, /public/logo-hvid.svg, /public/favicon.svg
+interface Props { inverted?: boolean; dimension?: boolean; class?: string }
+const { inverted = false, dimension = false, class: cls = '' } = Astro.props;
+const ink = inverted ? '#fff' : '#000';
+const h = dimension ? 50 : 40;
+---
+<svg class={cls} viewBox={`0 0 172 ${h}`} width="172" height={h} role="img" aria-label="ProCAD">
+  <path d="M10 2.5h16.5L35 20l-8.5 17.5H10L1.5 20z" fill="#000" stroke={ink} stroke-width="2.5" stroke-linejoin="miter" />
+  <path d="M13.5 30.5V10.5H22a5.25 5.25 0 0 1 0 10.5h-8.5" fill="none" stroke="#FF7621" stroke-width="4.2" stroke-linejoin="round" />
+  <text x="44" y="29.5" textLength="41" lengthAdjust="spacingAndGlyphs" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="29" letter-spacing=".6" fill={ink}>PRO</text>
+  <text x="89" y="29.5" textLength="46" lengthAdjust="spacingAndGlyphs" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="29" letter-spacing=".6" fill="none" stroke={ink} stroke-width="1.3">CAD</text>
+  {dimension && (
+    <g stroke={ink} stroke-width="1" fill={ink}>
+      <path d="M44 38v9M168 38v9" />
+      <path d="M44 43.5h124" />
+      <path d="M44 43.5l5-2.2v4.4zM168 43.5l-5-2.2v4.4z" stroke="none" />
+    </g>
+  )}
+</svg>

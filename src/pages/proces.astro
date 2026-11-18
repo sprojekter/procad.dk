@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import CTASection from '../components/CTASection.astro';
+---
+<BaseLayout
+  title="Sådan arbejder jeg – fra fil eller skitse til færdig tegning | ProCAD"
+  description="Upload, svar inden 24 timer, kort afklaring, fast pris og levering inkl. mindre rettelser. Se hvordan et samarbejde med ProCAD foregår."
+>
+  <PageHeader
+    crumbs={[{ label: 'Proces', href: '/proces/' }]}
+    title="Fra fil eller skitse til færdig tegning"
+    lead="Fem trin og ingen overraskelser. Du ved, hvad det koster, før jeg går i gang, og hvornår du får tegningerne."
+  />
+
+  <section class="section">
+    <div class="container proc">
+      <ProcessSteps detailed />
+      <aside class="proc__aside">
+        <div class="sheet proc__box">
+          <h2 class="proc__h">Det er godt at sende med</h2>
+          <ul class="proc__list">
+            <li>Skitse, foto, PDF, DXF, DWG eller STEP</li>
+            <li>Materiale og tykkelse</li>
+            <li>Antal emner</li>
+            <li>Maskine eller proces (laser, plasma, kantbuk, CNC)</li>
+            <li>Kritiske mål og tolerancer</li>
+            <li>Jeres tegningsramme og standarder</li>
+            <li>Ønsket leveringsdato</li>
+          </ul>
+          <p class="muted">Mangler du noget af det? Send det, du har. Jeg spørger ind til resten.</p>
+        </div>
+        <div class="proc__box proc__box--plain">
+          <h2 class="proc__h">Tre måder at samarbejde på</h2>
+          <p><strong>Hele opgaven.</strong> Fra skitse til færdige tegninger og filer.</p>
+          <p><strong>I modellerer, jeg tegner.</strong> Jeres konstruktør laver 3D-modellen, jeg laver produktionstegningerne.</p>
+          <p><strong>Ekstra kapacitet.</strong> En ekstra tegner i travle perioder – på timepris eller som timebank.</p>
+          <a href="/priser/" class="link">Sådan prissætter jeg</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <CTASection />
+</BaseLayout>
+
+<style>
+  .proc { display: grid; gap: 3rem; }
+  @media (min-width: 64rem) { .proc { grid-template-columns: 1.6fr 1fr; gap: 4rem; align-items: start; } }
+  .proc__aside { display: grid; gap: 2rem; }
+  @media (min-width: 64rem) { .proc__aside { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
+  .proc__box { padding: 1.5rem; display: grid; gap: 1rem; }
+  .proc__box--plain { border: 2px solid #000; background: var(--c-paper); }
+  .proc__h { font-size: var(--fs-xl); }
+  .proc__list { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; font-size: var(--fs-sm); }
+  .proc__list li { padding-left: 1.25rem; position: relative; }
+  .proc__list li::before { content: ""; position: absolute; left: 0; top: .7em; width: .7rem; height: 2px; background: var(--c-orange); }
+</style>

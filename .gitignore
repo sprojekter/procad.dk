@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vercel/
+.netlify/
+# Hemmeligheder til PHP-formularen – uploades manuelt via FTP
+public/api/config.php

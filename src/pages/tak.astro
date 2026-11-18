@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+<BaseLayout title="Tak – din forespørgsel er sendt | ProCAD" description="Tak for din forespørgsel til ProCAD." noindex>
+  <section class="section grid-paper thanks">
+    <div class="container">
+      <div class="sheet thanks__box">
+        <svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 3h20l11 21-11 21H14L3 24z" fill="#FF7621" stroke="#000" stroke-width="2.5" /><path d="M16.5 24.5l5 5 10-11" fill="none" stroke="#000" stroke-width="3" /></svg>
+        <h1>Tak – din forespørgsel er sendt</h1>
+        <p class="lead">Jeg kigger på dit materiale og vender tilbage inden for {site.responseHours} timer på hverdage, enten med spørgsmål eller en fast pris.</p>
+        <p>Haster det? Ring på <a href={site.phoneHref} class="link">{site.phone}</a>.</p>
+        <div class="thanks__actions">
+          <a href="/cases/" class="btn btn-primary">Se cases imens</a>
+          <a href="/" class="btn btn-secondary">Til forsiden</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Konvertering sendes allerede fra formularen ("generate_lead").
+  // Her sendes en ekstra sidevisnings-hændelse, kun hvis brugeren kom fra formularen.
+  try {
+    if (sessionStorage.getItem('procad-lead') === '1') {
+      (window as any).dataLayer?.push({ event: 'lead_thankyou_view' });
+      sessionStorage.removeItem('procad-lead');
+    }
+  } catch {}
+</script>
+
+<style>
+  .thanks { min-height: 60vh; display: grid; align-items: center; }
+  .thanks__box { max-width: 44rem; padding: clamp(1.5rem, 5vw, 3.5rem); display: grid; gap: 1.25rem; justify-items: start; }
+  .thanks__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .75rem; }
+</style>

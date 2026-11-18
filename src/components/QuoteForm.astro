@@ -1,0 +1,222 @@
+---
+// Tilbudsformular. Sender multipart/form-data til site.formEndpoint
+// (PHP på Simply.com som standard – eller Formspree/Basin på Vercel/Netlify).
+// Spambeskyttelse: honeypot (_gotcha) + tidsfælde + valgfri Cloudflare Turnstile.
+// Ved succes: dataLayer-hændelse "generate_lead" og videre til /tak/.
+import { getCollection } from 'astro:content';
+import { site } from '../data/site';
+
+interface Props {
+  id?: string;
+  compact?: boolean;          // kort version til ydelsessider (landingssider)
+  preselect?: string;         // ydelse-id der vælges på forhånd
+  heading?: string;
+  submitLabel?: string;
+}
+const { id = 'tilbud', compact = false, preselect = '', heading, submitLabel = 'Send forespørgsel' } = Astro.props;
+const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
+const accept = '.pdf,.dxf,.dwg,.step,.stp,.iges,.igs,.jpg,.jpeg,.png,.heic,.webp,.zip';
+const f = (n: string) => `${id}-${n}`;
+---
+<form
+  class:list={['quote', { 'quote--compact': compact }]}
+  id={id}
+  action={site.formEndpoint}
+  method="post"
+  enctype="multipart/form-data"
+  novalidate
+  data-quote-form
+>
+  {heading && <h2 class="quote__heading">{heading}</h2>}
+
+  <div class="quote__grid">
+    <div class="field">
+      <label for={f('navn')}>Navn</label>
+      <input class="input" id={f('navn')} name="navn" type="text" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for={f('firma')}>Firma <span class="hint">(valgfrit)</span></label>
+      <input class="input" id={f('firma')} name="firma" type="text" autocomplete="organization" />
+    </div>
+    <div class="field">
+      <label for={f('email')}>E-mail</label>
+      <input class="input" id={f('email')} name="email" type="email" autocomplete="email" required />
+    </div>
+    <div class="field">
+      <label for={f('telefon')}>Telefon <span class="hint">(valgfrit)</span></label>
+      <input class="input" id={f('telefon')} name="telefon" type="tel" autocomplete="tel" inputmode="tel" />
+    </div>
+
+    {compact ? (
+      <input type="hidden" name="ydelse" value={preselect} />
+    ) : (
+      <div class="field">
+        <label for={f('ydelse')}>Hvad skal du have lavet?</label>
+        <select class="input" id={f('ydelse')} name="ydelse" required>
+          <option value="">Vælg ydelse</option>
+          {services.map((s) => <option value={s.id} selected={s.id === preselect}>{s.data.navTitle}</option>)}
+          <option value="andet">Andet / ved ikke endnu</option>
+        </select>
+      </div>
+    )}
+    {!compact && (
+      <div class="field">
+        <label for={f('dato')}>Ønsket leveringsdato <span class="hint">(valgfrit)</span></label>
+        <input class="input" id={f('dato')} name="leveringsdato" type="date" />
+      </div>
+    )}
+
+    <div class="field quote__full">
+      <label for={f('beskrivelse')}>Beskriv opgaven</label>
+      <textarea class="input" id={f('beskrivelse')} name="beskrivelse" rows={compact ? 4 : 6} required aria-describedby={f('beskrivelse-hint')}></textarea>
+      <span class="hint" id={f('beskrivelse-hint')}>Fx materiale og tykkelse, antal, hvilken maskine filen skal bruges i, og hvad du har i forvejen.</span>
+    </div>
+
+    <div class="field quote__full">
+      <span class="quote__label" id={f('filer-label')}>Upload filer <span class="hint">(valgfrit, maks. 25 MB i alt)</span></span>
+      <label class="dropzone" for={f('filer')}>
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 20V6m-6 6l6-6 6 6M5 23h18" fill="none" stroke="currentColor" stroke-width="2.4" /></svg>
+        <span><strong>Træk filer hertil</strong> eller klik for at vælge</span>
+        <span class="mono hint">PDF, DXF, DWG, STEP, IGES, billeder, ZIP</span>
+        <input id={f('filer')} name="filer[]" type="file" multiple accept={accept} aria-labelledby={f('filer-label')} aria-describedby={f('filer-fejl')} />
+      </label>
+      <ul class="file-list" aria-live="polite" data-file-list></ul>
+      <span class="field-error" id={f('filer-fejl')} data-file-error></span>
+    </div>
+  </div>
+
+  <!-- Honeypot: skjult for mennesker -->
+  <div class="hp" aria-hidden="true">
+    <label for={f('hp')}>Udfyld ikke dette felt</label>
+    <input id={f('hp')} type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="_ts" value="" data-ts />
+  <input type="hidden" name="_side" value={Astro.url.pathname} />
+
+  {site.turnstileSiteKey && <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey} data-language="da"></div>}
+
+  <label class="check quote__consent">
+    <input type="checkbox" name="samtykke" value="ja" required aria-describedby={f('samtykke-fejl')} />
+    <span>Jeg accepterer, at ProCAD bruger mine oplysninger og filer til at besvare min forespørgsel. Se <a href="/privatlivspolitik/" class="link">privatlivspolitikken</a>.</span>
+  </label>
+  <span class="field-error" id={f('samtykke-fejl')}></span>
+
+  <div class="quote__submit">
+    <button type="submit" class="btn btn-primary">{submitLabel}</button>
+    <p class="hint">Du får svar inden for {site.responseHours} timer på hverdage. Filerne behandles fortroligt.</p>
+  </div>
+  <p class="quote__status field-error" role="alert" data-status></p>
+</form>
+
+{site.turnstileSiteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<style>
+  .quote { display: grid; gap: 1.25rem; }
+  .quote__heading { font-size: var(--fs-2xl); }
+  .quote__grid { display: grid; gap: 1rem; }
+  @media (min-width: 40rem) { .quote__grid { grid-template-columns: 1fr 1fr; } .quote__full { grid-column: 1 / -1; } }
+  .quote--compact .quote__grid { grid-template-columns: 1fr; }
+  .quote--compact .quote__full { grid-column: auto; }
+  .quote__label { font-weight: 600; font-size: var(--fs-sm); }
+  .quote__submit { display: grid; gap: .6rem; justify-items: start; }
+  .quote__submit .btn { min-width: 14rem; }
+  .quote__status:empty, .field-error:empty { display: none; }
+</style>
+
+<script>
+  const MAX = 25 * 1024 * 1024;
+  const OK_EXT = ['pdf', 'dxf', 'dwg', 'step', 'stp', 'iges', 'igs', 'jpg', 'jpeg', 'png', 'heic', 'webp', 'zip'];
+  const MSG: Record<string, string> = {
+    navn: 'Skriv dit navn.',
+    email: 'Skriv en gyldig e-mailadresse, fx navn@firma.dk.',
+    ydelse: 'Vælg hvad du skal have lavet – eller "Andet".',
+    beskrivelse: 'Beskriv kort opgaven, så jeg kan give en pris.',
+    samtykke: 'Sæt hak for at sende forespørgslen.',
+  };
+
+  document.querySelectorAll<HTMLFormElement>('[data-quote-form]').forEach((form) => {
+    const ts = form.querySelector<HTMLInputElement>('[data-ts]');
+    if (ts) ts.value = String(Date.now());
+    const fileInput = form.querySelector<HTMLInputElement>('input[type="file"]');
+    const list = form.querySelector<HTMLUListElement>('[data-file-list]');
+    const fileErr = form.querySelector<HTMLElement>('[data-file-error]');
+    const status = form.querySelector<HTMLElement>('[data-status]');
+    const zone = form.querySelector<HTMLElement>('.dropzone');
+
+    const fmt = (b: number) => (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.ceil(b / 1024)} kB`);
+
+    function checkFiles(): boolean {
+      if (!fileInput || !list || !fileErr) return true;
+      const files = Array.from(fileInput.files || []);
+      list.innerHTML = '';
+      let total = 0; let bad = '';
+      files.forEach((file) => {
+        total += file.size;
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        if (!OK_EXT.includes(ext)) bad = file.name;
+        const li = document.createElement('li');
+        li.textContent = `${file.name} (${fmt(file.size)})`;
+        list.appendChild(li);
+      });
+      let msg = '';
+      if (bad) msg = `Filtypen i "${bad}" kan ikke sendes. Pak den i en ZIP-fil, eller send den på mail.`;
+      else if (total > MAX) msg = `Filerne fylder ${fmt(total)}. Maks. 25 MB – send store filer via WeTransfer-link i beskrivelsen.`;
+      fileErr.textContent = msg;
+      fileInput.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      return !msg;
+    }
+    fileInput?.addEventListener('change', checkFiles);
+    zone?.addEventListener('dragover', () => zone.classList.add('is-dragover'));
+    zone?.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
+    zone?.addEventListener('drop', () => zone.classList.remove('is-dragover'));
+
+    function setError(el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, msg: string) {
+      const id = `${el.id}-fejl`;
+      let err = document.getElementById(id);
+      if (el.type === 'checkbox') err = form.querySelector(`#${form.id}-samtykke-fejl`);
+      if (!err) {
+        err = document.createElement('span');
+        err.id = id; err.className = 'field-error';
+        el.insertAdjacentElement('afterend', err);
+        el.setAttribute('aria-describedby', [el.getAttribute('aria-describedby'), id].filter(Boolean).join(' '));
+      }
+      err.textContent = msg;
+      el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    }
+
+    function validate(): boolean {
+      let first: HTMLElement | null = null;
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[required]').forEach((el) => {
+        const ok = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.checkValidity() && el.value.trim() !== '';
+        setError(el, ok ? '' : MSG[el.name] || 'Udfyld feltet.');
+        if (!ok && !first) first = el;
+      });
+      const filesOk = checkFiles();
+      if (!filesOk && !first) first = fileInput;
+      (first as HTMLElement | null)?.focus();
+      return !first;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (status) status.textContent = '';
+      if (!validate()) return;
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const label = btn?.textContent || '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sender …'; }
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) throw new Error(data.error || 'Serveren svarede med en fejl.');
+        const ydelse = (form.elements.namedItem('ydelse') as HTMLInputElement | null)?.value || 'ukendt';
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).dataLayer.push({ event: 'generate_lead', form_id: form.id, ydelse, side: location.pathname });
+        try { sessionStorage.setItem('procad-lead', '1'); } catch {}
+        setTimeout(() => { location.href = '/tak/'; }, 300);
+      } catch (err) {
+        if (status) status.textContent = `Forespørgslen blev ikke sendt: ${(err as Error).message} Prøv igen, eller skriv direkte til kontakt@procad.dk.`;
+        if (btn) { btn.disabled = false; btn.textContent = label; }
+      }
+    });
+  });
+</script>

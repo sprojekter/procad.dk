@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Siden findes ikke | ProCAD" description="Siden findes ikke." noindex>
+  <section class="section grid-paper">
+    <div class="container nf">
+      <p class="mono">Fejl 404 – målet passer ikke</p>
+      <h1>Den side findes ikke</h1>
+      <p class="lead">Linket kan være forældet, eller adressen er tastet forkert. Prøv en af disse:</p>
+      <div class="nf__actions">
+        <a href="/" class="btn btn-secondary">Forsiden</a>
+        <a href="/ydelser/" class="btn btn-secondary">Ydelser</a>
+        <a href="/kontakt/" class="btn btn-primary">Få tilbud</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .nf { display: grid; gap: 1.25rem; justify-items: start; min-height: 50vh; align-content: center; }
+  .nf__actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+</style>

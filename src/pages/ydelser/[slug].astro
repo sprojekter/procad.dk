@@ -1,0 +1,128 @@
+---
+// Ydelsesside – fungerer også som landingsside til Google Ads:
+// én tydelig CTA og formularen ligger over folden på mobil (lige efter overskriften).
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
+import Media from '../../components/Media.astro';
+import FaqList from '../../components/FaqList.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import HexIcon from '../../components/HexIcon.astro';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const services = await getCollection('ydelser');
+  return services.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+interface Props { entry: CollectionEntry<'ydelser'> }
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const related = (await getCollection('cases')).filter((c) => c.data.service === entry.id).slice(0, 2);
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: d.title,
+  serviceType: d.navTitle,
+  description: d.metaDescription,
+  url: `${site.url}/ydelser/${entry.id}/`,
+  provider: { '@id': `${site.url}/#organization` },
+  areaServed: { '@type': 'Country', name: 'Danmark' },
+};
+---
+<BaseLayout title={d.metaTitle} description={d.metaDescription} schema={[serviceSchema]}>
+  <section class="lp-hero grid-paper">
+    <div class="container lp-hero__grid">
+      <div class="lp-hero__copy">
+        <Breadcrumbs items={[{ label: 'Ydelser', href: '/ydelser/' }, { label: d.navTitle, href: `/ydelser/${entry.id}/` }]} />
+        <p class="lp-hero__problem">{d.problem}</p>
+        <h1>{d.h1}</h1>
+        <p class="lead">{d.intro}</p>
+        <ul class="lp-hero__usp">
+          <li><HexIcon icon="clock" size={32} /> Svar inden for {site.responseHours} timer</li>
+          <li><HexIcon icon="price" size={32} /> Fast pris før start</li>
+          <li><HexIcon icon="lock" size={32} /> NDA ved behov</li>
+        </ul>
+      </div>
+      <div class="lp-hero__form" id="tilbud">
+        <QuoteForm id={`tilbud-${entry.id}`} compact preselect={entry.id} heading="Få en fast pris" submitLabel="Send og få en pris" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container lp-body">
+      <div class="lp-body__main">
+        <div class="prose"><Content /></div>
+      </div>
+      <aside class="lp-body__aside">
+        <div class="sheet lp-deliv">
+          <h2 class="lp-deliv__h">Du får</h2>
+          <ul>
+            {d.deliverables.map((x) => <li>{x}</li>)}
+          </ul>
+          {d.formats.length > 0 && (
+            <dl class="titleblock lp-deliv__formats">
+              <dt>Formater</dt><dd>{d.formats.join(', ')}</dd>
+              <dt>Standard</dt><dd>DS/EN ISO</dd>
+              <dt>Svartid</dt><dd>{site.responseHours} timer</dd>
+            </dl>
+          )}
+          <a href="#tilbud" class="btn btn-primary btn-block">Få en fast pris</a>
+        </div>
+        <Media src={d.image.src} alt={d.image.alt} spec={d.image.spec} motif={d.image.motif} ratio="3 / 2" />
+      </aside>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section bg-paper">
+      <div class="container">
+        <h2 class="lp-h2">Eksempler</h2>
+        <div class="lp-cases">{related.map((c) => <CaseCard entry={c} />)}</div>
+      </div>
+    </section>
+  )}
+
+  {d.faq.length > 0 && (
+    <section class="section">
+      <div class="container lp-faq">
+        <h2 class="lp-h2">Spørgsmål og svar</h2>
+        <FaqList items={d.faq} />
+      </div>
+    </section>
+  )}
+
+  <CTASection preselect={entry.id} ctaHref="#tilbud" />
+</BaseLayout>
+
+<style>
+  .lp-hero { border-bottom: 2px solid #000; padding-block: 1.5rem clamp(2rem, 5vw, 4.5rem); }
+  .lp-hero__grid { display: grid; gap: 1.75rem; }
+  @media (min-width: 64rem) { .lp-hero__grid { grid-template-columns: 1.15fr 1fr; gap: 3.5rem; align-items: start; } }
+  .lp-hero__problem { margin-top: 1.25rem; font-family: var(--font-mono); font-size: var(--fs-sm); display: inline-block; background: #000; color: #fff; padding: .3rem .7rem; }
+  .lp-hero h1 { margin-top: 1rem; font-size: clamp(2.25rem, 1.6rem + 3vw, 4rem); }
+  .lp-hero .lead { margin-top: 1rem; }
+  .lp-hero__usp { list-style: none; padding: 0; margin: 1.5rem 0 0; display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; font-size: var(--fs-sm); font-weight: 600; }
+  .lp-hero__usp li { display: flex; align-items: center; gap: .5rem; }
+  .lp-hero__form { background: #fff; border: 2px solid #000; box-shadow: var(--shadow-hard); padding: clamp(1.25rem, 3vw, 2rem); }
+  /* Mobil: skjul USP-listen, så formularen kommer højere op */
+  @media (max-width: 39.99rem) { .lp-hero__usp { display: none; } .lp-hero .lead { font-size: var(--fs-base); } }
+
+  .lp-body { display: grid; gap: 3rem; }
+  @media (min-width: 64rem) { .lp-body { grid-template-columns: 1.4fr 1fr; gap: 4rem; } }
+  .lp-body__aside { display: grid; gap: 2rem; align-content: start; }
+  @media (min-width: 64rem) { .lp-body__aside { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
+  .lp-deliv { padding: 1.5rem; display: grid; gap: 1.25rem; }
+  .lp-deliv__h { font-size: var(--fs-2xl); }
+  .lp-deliv ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+  .lp-deliv li { padding-left: 1.5rem; position: relative; }
+  .lp-deliv li::before { content: ""; position: absolute; left: 0; top: .45em; width: .65rem; height: .35rem; border-left: 2px solid #000; border-bottom: 2px solid #000; transform: rotate(-45deg); }
+  .lp-h2 { margin-bottom: 2rem; font-size: var(--fs-2xl); }
+  .lp-cases { display: grid; gap: 1.5rem; }
+  @media (min-width: 56rem) { .lp-cases { grid-template-columns: 1fr 1fr; } }
+  .lp-faq { max-width: 56rem; }
+</style>

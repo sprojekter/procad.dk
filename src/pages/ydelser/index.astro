@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Media from '../../components/Media.astro';
+import CTASection from '../../components/CTASection.astro';
+
+const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
+---
+<BaseLayout
+  title="Ydelser – CAD-tegninger, DXF, 3D og dokumentation | ProCAD"
+  description="Arbejdstegninger, filklargøring til laser, kantbuk og CNC, 3D-modellering og teknisk dokumentation til metalbearbejdning. Se hvad ProCAD kan hjælpe med."
+>
+  <PageHeader
+    crumbs={[{ label: 'Ydelser', href: '/ydelser/' }]}
+    title="Ydelser til metalbearbejdning"
+    lead="Jeg hjælper værksteder, produktionsvirksomheder, ingeniørfirmaer og iværksættere med det tegnearbejde, der skal til, før metallet kan skæres, bukkes, svejses eller fræses."
+  />
+
+  <section class="section">
+    <div class="container">
+      <ol class="svc-list">
+        {services.map((s) => (
+          <li class="svc">
+            <div class="svc__media">
+              <Media src={s.data.image.src} alt={s.data.image.alt} spec={s.data.image.spec} ratio="3 / 2" />
+            </div>
+            <div class="svc__body">
+              <p class="mono muted">{s.data.problem}</p>
+              <h2 class="svc__title"><a href={`/ydelser/${s.id}/`}>{s.data.title}</a></h2>
+              <p>{s.data.intro}</p>
+              <ul class="svc__deliv">
+                {s.data.deliverables.slice(0, 4).map((d) => <li>{d}</li>)}
+              </ul>
+              <a href={`/ydelser/${s.id}/`} class="btn btn-secondary btn-sm">Se {s.data.navTitle}</a>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <CTASection heading="Ved du ikke, hvilken ydelse du skal bruge?" text="Send det, du har, og fortæl hvad det skal bruges til. Så finder jeg ud af resten og giver dig en fast pris." />
+</BaseLayout>
+
+<style>
+  .svc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+  .svc { display: grid; gap: 1.5rem; padding-block: 2.5rem; border-top: 2px solid #000; }
+  .svc:last-child { border-bottom: 2px solid #000; }
+  @media (min-width: 56rem) { .svc { grid-template-columns: 1fr 1.3fr; gap: 3rem; align-items: center; } }
+  .svc__body { display: grid; gap: 1rem; justify-items: start; }
+  .svc__title { font-size: var(--fs-3xl); }
+  .svc__title a { text-decoration: none; }
+  .svc__title a:hover { text-decoration: underline; text-decoration-color: var(--c-orange); text-decoration-thickness: 3px; }
+  .svc__deliv { list-style: none; padding: 0; margin: 0; display: grid; gap: .4rem; font-size: var(--fs-sm); }
+  .svc__deliv li { padding-left: 1.25rem; position: relative; }
+  .svc__deliv li::before { content: ""; position: absolute; left: 0; top: .7em; width: .7rem; height: 2px; background: var(--c-orange); }
+</style>

@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CTASection from '../../components/CTASection.astro';
+const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+---
+<BaseLayout
+  title="Cases – før og efter: fra skitse til færdig tegning | ProCAD"
+  description="Se hvad kunderne sendte, og hvad de fik tilbage: håndskitser, gamle tegninger og idéer, der blev til arbejdstegninger, DXF-filer og 3D-modeller."
+>
+  <PageHeader
+    crumbs={[{ label: 'Cases', href: '/cases/' }]}
+    title="Før og efter"
+    lead="Hver case viser udgangspunktet, det jeg leverede, og hvad det betød for kunden. Kundenavne vises kun med tilladelse."
+  />
+  <section class="section">
+    <div class="container">
+      <div class="case-grid">
+        {cases.map((c) => <CaseCard entry={c} headingLevel="h2" />)}
+      </div>
+    </div>
+  </section>
+  <CTASection heading="Har du en skitse, der skal blive til en tegning?" />
+</BaseLayout>
+
+<style>
+  .case-grid { display: grid; gap: 1.5rem; }
+  @media (min-width: 48rem) { .case-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 72rem) { .case-grid { grid-template-columns: repeat(3, 1fr); } }
+</style>

@@ -1,0 +1,124 @@
+---
+import { getCollection } from 'astro:content';
+import Logo from './Logo.astro';
+import { mainNav } from '../data/site';
+
+const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="site-header__logo" aria-label="ProCAD – til forsiden">
+      <Logo />
+    </a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="hovedmenu">
+      <span class="menu-toggle__bars" aria-hidden="true"></span>
+      <span class="menu-toggle__label">Menu</span>
+    </button>
+
+    <nav id="hovedmenu" class="nav" aria-label="Hovedmenu">
+      <ul class="nav__list">
+        <li class="nav__item nav__item--has-sub">
+          <a href="/ydelser/" class:list={['nav__link', { 'is-active': isActive('/ydelser/') }]}>Ydelser</a>
+          <button class="nav__subtoggle" type="button" aria-expanded="false" aria-controls="submenu-ydelser">
+            <span class="sr-only">Vis ydelser</span>
+            <svg width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" /></svg>
+          </button>
+          <div id="submenu-ydelser" class="mega">
+            <ul class="mega__grid">
+              {services.map((s) => (
+                <li>
+                  <a href={`/ydelser/${s.id}/`} class="mega__link">
+                    <span class="mega__title">{s.data.navTitle}</span>
+                    <span class="mega__desc">{s.data.navDescription}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a href="/ydelser/" class="link mega__all">Se alle ydelser</a>
+          </div>
+        </li>
+        {mainNav.map((item) => (
+          <li class="nav__item">
+            <a href={item.href} class:list={['nav__link', { 'is-active': isActive(item.href) }]} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+      <a href="/kontakt/" class="btn btn-primary btn-sm nav__cta">Få tilbud</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 50; background: #fff; border-bottom: 2px solid #000; }
+  .site-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); }
+  .site-header__logo { display: block; flex-shrink: 0; }
+  .site-header__logo :global(svg) { width: 9rem; height: auto; }
+
+  .menu-toggle { display: inline-flex; align-items: center; gap: .6rem; min-height: 2.75rem; padding: 0 .9rem; background: #fff; border: 2px solid #000; font: 700 .9375rem var(--font-sans); cursor: pointer; }
+  .menu-toggle__bars, .menu-toggle__bars::before, .menu-toggle__bars::after { display: block; width: 18px; height: 2px; background: #000; position: relative; transition: transform .2s ease; }
+  .menu-toggle__bars::before, .menu-toggle__bars::after { content: ""; position: absolute; left: 0; }
+  .menu-toggle__bars::before { top: -6px; }
+  .menu-toggle__bars::after { top: 6px; }
+  .menu-toggle[aria-expanded="true"] .menu-toggle__bars { background: transparent; }
+  .menu-toggle[aria-expanded="true"] .menu-toggle__bars::before { transform: translateY(6px) rotate(45deg); }
+  .menu-toggle[aria-expanded="true"] .menu-toggle__bars::after { transform: translateY(-6px) rotate(-45deg); }
+
+  /* Mobil først */
+  .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-bottom: 2px solid #000; padding: 1rem clamp(1rem, 3vw, 2.5rem) 1.5rem; max-height: calc(100dvh - var(--header-h)); overflow-y: auto; }
+  .nav.is-open { display: block; }
+  .nav__list { list-style: none; margin: 0; padding: 0; }
+  .nav__item { border-bottom: 1px solid var(--c-rule); display: flex; flex-wrap: wrap; align-items: center; }
+  .nav__link { flex: 1; display: block; padding: .9rem 0; text-decoration: none; font-weight: 600; font-size: 1.0625rem; }
+  .nav__link.is-active { text-decoration: underline; text-decoration-color: var(--c-orange); text-decoration-thickness: 3px; text-underline-offset: 6px; }
+  .nav__subtoggle { width: 2.75rem; height: 2.75rem; display: grid; place-items: center; background: none; border: 0; cursor: pointer; }
+  .nav__subtoggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .mega { display: none; width: 100%; padding-bottom: 1rem; }
+  .mega.is-open { display: block; }
+  .mega__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+  .mega__link { display: block; padding: .6rem .75rem; text-decoration: none; border-left: 3px solid var(--c-orange); }
+  .mega__link:hover { background: var(--c-paper); }
+  .mega__title { display: block; font-weight: 700; }
+  .mega__desc { display: block; font-size: var(--fs-xs); color: var(--c-steel); }
+  .mega__all { display: inline-block; margin: .75rem 0 0 .75rem; font-size: var(--fs-sm); }
+  .nav__cta { margin-top: 1.25rem; width: 100%; }
+
+  @media (min-width: 64rem) {
+    .menu-toggle { display: none; }
+    .nav { display: flex; align-items: center; gap: 1.5rem; position: static; padding: 0; border: 0; max-height: none; overflow: visible; background: none; }
+    .nav__list { display: flex; align-items: center; gap: .25rem; }
+    .nav__item { border: 0; position: relative; flex-wrap: nowrap; }
+    .nav__link { padding: .5rem .6rem; font-size: .96875rem; }
+    .nav__subtoggle { width: 1.5rem; height: 2.5rem; margin-left: -.35rem; }
+    .mega { position: absolute; top: calc(100% + 1.1rem); left: -1rem; width: 40rem; padding: 1.25rem; background: #fff; border: 2px solid #000; box-shadow: var(--shadow-hard); }
+    .mega__grid { grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .nav__item--has-sub:hover .mega, .nav__item--has-sub:focus-within .mega { display: block; }
+    /* Usynlig bro så musen kan nå menuen */
+    .nav__item--has-sub:hover::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1.2rem; }
+    .nav__cta { margin: 0; width: auto; }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.getElementById('hovedmenu');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('is-open', !open);
+  });
+  const sub = document.querySelector<HTMLButtonElement>('.nav__subtoggle');
+  const mega = document.getElementById('submenu-ydelser');
+  sub?.addEventListener('click', () => {
+    const open = sub.getAttribute('aria-expanded') === 'true';
+    sub.setAttribute('aria-expanded', String(!open));
+    mega?.classList.toggle('is-open', !open);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (mega?.classList.contains('is-open')) { mega.classList.remove('is-open'); sub?.setAttribute('aria-expanded', 'false'); sub?.focus(); }
+    else if (nav?.classList.contains('is-open')) { nav.classList.remove('is-open'); toggle?.setAttribute('aria-expanded', 'false'); toggle?.focus(); }
+  });
+</script>
