@@ -34,7 +34,7 @@ export const site = {
 
   // Tilbudsformularen. Standard: FormSubmit (gratis, virker på GitHub Pages, filer op til 10 MB).
   // På Simply.com kan den sættes til '/api/tilbud.php' (PHP, filer op til 25 MB).
-  formEndpoint: import.meta.env.PUBLIC_FORM_ENDPOINT || 'https://formsubmit.co/kontakt@procad.dk', // [UDFYLD] rigtig e-mail
+  formEndpoint: import.meta.env.PUBLIC_FORM_ENDPOINT || 'https://formsubmit.co/sinanp2020@hotmail.com', // MIDLERTIDIG (test/forhåndsvisning) – skift til kundens mail før lancering
   turnstileSiteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '',
   gtmId: import.meta.env.PUBLIC_GTM_ID || '',
 };

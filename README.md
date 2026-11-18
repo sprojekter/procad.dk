@@ -92,7 +92,7 @@ Formularen bruges tre steder:
 Den har to trin: **1. Hvad skal laves** (ydelse, beskrivelse **eller** fil **eller** link, tidsplan) og **2. Hvem er du** (navn, e-mail, evt. telefon). Der er ingen samtykke-afkrydsning; der står i stedet en linje om behandling af oplysninger, da behandlingen sker for at besvare henvendelsen.
 
 - **På Simply (standard ved deploy):** `PUBLIC_FORM_ENDPOINT=/api/tilbud.php` sættes automatisk af workflowet. PHP-maileren tager op til 15 MB og 15 filer, har honeypot og tidstjek mod spam og kræver `api/config.php` (se Deploy).
-- **Andre steder (Pages/Vercel/Netlify):** FormSubmit `https://formsubmit.co/kontakt@procad.dk`. Første gang sendes en aktiveringsmail, som skal klikkes. Grænsen er 10 MB.
+- **Andre steder (Pages/Vercel/Netlify):** FormSubmit – sender midlertidigt til `sinanp2020@hotmail.com` (se `src/data/site.ts`; skift til kundens mail før lancering). Første gang sendes en aktiveringsmail, som skal klikkes. Grænsen er 10 MB.
 
 Ved succes sendes brugeren til `/tak/`, og `generate_lead` lægges i `dataLayer`.
 

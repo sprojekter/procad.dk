@@ -385,38 +385,62 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       (form.querySelector('[data-side]') as HTMLInputElement).value = location.pathname;
 
       const ydelse = (form.querySelector('input[name="Ydelse"]:checked') as HTMLInputElement | null)?.value || 'ukendt';
-      (window as any).dataLayer = (window as any).dataLayer || [];
-      (window as any).dataLayer.push({ event: 'generate_lead', form_id: form.id, ydelse, files: files.length });
-      try { sessionStorage.setItem('procad-lead', '1'); localStorage.removeItem(draftKey); } catch {}
       form.classList.add('is-sending');
       (form.querySelector('[data-label]') as HTMLElement).textContent = 'Sender …';
 
-      // 1) Foretrukket: almindelig afsendelse med ét filfelt pr. fil
-      try {
-        form.querySelectorAll('input[data-generated]').forEach((n) => n.remove());
-        files.forEach((file, i) => {
-          const dt = new DataTransfer();
-          dt.items.add(file);
-          const el = document.createElement('input');
-          el.type = 'file'; el.name = `attachment${i + 1}`; el.hidden = true; el.dataset.generated = '1';
-          el.files = dt.files;
-          form.appendChild(el);
-        });
-        HTMLFormElement.prototype.submit.call(form);
-        return;
-      } catch {}
-
-      // 2) Reserve (ældre Safari): send med fetch
-      try {
-        const fd = new FormData(form);
-        files.forEach((file, i) => fd.append(`attachment${i + 1}`, file));
-        const sameOrigin = new URL(form.action, location.href).origin === location.origin;
-        await fetch(form.action, { method: 'POST', body: fd, mode: sameOrigin ? 'same-origin' : 'no-cors', headers: sameOrigin ? { Accept: 'application/json' } : undefined });
-        location.href = thanks;
-      } catch {
+      // Send i baggrunden, så brugeren bliver på siden (ingen hop til formsubmit.co).
+      const resetBtn = () => {
         form.classList.remove('is-sending');
         (form.querySelector('[data-label]') as HTMLElement).textContent = 'Send og få fast pris';
-        showErrors([{ el: form.querySelector('[data-submit]') as HTMLElement, msg: 'Forespørgslen blev ikke sendt. Tjek forbindelsen, eller skriv til kontakt@procad.dk.' }]);
+      };
+      const fail = (msg: string) => { resetBtn(); showErrors([{ el: form.querySelector('[data-submit]') as HTMLElement, msg }]); };
+      const fd = new FormData(form);
+      fd.delete('attachment');
+      files.forEach((file, i) => fd.append(`attachment${i + 1}`, file));
+      const action = new URL(form.action, location.href);
+      const sameOrigin = action.origin === location.origin;
+
+      try {
+        if (sameOrigin) {
+          // PHP-maileren på Simply svarer med JSON
+          const res = await fetch(action, { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || data.ok === false) return fail(data.error || 'Forespørgslen blev ikke sendt. Prøv igen, eller skriv til kontakt@procad.dk.');
+        } else if (action.hostname.endsWith('formsubmit.co') && files.length === 0) {
+          // FormSubmit uden filer: AJAX-endpoint med rigtigt svar
+          const res = await fetch(action.href.replace('formsubmit.co/', 'formsubmit.co/ajax/'), { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+          const data = await res.json().catch(() => ({}));
+          if (String(data.success) !== 'true') {
+            const msg = String(data.message || '');
+            return fail(/activat/i.test(msg)
+              ? 'Formularen er ikke aktiveret endnu. Ejeren skal klikke på linket i aktiveringsmailen fra FormSubmit.'
+              : 'Forespørgslen blev ikke sendt. Prøv igen, eller skriv til kontakt@procad.dk.');
+          }
+        } else {
+          // FormSubmit med filer: AJAX tager ikke vedhæftninger, så send som almindelig formular i baggrunden.
+          // Svaret kan ikke læses (cross-origin), men forespørgslen og filerne kommer frem.
+          await fetch(action, { method: 'POST', body: fd, mode: 'no-cors' });
+        }
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).dataLayer.push({ event: 'generate_lead', form_id: form.id, ydelse, files: files.length });
+        try { sessionStorage.setItem('procad-lead', '1'); localStorage.removeItem(draftKey); } catch {}
+        location.href = thanks;
+      } catch {
+        // Netværksfejl i fetch: sidste udvej er almindelig afsendelse (forlader siden)
+        try {
+          form.querySelectorAll('input[data-generated]').forEach((n) => n.remove());
+          files.forEach((file, i) => {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            const el = document.createElement('input');
+            el.type = 'file'; el.name = `attachment${i + 1}`; el.hidden = true; el.dataset.generated = '1';
+            el.files = dt.files;
+            form.appendChild(el);
+          });
+          HTMLFormElement.prototype.submit.call(form);
+        } catch {
+          fail('Forespørgslen blev ikke sendt. Tjek forbindelsen, eller skriv til kontakt@procad.dk.');
+        }
       }
     });
   });

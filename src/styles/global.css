@@ -146,6 +146,15 @@
   .bg-dark h1, .bg-dark h2, .bg-dark h3 { color: #fff; }
   .bg-dark .muted, .bg-dark .lead { color: var(--c-dark-muted); }
   .rule-y { border-block: 1px solid var(--c-line); }
+  /* Skillelinje mellem sektioner: tynd streg i indholdets bredde, der toner ud i enderne.
+     Bruges ikke ved flader (bg-surface), som allerede har kanter. */
+  :is(.hero, .section:not(.bg-surface)) + .section:not(.bg-surface) { position: relative; }
+  :is(.hero, .section:not(.bg-surface)) + .section:not(.bg-surface)::before {
+    content: ""; position: absolute; top: 0; left: 50%; translate: -50% 0;
+    width: calc(min(75rem, 100%) - 2 * clamp(1.25rem, .5rem + 3vw, 2.5rem)); height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c-line-strong) 18%, var(--c-line-strong) 82%, transparent);
+    pointer-events: none;
+  }
 
   /* Blød baggrund til hero/sidehoveder (afløser det gamle gitter) */
   .grid-paper {
