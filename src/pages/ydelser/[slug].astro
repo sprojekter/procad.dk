@@ -1,6 +1,6 @@
 ---
 // Ydelsesside – fungerer også som landingsside til Google Ads:
-// én tydelig CTA og formularen ligger over folden på mobil (lige efter overskriften).
+// én handling (formularen), som ligger over folden på mobil. Kompakt: alt vigtigt på 2–3 skærme.
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
@@ -8,7 +8,6 @@ import QuoteForm from '../../components/QuoteForm.astro';
 import Media from '../../components/Media.astro';
 import FaqList from '../../components/FaqList.astro';
 import CaseCard from '../../components/CaseCard.astro';
-import CTASection from '../../components/CTASection.astro';
 import Icon from '../../components/Icon.astro';
 import { site } from '../../data/site';
 
@@ -21,6 +20,7 @@ const { entry } = Astro.props;
 const d = entry.data;
 const { Content } = await render(entry);
 const related = (await getCollection('cases')).filter((c) => c.data.service === entry.id).slice(0, 2);
+const others = (await getCollection('ydelser')).filter((s) => s.id !== entry.id).sort((a, b) => a.data.order - b.data.order);
 
 const serviceSchema = {
   '@context': 'https://schema.org',
@@ -34,97 +34,119 @@ const serviceSchema = {
 };
 ---
 <BaseLayout title={d.metaTitle} description={d.metaDescription} schema={[serviceSchema]}>
-  <section class="lp-hero grid-paper">
-    <div class="container lp-hero__grid">
-      <div class="lp-hero__copy">
+  <section class="lp grid-paper">
+    <div class="container lp__grid">
+      <div class="lp__copy">
         <Breadcrumbs items={[{ label: 'Ydelser', href: '/ydelser/' }, { label: d.navTitle, href: `/ydelser/${entry.id}/` }]} />
-        <p class="kicker lp-hero__kicker">{d.problem}</p>
+        <p class="kicker lp__kicker">{d.problem}</p>
         <h1>{d.h1}</h1>
         <p class="lead">{d.intro}</p>
-        <ul class="lp-hero__usp">
-          <li><Icon icon="clock" tile={false} size={18} /> Svar inden for {site.responseHours} timer</li>
+        <ul class="lp__usp">
+          <li><Icon icon="clock" tile={false} size={18} /> Svar inden {site.responseHours} timer</li>
           <li><Icon icon="price" tile={false} size={18} /> Fast pris før start</li>
           <li><Icon icon="lock" tile={false} size={18} /> NDA ved behov</li>
         </ul>
+        <div class="lp__photo">
+          <Media src={d.image.src} alt={d.image.alt} spec={d.image.spec} ratio="16 / 9" eager sizes="(min-width: 64rem) 50vw, 100vw" />
+        </div>
       </div>
-      <div class="lp-hero__form" id="tilbud">
+      <div class="lp__form" id="tilbud">
         <QuoteForm id={`tilbud-${entry.id}`} compact preselect={entry.id} heading="Få en fast pris" submitLabel="Send og få en pris" />
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container lp-body">
-      <div class="lp-body__main">
-        <div class="prose"><Content /></div>
-      </div>
-      <aside class="lp-body__aside">
-        <div class="card lp-deliv">
-          <h2 class="lp-deliv__h">Du får</h2>
-          <ul>
-            {d.deliverables.map((x) => <li>{x}</li>)}
-          </ul>
-          {d.formats.length > 0 && (
-            <dl class="titleblock lp-deliv__formats">
-              <dt>Formater</dt><dd>{d.formats.join(', ')}</dd>
-              <dt>Standard</dt><dd>DS/EN ISO</dd>
-              <dt>Svartid</dt><dd>{site.responseHours} timer</dd>
-            </dl>
-          )}
-          <a href="#tilbud" class="btn btn-primary btn-block">Få en fast pris</a>
+  <section class="section section--tight">
+    <div class="container">
+      <div class="facts">
+        <div class="card fact">
+          <h2 class="fact__h">Du får</h2>
+          <ul class="ticks">{d.deliverables.map((x) => <li>{x}</li>)}</ul>
+          {d.formats.length > 0 && <p class="fact__formats">{d.formats.join(' / ')}</p>}
         </div>
-        <Media src={d.image.src} alt={d.image.alt} spec={d.image.spec} motif={d.image.motif} ratio="3 / 2" />
-      </aside>
+        <div class="card fact">
+          <h2 class="fact__h">Til hvem</h2>
+          <ul class="dots">{d.audience.map((x) => <li>{x}</li>)}</ul>
+        </div>
+        <div class="card fact">
+          <h2 class="fact__h">Det skal jeg bruge</h2>
+          <ol class="nums">{d.needs.map((x) => <li>{x}</li>)}</ol>
+          <a href="#tilbud" class="link fact__cta">Send det, du har</a>
+        </div>
+      </div>
+      <div class="prose lp__body"><Content /></div>
     </div>
   </section>
 
-  {related.length > 0 && (
-    <section class="section bg-white border-y">
-      <div class="container">
-        <h2 class="lp-h2">Eksempler</h2>
-        <div class="lp-cases">{related.map((c) => <CaseCard entry={c} />)}</div>
+  {(related.length > 0 || d.faq.length > 0) && (
+    <section class="section section--tight bg-white border-y">
+      <div class="container lp__more">
+        {d.faq.length > 0 && (
+          <div>
+            <h2 class="lp__h2">Spørgsmål og svar</h2>
+            <FaqList items={d.faq} />
+          </div>
+        )}
+        {related.length > 0 && (
+          <div>
+            <h2 class="lp__h2">Eksempel</h2>
+            <CaseCard entry={related[0]} />
+          </div>
+        )}
       </div>
     </section>
   )}
 
-  {d.faq.length > 0 && (
-    <section class="section">
-      <div class="container lp-faq">
-        <h2 class="lp-h2">Spørgsmål og svar</h2>
-        <FaqList items={d.faq} />
-      </div>
-    </section>
-  )}
-
-  <CTASection preselect={entry.id} ctaHref="#tilbud" />
+  <section class="section section--tight">
+    <div class="container">
+      <h2 class="lp__h2">Andre ydelser</h2>
+      <ul class="others">
+        {others.map((s) => (
+          <li><a href={`/ydelser/${s.id}/`} class="card card--hover other"><strong>{s.data.navTitle}</strong><span>{s.data.navDescription}</span></a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .lp-hero { padding-block: 2rem clamp(3rem, 2rem + 5vw, 6rem); }
-  .lp-hero__grid { display: grid; gap: 2rem; }
-  @media (min-width: 64rem) { .lp-hero__grid { grid-template-columns: 1.15fr 1fr; gap: 4rem; align-items: start; } }
-  .lp-hero__kicker { margin: clamp(2rem, 1.5rem + 3vw, 4rem) 0 0; }
-  .lp-hero h1 { margin-top: 1rem; font-size: clamp(2.4rem, 1.4rem + 3.4vw, 4rem); }
-  .lp-hero .lead { margin-top: 1.25rem; }
-  .lp-hero__usp { list-style: none; padding: 0; margin: 2rem 0 0; display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; font-size: var(--fs-sm); color: var(--c-ink); }
-  .lp-hero__usp li { display: flex; align-items: center; gap: .5rem; }
-  .lp-hero__usp :global(svg) { color: var(--c-muted); }
-  .lp-hero__form { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); padding: clamp(1.5rem, 3vw, 2.25rem); }
-  @media (min-width: 64rem) { .lp-hero__form { margin-top: 3.5rem; } }
-  /* Mobil: formularen højt oppe (Google Ads-landingsside) */
-  @media (max-width: 39.99rem) { .lp-hero__usp { display: none; } .lp-hero .lead { font-size: var(--fs-base); } }
+  .lp { padding-block: 1.5rem clamp(2.5rem, 2rem + 3vw, 4.5rem); }
+  .lp__grid { display: grid; gap: 2rem; }
+  @media (min-width: 64rem) { .lp__grid { grid-template-columns: 1.1fr 1fr; gap: 3.5rem; align-items: start; } }
+  .lp__kicker { margin: clamp(1.5rem, 1rem + 2vw, 3rem) 0 0; }
+  .lp h1 { margin-top: .75rem; font-size: clamp(2.2rem, 1.4rem + 3vw, 3.5rem); }
+  .lp .lead { margin-top: 1rem; }
+  .lp__usp { list-style: none; padding: 0; margin: 1.5rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; font-size: var(--fs-sm); color: var(--c-ink); }
+  .lp__usp li { display: flex; align-items: center; gap: .45rem; }
+  .lp__usp :global(svg) { color: var(--c-orange); }
+  .lp__photo { margin-top: 2rem; display: none; }
+  @media (min-width: 64rem) { .lp__photo { display: block; } }
+  .lp__form { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); padding: clamp(1.25rem, 3vw, 2rem); }
+  @media (min-width: 64rem) { .lp__form { position: sticky; top: calc(var(--header-h) + 1rem); } }
+  /* Mobil: formularen kommer højt op */
+  @media (max-width: 39.99rem) { .lp__usp { display: none; } .lp .lead { font-size: var(--fs-base); } }
 
-  .lp-body { display: grid; gap: 3rem; }
-  @media (min-width: 64rem) { .lp-body { grid-template-columns: 1.4fr 1fr; gap: 5rem; } }
-  .lp-body__aside { display: grid; gap: 1.5rem; align-content: start; }
-  @media (min-width: 64rem) { .lp-body__aside { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
-  .lp-deliv { padding: 1.75rem; display: grid; gap: 1.25rem; }
-  .lp-deliv__h { font-size: var(--fs-xl); letter-spacing: -0.025em; }
-  .lp-deliv ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; font-size: var(--fs-sm); }
-  .lp-deliv li { padding-left: 1.6rem; position: relative; }
-  .lp-deliv li::before { content: ""; position: absolute; left: .15rem; top: .38em; width: .7rem; height: .38rem; border-left: 1.6px solid var(--c-orange); border-bottom: 1.6px solid var(--c-orange); transform: rotate(-45deg); }
-  .lp-h2 { margin-bottom: 2rem; font-size: var(--fs-2xl); letter-spacing: -0.03em; }
-  .lp-cases { display: grid; gap: 1rem; }
-  @media (min-width: 56rem) { .lp-cases { grid-template-columns: 1fr 1fr; } }
-  .lp-faq { max-width: 52rem; }
+  .facts { display: grid; gap: 1rem; }
+  @media (min-width: 56rem) { .facts { grid-template-columns: repeat(3, 1fr); } }
+  .fact { padding: 1.5rem; display: grid; gap: 1rem; align-content: start; }
+  .fact__h { font-size: var(--fs-lg); letter-spacing: -0.02em; }
+  .fact__formats { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-muted); border-top: 1px solid var(--c-line); padding-top: .75rem; }
+  .fact__cta { font-size: var(--fs-sm); }
+  .ticks, .dots, .nums { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; font-size: var(--fs-sm); color: var(--c-body); }
+  .ticks li, .dots li { position: relative; padding-left: 1.5rem; }
+  .ticks li::before { content: ""; position: absolute; left: .15rem; top: .38em; width: .7rem; height: .38rem; border-left: 1.6px solid var(--c-orange); border-bottom: 1.6px solid var(--c-orange); transform: rotate(-45deg); }
+  .dots li::before { content: ""; position: absolute; left: .2rem; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
+  .nums { counter-reset: n; }
+  .nums li { counter-increment: n; display: grid; grid-template-columns: 1.5rem 1fr; }
+  .nums li::before { content: counter(n); font: 500 var(--fs-xs)/1.9 var(--font-mono); color: var(--c-muted); }
+  .lp__body { margin-top: 2rem; color: var(--c-muted); }
+
+  .lp__more { display: grid; gap: 3rem; }
+  @media (min-width: 64rem) { .lp__more { grid-template-columns: 1.3fr 1fr; gap: 4rem; } }
+  .lp__h2 { font-size: var(--fs-2xl); letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+  .others { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  @media (min-width: 48rem) { .others { grid-template-columns: repeat(3, 1fr); } }
+  .other { display: grid; gap: .2rem; padding: 1.1rem 1.25rem; text-decoration: none; color: inherit; }
+  .other strong { color: var(--c-ink); font-weight: 500; }
+  .other span { font-size: var(--fs-sm); color: var(--c-muted); }
 </style>

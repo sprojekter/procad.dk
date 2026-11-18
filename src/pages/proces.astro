@@ -14,7 +14,7 @@ import CTASection from '../components/CTASection.astro';
     lead="Fem trin og ingen overraskelser. Du ved, hvad det koster, før jeg går i gang, og hvornår du får tegningerne."
   />
 
-  <section class="section">
+  <section class="section section--tight">
     <div class="container proc">
       <ProcessSteps detailed />
       <aside class="proc__aside">
@@ -46,14 +46,14 @@ import CTASection from '../components/CTASection.astro';
 </BaseLayout>
 
 <style>
-  .proc { display: grid; gap: 3rem; }
-  @media (min-width: 64rem) { .proc { grid-template-columns: 1.6fr 1fr; gap: 4rem; align-items: start; } }
-  .proc__aside { display: grid; gap: 2rem; }
-  @media (min-width: 64rem) { .proc__aside { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
-  .proc__box { padding: 1.75rem; display: grid; gap: 1rem; font-size: var(--fs-sm); }
+  .proc { display: grid; gap: 1rem; }
+  .proc__aside { display: grid; gap: 1rem; }
+  @media (min-width: 56rem) { .proc__aside { grid-template-columns: 1fr 1fr; } }
+  .proc__box { padding: 1.5rem; display: grid; gap: .9rem; align-content: start; font-size: var(--fs-sm); }
   .proc__box--plain { background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-lg); }
   .proc__h { font-size: var(--fs-lg); }
-  .proc__list { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; font-size: var(--fs-sm); }
+  .proc__list { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; }
+  @media (min-width: 40rem) { .proc__list { grid-template-columns: 1fr 1fr; column-gap: 1.5rem; } }
   .proc__list li { padding-left: 1.25rem; position: relative; }
   .proc__list li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
 </style>

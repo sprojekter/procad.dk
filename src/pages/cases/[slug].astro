@@ -76,13 +76,13 @@ const service = await getEntry('ydelser', d.service);
 
 <style>
   .case-meta { margin-top: 2.5rem; max-width: 40rem; }
-  .example-note { margin-top: 1.5rem; padding: .85rem 1.1rem; border: 1px solid #ffd2b3; border-radius: var(--r-md); background: #fff4ec; font-size: var(--fs-sm); color: var(--c-ink); }
+  .example-note { margin-top: 1.5rem; padding: .85rem 1.1rem; border: 1px solid color-mix(in srgb, var(--c-orange) 35%, transparent); border-radius: var(--r-md); background: var(--c-orange-soft); font-size: var(--fs-sm); color: var(--c-ink); }
   .ba { display: grid; gap: 1rem; }
   @media (min-width: 48rem) { .ba { grid-template-columns: 1fr 1fr; } }
   .ba__item { margin: 0; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); padding: 8px; box-shadow: var(--shadow-sm); }
   .ba__item figcaption { padding: .9rem .6rem .5rem; font-size: var(--fs-sm); color: var(--c-muted); display: flex; gap: .7rem; align-items: baseline; }
   .ba__tag { border-radius: 999px; padding: .1rem .6rem; font-size: var(--fs-xs); font-weight: 500; background: var(--c-paper); color: var(--c-ink); border: 1px solid var(--c-line); }
-  .ba__tag--after { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+  .ba__tag--after { background: var(--c-ink); color: var(--c-on-ink); border-color: var(--c-ink); }
   .story { list-style: none; padding: 0; margin: 5rem 0 0; display: grid; gap: 2.5rem; counter-reset: s; }
   @media (min-width: 56rem) { .story { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; } }
   .story li { border-top: 1px solid var(--c-line-strong); padding-top: 1.5rem; counter-increment: s; }

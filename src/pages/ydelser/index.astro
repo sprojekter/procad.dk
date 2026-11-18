@@ -17,20 +17,20 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
     lead="Jeg hjælper værksteder, produktionsvirksomheder, ingeniørfirmaer og iværksættere med det tegnearbejde, der skal til, før metallet kan skæres, bukkes, svejses eller fræses."
   />
 
-  <section class="section">
+  <section class="section section--tight">
     <div class="container">
       <ol class="svc-list">
         {services.map((s) => (
           <li class="svc">
             <div class="svc__media">
-              <Media src={s.data.image.src} alt={s.data.image.alt} spec={s.data.image.spec} ratio="3 / 2" />
+              <Media src={s.data.image.src} alt={s.data.image.alt} spec={s.data.image.spec} ratio="16 / 10" sizes="(min-width: 56rem) 45vw, 100vw" />
             </div>
             <div class="svc__body">
               <p class="kicker" style="margin:0">{s.data.problem}</p>
               <h2 class="svc__title"><a href={`/ydelser/${s.id}/`}>{s.data.title}</a></h2>
               <p>{s.data.intro}</p>
               <ul class="svc__deliv">
-                {s.data.deliverables.slice(0, 4).map((d) => <li>{d}</li>)}
+                {s.data.deliverables.slice(0, 3).map((d) => <li>{d}</li>)}
               </ul>
               <a href={`/ydelser/${s.id}/`} class="btn btn-secondary btn-sm">Se {s.data.navTitle}</a>
             </div>
@@ -45,14 +45,15 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
 
 <style>
   .svc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
-  .svc { display: grid; gap: 1.5rem; padding: clamp(1rem, 2vw, 1.25rem); background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); }
-  @media (min-width: 56rem) { .svc { grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: center; } }
-  .svc__body { display: grid; gap: 1rem; justify-items: start; padding: .5rem .75rem 1rem; }
-  .svc__title { font-size: var(--fs-2xl); letter-spacing: -0.03em; }
+  @media (min-width: 56rem) { .svc-list { grid-template-columns: 1fr 1fr; } }
+  .svc { display: grid; gap: 1rem; padding: 6px; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); align-content: start; }
+  .svc :global(.media) { border-radius: 22px; }
+  .svc__body { display: grid; gap: .75rem; justify-items: start; padding: .5rem 1.25rem 1.25rem; }
+  .svc__title { font-size: var(--fs-xl); letter-spacing: -0.025em; }
   .svc__title a { text-decoration: none; }
-  .svc__title a:hover { color: #000; }
-  .svc__body > p:not(.mono) { color: var(--c-muted); }
-  .svc__deliv { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; font-size: var(--fs-sm); }
+  .svc__title a:hover { opacity: .8; }
+  .svc__body > p:not(.kicker) { color: var(--c-muted); font-size: var(--fs-sm); }
+  .svc__deliv { list-style: none; padding: 0; margin: 0; display: grid; gap: .4rem; font-size: var(--fs-sm); }
   .svc__deliv li { padding-left: 1.25rem; position: relative; }
   .svc__deliv li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
 </style>

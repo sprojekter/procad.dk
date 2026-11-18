@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import { mainNav } from '../data/site';
 
 const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
@@ -48,23 +49,29 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
         ))}
       </ul>
       <div class="nav__actions">
+        <span class="nav__theme"><ThemeToggle /></span>
         <a href="/kontakt/" class="nav__link nav__contact">Kontakt</a>
         <a href="/kontakt/" class="btn btn-primary btn-sm">Få et tilbud</a>
       </div>
     </nav>
 
+    <div class="hdr__mobile">
+      <ThemeToggle />
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="hovedmenu">
       <span class="sr-only">Menu</span>
       <span class="menu-toggle__bars" aria-hidden="true"></span>
     </button>
+    </div>
   </div>
 </header>
 
 <style>
-  .hdr { position: sticky; top: 0; z-index: 50; background: rgba(247,247,245,.8); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s ease; }
+  .hdr { position: sticky; top: 0; z-index: 50; background: var(--c-header); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s ease; }
   .hdr.is-scrolled { border-bottom-color: var(--c-line); }
   .hdr__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); }
   .hdr__logo :global(svg) { height: 28px; width: auto; }
+  .hdr__mobile { display: flex; align-items: center; gap: .25rem; }
+  .nav__theme { display: none; }
 
   .menu-toggle { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; background: transparent; cursor: pointer; border-radius: 10px; }
   .menu-toggle__bars, .menu-toggle__bars::before { display: block; width: 18px; height: 1.5px; background: var(--c-ink); position: relative; transition: transform .25s var(--ease); }
@@ -93,7 +100,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .nav__contact { display: none; }
 
   @media (min-width: 64rem) {
-    .menu-toggle { display: none; }
+    .hdr__mobile { display: none; }
+    .nav__theme { display: inline-flex; }
     .nav { display: flex; flex: 1; justify-content: space-between; align-items: center; position: static; padding: 0 0 0 2.5rem; border: 0; max-height: none; overflow: visible; background: none; }
     .nav__list { display: flex; align-items: center; gap: .25rem; }
     .nav__item { border: 0; position: relative; flex-wrap: nowrap; }

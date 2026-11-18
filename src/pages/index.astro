@@ -1,8 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroVisual from '../components/HeroVisual.astro';
+import Model3D from '../components/Model3D.astro';
 import Icon from '../components/Icon.astro';
+import Media from '../components/Media.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import CaseCard from '../components/CaseCard.astro';
 import FaqList from '../components/FaqList.astro';
@@ -11,9 +12,8 @@ import { site } from '../data/site';
 import { faq } from '../data/faq';
 
 const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
-const serviceIcons = ['ruler', 'file', 'cube', 'doc'] as const;
 const featured = (await getCollection('cases')).filter((c) => c.data.featured).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
-const homeFaq = faq.filter((f) => f.home);
+const homeFaq = faq.filter((f) => f.home).slice(0, 4);
 ---
 <BaseLayout
   title="Produktionsklare CAD-tegninger til metalbearbejdning | ProCAD"
@@ -23,47 +23,43 @@ const homeFaq = faq.filter((f) => f.home);
   <section class="hero grid-paper">
     <div class="container hero__grid">
       <div class="hero__copy">
-        <a href="/kontakt/" class="pill"><span class="pill__tag">Fast pris</span> Send en fil – få svar inden 24 timer <span aria-hidden="true">›</span></a>
+        <a href="/kontakt/" class="pill"><span class="pill__tag">Fast pris</span> Send en fil – svar inden 24 timer <span aria-hidden="true">›</span></a>
         <h1>Produktionsklare CAD-tegninger til metal&shy;bearbejdning.</h1>
-        <p class="lead">Arbejdstegninger, DXF- og STEP-filer, 3D-modeller og styklister – lavet af en tegner, der kommer fra værkstedet og ved, hvad operatøren skal bruge.</p>
+        <p class="lead">Arbejdstegninger, DXF- og STEP-filer, 3D-modeller og styklister – lavet af en tegner fra værkstedet, der ved, hvad operatøren skal bruge.</p>
         <div class="hero__actions">
           <a href="/kontakt/" class="btn btn-primary">Få et tilbud</a>
           <a href="/cases/" class="btn btn-secondary">Se cases</a>
         </div>
+        <ul class="hero__trust" aria-label="Det kan du regne med">
+          <li><Icon icon="clock" tile={false} size={18} /> Svar inden 24 timer</li>
+          <li><Icon icon="price" tile={false} size={18} /> Fast pris</li>
+          <li><Icon icon="lock" tile={false} size={18} /> NDA ved behov</li>
+          <li><Icon icon="file" tile={false} size={18} /> DXF, DWG, STEP, IGES, PDF</li>
+        </ul>
       </div>
       <div class="hero__visual">
-        <HeroVisual />
+        <Model3D />
       </div>
     </div>
-  </section>
-
-  <!-- Tillidsbjælke -->
-  <section class="trust" aria-label="Det kan du regne med">
-    <ul class="container trust__list">
-      <li><span class="trust__k">Software</span><span class="trust__v">{site.software.join(', ')}</span></li>
-      <li><span class="trust__k">Filformater</span><span class="trust__v">DXF, DWG, STEP, IGES, PDF</span></li>
-      <li><span class="trust__k">Svartid</span><span class="trust__v">Inden for 24 timer</span></li>
-      <li><span class="trust__k">Fortrolighed</span><span class="trust__v">NDA ved behov</span></li>
-    </ul>
   </section>
 
   <!-- Ydelser -->
   <section class="section" aria-labelledby="ydelser-h">
     <div class="container">
-      <div class="head">
-        <p class="kicker">Ydelser</p>
+      <div class="head head--split">
         <h2 id="ydelser-h">Fra skitse til en fil, maskinen kan læse.</h2>
-        <p class="lead">Fire ydelser, der hænger sammen. Køb én af dem – eller få det hele samlet ét sted.</p>
+        <p class="lead">Fire ydelser, der hænger sammen. Køb én – eller få det hele samlet ét sted.</p>
       </div>
       <ul class="services">
-        {services.map((s, i) => (
+        {services.map((s) => (
           <li>
             <a href={`/ydelser/${s.id}/`} class="service card card--hover">
-              <Icon icon={serviceIcons[i % serviceIcons.length]} />
-              <h3 class="service__title">{s.data.navTitle}</h3>
-              <p class="service__desc">{s.data.intro}</p>
-              <p class="service__formats">{s.data.formats.join(' / ')}</p>
-              <span class="link" aria-hidden="true">Læs mere</span>
+              <Media src={s.data.image.src} alt={s.data.image.alt} ratio="4 / 3" sizes="(min-width: 64rem) 25vw, (min-width: 40rem) 50vw, 100vw" />
+              <div class="service__body">
+                <h3 class="service__title">{s.data.navTitle}</h3>
+                <p class="service__desc">{s.data.navDescription}</p>
+                <span class="link" aria-hidden="true">Læs mere</span>
+              </div>
             </a>
           </li>
         ))}
@@ -75,14 +71,10 @@ const homeFaq = faq.filter((f) => f.home);
   <section class="section bg-white border-y" aria-labelledby="proces-h">
     <div class="container">
       <div class="head head--split">
-        <div>
-          <p class="kicker">Proces</p>
-          <h2 id="proces-h">Fem trin. Ingen overraskelser.</h2>
-        </div>
-        <p class="lead">Du ved hele vejen, hvad det koster, og hvornår du får tegningerne.</p>
+        <h2 id="proces-h">Fem trin. Ingen overraskelser.</h2>
+        <p class="lead">Du ved hele vejen, hvad det koster, og hvornår du får tegningerne. <a href="/proces/" class="link">Se detaljer</a></p>
       </div>
       <ProcessSteps />
-      <p class="foot"><a href="/proces/" class="link">Se processen i detaljer</a></p>
     </div>
   </section>
 
@@ -90,43 +82,32 @@ const homeFaq = faq.filter((f) => f.home);
   <section class="section" aria-labelledby="cases-h">
     <div class="container">
       <div class="head head--split">
-        <div>
-          <p class="kicker">Cases</p>
-          <h2 id="cases-h">Før og efter.</h2>
-        </div>
-        <p class="lead">Det bedste bevis er resultatet: hvad kunderne sendte, og hvad de fik tilbage.</p>
+        <h2 id="cases-h">Før og efter.</h2>
+        <p class="lead">Hvad kunderne sendte – og hvad de fik tilbage. <a href="/cases/" class="link">Alle cases</a></p>
       </div>
       <div class="cases">
         {featured.map((c) => <CaseCard entry={c} />)}
       </div>
-      <p class="foot"><a href="/cases/" class="link">Se alle cases</a></p>
     </div>
   </section>
 
   <!-- Hvorfor ProCAD (mørk) -->
   <section class="section why bg-dark" aria-labelledby="why-h">
-    <div class="container">
-      <div class="why__top">
+    <div class="container why__grid">
+      <div class="why__intro">
         <h2 id="why-h">Tegnet af en, der har stået ved maskinen.</h2>
-        <p class="lead">[UDFYLD: 1–2 sætninger om din baggrund – fx uddannet smed, år på værksted.] Derfor sætter jeg mål, som de bliver produceret og kontrolleret – og spørger hellere én gang for meget.</p>
-      </div>
-      <ul class="why__grid">
-        <li class="why__item"><Icon icon="chat" /><h3>Dansk og personligt</h3><p>Du taler med den, der tegner. Ingen sprogbarrierer og ingen mellemled.</p></li>
-        <li class="why__item"><Icon icon="ruler" /><h3>Danske standarder</h3><p>DS/EN ISO for tolerancer, svejsesymboler og overfladekrav – som danske værksteder kender dem.</p></li>
-        <li class="why__item"><Icon icon="layers" /><h3>Din tegningsramme</h3><p>Tegninger med jeres egen ramme, logo og nummerering, så de passer ind i arkivet.</p></li>
-      </ul>
-      <div class="modes">
-        <h3 class="modes__h">Tre måder at samarbejde på</h3>
-        <ul class="modes__list">
-          <li><strong>Hele opgaven</strong><span>Fra skitse til færdige tegninger og filer.</span></li>
-          <li><strong>I modellerer, jeg tegner</strong><span>I sender 3D-modellen, jeg laver produktionstegningerne.</span></li>
-          <li><strong>Ekstra kapacitet</strong><span>En ekstra tegner i travle perioder – timepris eller timebank.</span></li>
-        </ul>
-        <div class="modes__links">
+        <p class="lead">[UDFYLD: 1–2 sætninger om din baggrund – fx uddannet smed, år på værksted.] Derfor sætter jeg mål, som de bliver produceret og kontrolleret.</p>
+        <div class="why__links">
           <a href="/om/" class="link">Om ProCAD</a>
           <a href="/priser/" class="link">Sådan prissætter jeg</a>
         </div>
       </div>
+      <ul class="why__list">
+        <li><Icon icon="chat" /><div><h3>Dansk og personligt</h3><p>Du taler med den, der tegner. Ingen mellemled.</p></div></li>
+        <li><Icon icon="ruler" /><div><h3>Danske standarder</h3><p>DS/EN ISO for tolerancer, svejsesymboler og overflade.</p></div></li>
+        <li><Icon icon="layers" /><div><h3>Din tegningsramme</h3><p>Jeres ramme, logo og nummerering – passer ind i arkivet.</p></div></li>
+        <li><Icon icon="cube" /><div><h3>Fleksibelt samarbejde</h3><p>Hele opgaven, kun tegningerne – eller ekstra kapacitet.</p></div></li>
+      </ul>
     </div>
   </section>
 
@@ -134,9 +115,9 @@ const homeFaq = faq.filter((f) => f.home);
   <section class="section" aria-labelledby="faq-h">
     <div class="container faq-wrap">
       <div>
-        <p class="kicker">Spørgsmål</p>
-        <h2 id="faq-h">Det spørger kunderne typisk om.</h2>
-        <p class="foot"><a href="/faq/" class="link">Se alle spørgsmål</a></p>
+        <h2 id="faq-h">Typiske spørgsmål.</h2>
+        <p class="lead">Pris, levering, filer og fortrolighed.</p>
+        <p class="foot"><a href="/faq/" class="link">Alle spørgsmål</a></p>
       </div>
       <FaqList items={homeFaq} />
     </div>
@@ -146,54 +127,63 @@ const homeFaq = faq.filter((f) => f.home);
 </BaseLayout>
 
 <style>
-  .hero { padding-block: clamp(3rem, 2rem + 6vw, 7.5rem) clamp(3rem, 2rem + 4vw, 6rem); overflow: hidden; }
-  .hero__grid { display: grid; gap: 3rem; align-items: center; }
-  @media (min-width: 64rem) { .hero__grid { grid-template-columns: 1.15fr 1fr; gap: 3rem; } }
-  .hero h1 { margin-top: 1.75rem; font-size: clamp(2.6rem, 1.3rem + 3.6vw, 4rem); }
-  .hero .lead { margin-top: 1.5rem; }
-  .hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.25rem; }
+  .hero { padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(2.5rem, 2rem + 3vw, 4.5rem); overflow: hidden; }
+  .hero__grid { display: grid; gap: 2.5rem; align-items: center; }
+  @media (min-width: 64rem) { .hero__grid { grid-template-columns: 1.05fr 1fr; gap: 3.5rem; } }
+  .hero h1 { margin-top: 1.5rem; font-size: clamp(2.4rem, 1.4rem + 2.8vw, 3.6rem); }
+  .hero .lead { margin-top: 1.25rem; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+  .hero__trust { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: .6rem 1.5rem; font-size: var(--fs-sm); color: var(--c-ink); }
+  .hero__trust li { display: flex; align-items: center; gap: .5rem; }
+  .hero__trust :global(svg) { color: var(--c-orange); flex-shrink: 0; }
 
-  .trust { border-block: 1px solid var(--c-line); background: var(--c-white); }
-  .trust__list { list-style: none; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; }
-  @media (min-width: 64rem) { .trust__list { grid-template-columns: repeat(4, 1fr); } }
-  .trust li { display: grid; gap: .2rem; padding: 1.5rem 1.25rem 1.5rem 0; }
-  @media (min-width: 64rem) { .trust li + li { border-left: 1px solid var(--c-line); padding-left: 1.75rem; } }
-  .trust__k { font-size: var(--fs-xs); color: var(--c-muted); }
-  .trust__v { font-weight: 500; color: var(--c-ink); font-size: var(--fs-sm); }
-
-  .head { display: grid; gap: .25rem; margin-bottom: clamp(2.5rem, 4vw, 4rem); max-width: 46rem; }
-  .head .lead { margin-top: 1rem; }
-  .head--split { max-width: none; }
+  .head { display: grid; gap: 1rem; margin-bottom: clamp(2rem, 3vw, 3rem); }
+  .head--split { grid-template-columns: 1fr; }
   @media (min-width: 64rem) { .head--split { grid-template-columns: 1fr 1fr; align-items: end; gap: 4rem; } .head--split .lead { margin: 0; } }
-  .foot { margin-top: 2.5rem; }
+  .head h2 { font-size: clamp(2rem, 1.4rem + 2.2vw, 3rem); }
+  .foot { margin-top: 1.5rem; }
 
-  .services { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
-  @media (min-width: 48rem) { .services { grid-template-columns: 1fr 1fr; } }
-  .service { display: grid; gap: .75rem; align-content: start; height: 100%; padding: clamp(1.5rem, 3vw, 2.25rem); text-decoration: none; color: inherit; }
-  .service__title { margin-top: .75rem; font-size: var(--fs-xl); letter-spacing: -0.025em; }
-  .service__desc { color: var(--c-muted); max-width: 48ch; }
-  .service__formats { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--c-muted); }
-  .service .link { margin-top: .5rem; font-size: var(--fs-sm); }
+  .services { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; grid-template-columns: 1fr; }
+  @media (min-width: 40rem) { .services { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 64rem) { .services { grid-template-columns: repeat(4, 1fr); } }
+  .service { display: grid; height: 100%; padding: 6px; text-decoration: none; color: inherit; align-content: start; }
+  .service :global(.media) { border-radius: 14px; }
+  .service__body { display: grid; gap: .4rem; padding: 1rem .75rem .9rem; }
+  .service__title { font-size: var(--fs-lg); }
+  .service__desc { font-size: var(--fs-sm); color: var(--c-muted); }
+  .service .link { margin-top: .4rem; font-size: var(--fs-sm); }
+  /* Mobil: kompakte rækker i stedet for store kort */
+  @media (max-width: 39.99rem) {
+    .services { gap: .6rem; }
+    .service { grid-template-columns: 5.5rem 1fr; align-items: center; gap: .25rem; }
+    .service :global(.media), .service :global(.ph) { aspect-ratio: 1 / 1 !important; border-radius: 12px; }
+    .service :global(.ph__label) { display: none; }
+    .service__body { padding: .4rem .75rem; gap: .15rem; }
+    .service .link { display: none; }
+  }
 
   .cases { display: grid; gap: 1rem; }
   @media (min-width: 56rem) { .cases { grid-template-columns: repeat(3, 1fr); } }
+  /* Mobil/tablet: vandret karrusel i stedet for tre kort under hinanden */
+  @media (max-width: 55.99rem) {
+    .cases { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: .75rem; margin-inline: calc(-1 * clamp(1.25rem, .5rem + 3vw, 2.5rem)); padding: 0 clamp(1.25rem, .5rem + 3vw, 2.5rem) .5rem; scrollbar-width: none; }
+    .cases::-webkit-scrollbar { display: none; }
+    .cases > :global(*) { flex: 0 0 min(82%, 22rem); scroll-snap-align: start; }
+  }
 
-  .why__top { display: grid; gap: 1.5rem; max-width: 52rem; }
-  .why__grid { list-style: none; padding: 0; margin: clamp(3rem, 5vw, 4.5rem) 0 0; display: grid; gap: 2rem; }
-  @media (min-width: 56rem) { .why__grid { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; } }
-  .why__item { display: grid; gap: .75rem; align-content: start; padding-top: 1.5rem; border-top: 1px solid var(--c-dark-line); }
-  .why__item h3 { margin-top: .5rem; }
-  .why__item p { color: var(--c-dark-muted); font-size: var(--fs-sm); }
-  .modes { margin-top: clamp(3rem, 5vw, 4.5rem); background: var(--c-ink-2); border: 1px solid var(--c-dark-line); border-radius: var(--r-lg); padding: clamp(1.5rem, 3vw, 2.5rem); }
-  .modes__h { font-size: var(--fs-lg); }
-  .modes__list { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 1.25rem; }
-  @media (min-width: 56rem) { .modes__list { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
-  .modes__list li { display: grid; gap: .25rem; align-content: start; }
-  .modes__list strong { color: #fff; font-weight: 500; }
-  .modes__list span { color: var(--c-dark-muted); font-size: var(--fs-sm); }
-  .modes__links { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.75rem; font-size: var(--fs-sm); }
+  .why__grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 64rem) { .why__grid { grid-template-columns: 1fr 1.15fr; gap: 5rem; align-items: center; } }
+  .why__intro { display: grid; gap: 1.25rem; }
+  .why__intro h2 { font-size: clamp(2rem, 1.4rem + 2.2vw, 3rem); }
+  .why__links { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: var(--fs-sm); }
+  .why__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1px; background: var(--c-dark-line); border: 1px solid var(--c-dark-line); border-radius: var(--r-lg); overflow: hidden; }
+  @media (min-width: 40rem) { .why__list { grid-template-columns: 1fr 1fr; } }
+  .why__list li { display: grid; gap: .9rem; align-content: start; padding: 1.5rem; background: var(--c-inverse); }
+  .why__list h3 { font-size: var(--fs-base); }
+  .why__list p { font-size: var(--fs-sm); color: var(--c-dark-muted); margin-top: .25rem; }
 
-  .faq-wrap { display: grid; gap: 2.5rem; }
+  .faq-wrap { display: grid; gap: 2rem; }
+  @media (min-width: 64rem) { .faq-wrap { grid-template-columns: 1fr 1.6fr; gap: 5rem; } }
   .faq-wrap h2 { font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem); }
-  @media (min-width: 64rem) { .faq-wrap { grid-template-columns: 1fr 1.5fr; gap: 5rem; } }
+  .faq-wrap .lead { margin-top: .75rem; }
 </style>

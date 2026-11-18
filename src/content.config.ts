@@ -24,6 +24,8 @@ const ydelser = defineCollection({
     h1: z.string(),
     intro: z.string(),
     deliverables: z.array(z.string()),
+    audience: z.array(z.string()).default([]),
+    needs: z.array(z.string()).default([]),
     formats: z.array(z.string()).default([]),
     image: media,
     faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),

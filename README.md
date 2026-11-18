@@ -84,18 +84,28 @@ Kopiér en fil i `src/content/ydelser/`, giv den et nyt filnavn (uden æøå, fx
 
 ## Tilbudsformularen
 
-Formularen sender til den adresse, der står i `PUBLIC_FORM_ENDPOINT` (standard `/api/tilbud.php`).
+Formularen sender som almindelig formular (med filer) til `PUBLIC_FORM_ENDPOINT`. Ved succes sendes brugeren til `/tak/`, og `generate_lead` lægges i `dataLayer`.
 
-**Simply.com (PHP 8.1+):**
-1. Kopiér `public/api/config.sample.php` til `config.php` og udfyld modtager-mail og afsender (`noreply@procad.dk` – opret adressen i Simply-kontrolpanelet, så mails ikke ender som spam).
-2. Upload `config.php` til `/api/` via FTP (den ligger ikke i git).
-3. Test med en rigtig forespørgsel og en fil på ~10 MB.
+**Standard: FormSubmit (virker på GitHub Pages, Vercel og Netlify – gratis, ingen konto):**
+1. Sæt variablen `PUBLIC_FORM_ENDPOINT` til `https://formsubmit.co/DIN@EMAIL.DK`
+   (GitHub: Settings → Secrets and variables → Actions → Variables. Lokalt: `.env`).
+2. Byg/push, og send én testforespørgsel fra sitet.
+3. FormSubmit sender en **aktiveringsmail** til adressen – klik på linket. Først derefter kommer forespørgsler igennem (filer fra før aktivering gemmes ikke).
+4. Valgfrit: FormSubmit giver dig bagefter en tilfældig kode, som kan bruges i stedet for e-mailen i URL'en.
+Grænse: 10 MB filer i alt pr. forespørgsel (formularen viser en måler og advarer).
 
-**Vercel/Netlify:** PHP kører ikke der. Opret en formular hos [Formspree](https://formspree.io) eller [Basin](https://usebasin.com), og sæt `PUBLIC_FORM_ENDPOINT` til deres URL. Filupload kræver typisk en betalt plan – tjek aktuelle vilkår.
+**Simply.com (PHP 8.1+, op til 25 MB):** sæt `PUBLIC_FORM_ENDPOINT=/api/tilbud.php`, kopiér `public/api/config.sample.php` til `config.php`, udfyld og upload via FTP.
 
-Spambeskyttelse: honeypot (`_gotcha`) og tidsfælde er altid aktive. Cloudflare Turnstile slås til ved at udfylde `PUBLIC_TURNSTILE_SITE_KEY` (+ secret i `config.php`).
+UX: ydelse vælges med knapper, filer kan trækkes ind og fjernes enkeltvis, felter valideres, når man forlader dem, og en kladde gemmes lokalt i browseren, hvis siden lukkes.
 
-Ved succes sendes `generate_lead` til `dataLayer`, og brugeren sendes til `/tak/`.
+## Lyst og mørkt tema
+
+Sitet følger brugerens systemindstilling (lyst/mørkt) og har en temaknap i headeren; valget huskes i browseren. Farverne er CSS-variabler i `src/styles/global.css` (`:root` = lyst, `:root[data-theme="dark"]` = mørkt). Brug altid variablerne – aldrig faste farver – så begge temaer virker.
+
+## 3D-model og fotos
+
+- Forsidens 3D-model (`src/components/Model3D.astro` + `src/scripts/bracket3d.ts`, three.js) indlæses først, når den er synlig. Uden WebGL eller med "reducer bevægelse" vises stregtegningen.
+- Ydelsesbillederne er midlertidige fotos fra Unsplash (gratis licens) – se `src/data/photos.ts`. Erstat dem med egne billeder ved at ændre `image.src` i `src/content/ydelser/*.md`.
 
 ## Deploy
 

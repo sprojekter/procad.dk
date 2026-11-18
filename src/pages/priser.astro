@@ -13,7 +13,7 @@ import CTASection from '../components/CTASection.astro';
     lead="Du får altid prisen, før jeg går i gang. Ingen timer, der løber, og ingen overraskelser på fakturaen."
   />
 
-  <section class="section">
+  <section class="section section--tight">
     <div class="container">
       <ul class="models">
         <li class="model model--main">
@@ -77,7 +77,7 @@ import CTASection from '../components/CTASection.astro';
   .models { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
   @media (min-width: 56rem) { .models { grid-template-columns: 1.15fr 1fr 1fr; } }
   .model { padding: clamp(1.75rem, 3vw, 2.25rem); display: grid; gap: .75rem; align-content: start; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); }
-  .model--main { background: var(--c-ink); border-color: var(--c-ink); color: var(--c-dark-text); }
+  .model--main { background: var(--c-inverse); border-color: var(--c-dark-line); color: var(--c-dark-text); }
   .model--main h2 { color: #fff; }
   .model--main .model__fit { color: var(--c-orange); }
   .model h2 { font-size: var(--fs-xl); letter-spacing: -0.025em; }

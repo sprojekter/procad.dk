@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
-import FaqList from '../components/FaqList.astro';
 import CTASection from '../components/CTASection.astro';
 import { faq, faqCategories, type FaqItem } from '../data/faq';
 
@@ -20,29 +19,81 @@ const schema = {
   <PageHeader
     crumbs={[{ label: 'FAQ', href: '/faq/' }]}
     title="Spørgsmål og svar"
-    lead="Kan du ikke finde svaret? Skriv eller ring – du får svar inden for 24 timer på hverdage."
-  >
-    <nav class="faq-nav" aria-label="Emner">
-      {cats.map(([k, v]) => <a href={`#${k}`} class="btn btn-secondary btn-sm">{v}</a>)}
-    </nav>
-  </PageHeader>
+    lead="Find svaret hurtigt – søg, eller vælg et emne."
+  />
 
-  <section class="section">
-    <div class="container faq-page">
-      {cats.map(([k, v]) => (
-        <section id={k} class="faq-group" aria-labelledby={`${k}-h`}>
-          <h2 id={`${k}-h`}>{v}</h2>
-          <FaqList items={faq.filter((f) => f.cat === k)} schema={false} />
-        </section>
-      ))}
+  <section class="section section--tight">
+    <div class="container faqp" data-faq>
+      <div class="faqp__tools">
+        <label class="faqp__search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="sr-only">Søg i spørgsmål</span>
+          <input type="search" class="input" placeholder="Søg, fx DXF, pris eller NDA" data-faq-search />
+        </label>
+        <div class="faqp__cats" role="group" aria-label="Emner">
+          <button type="button" class="faqp__cat" aria-pressed="true" data-cat="alle">Alle</button>
+          {cats.map(([k, v]) => <button type="button" class="faqp__cat" aria-pressed="false" data-cat={k}>{v}</button>)}
+        </div>
+      </div>
+
+      <div class="faqp__list">
+        {faq.map((i) => (
+          <details class="faq-item" data-cat={i.cat}>
+            <summary>{i.q}</summary>
+            <div class="faq-answer"><p>{i.a}</p></div>
+          </details>
+        ))}
+        <p class="faqp__empty" hidden data-faq-empty>Ingen spørgsmål matcher. <a href="/kontakt/" class="link">Spørg mig direkte</a></p>
+      </div>
     </div>
   </section>
 
-  <CTASection heading="Har du et spørgsmål, der ikke står her?" text="Send det sammen med din fil – så får du både svar og en pris." />
+  <CTASection heading="Fandt du ikke svaret?" text="Send dit spørgsmål sammen med din fil – så får du både svar og en pris." />
 </BaseLayout>
 
 <style>
-  .faq-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 2rem; }
-  .faq-page { max-width: 56rem; display: grid; gap: 4rem; }
-  .faq-group h2 { font-size: var(--fs-xl); letter-spacing: -0.025em; margin-bottom: 1rem; }
+  .faqp { display: grid; gap: 2rem; }
+  @media (min-width: 64rem) { .faqp { grid-template-columns: 18rem 1fr; gap: 4rem; align-items: start; } .faqp__tools { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
+  .faqp__tools { display: grid; gap: 1rem; }
+  .faqp__search { position: relative; display: block; }
+  .faqp__search svg { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--c-muted); pointer-events: none; }
+  .faqp__search .input { padding-left: 2.6rem; }
+  .faqp__cats { display: flex; flex-wrap: wrap; gap: .4rem; }
+  @media (min-width: 64rem) { .faqp__cats { flex-direction: column; align-items: stretch; } }
+  .faqp__cat { text-align: left; font: 500 .9375rem var(--font-sans); color: var(--c-muted); background: transparent; border: 1px solid var(--c-line); border-radius: 999px; padding: .45rem .9rem; cursor: pointer; }
+  @media (min-width: 64rem) { .faqp__cat { border-radius: 10px; border-color: transparent; } }
+  .faqp__cat:hover { color: var(--c-ink); }
+  .faqp__cat[aria-pressed="true"] { color: var(--c-ink); background: var(--c-white); border-color: var(--c-line); box-shadow: var(--shadow-sm); }
+  .faqp__list { min-width: 0; }
+  .faqp__empty { padding: 1.5rem 0; color: var(--c-muted); }
 </style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-faq]');
+  if (root) {
+    const items = Array.from(root.querySelectorAll<HTMLDetailsElement>('.faq-item'));
+    const search = root.querySelector<HTMLInputElement>('[data-faq-search]')!;
+    const empty = root.querySelector<HTMLElement>('[data-faq-empty]')!;
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-cat]')).filter((b) => b.tagName === 'BUTTON');
+    let cat = 'alle';
+    const norm = (s: string) => s.toLowerCase().normalize('NFKD');
+    const apply = () => {
+      const q = norm(search.value.trim());
+      let shown = 0;
+      items.forEach((it) => {
+        const okCat = cat === 'alle' || it.dataset.cat === cat;
+        const okQ = !q || norm(it.textContent || '').includes(q);
+        it.hidden = !(okCat && okQ);
+        if (!it.hidden) shown++;
+        if (q && !it.hidden) it.open = true;
+      });
+      empty.hidden = shown > 0;
+    };
+    buttons.forEach((b) => b.addEventListener('click', () => {
+      cat = b.dataset.cat || 'alle';
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    }));
+    search.addEventListener('input', apply);
+  }
+</script>

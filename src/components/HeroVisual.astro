@@ -1,10 +1,8 @@
 ---
-// Hero-illustration: isometrisk stregtegning af et bukket beslag over sin udfoldning,
-// med processens trin til højre. Tegnes op én gang; trinmarkøren skifter roligt.
-// Respekterer prefers-reduced-motion.
-const stages = ['Skitse eller fil', '3D-model', 'Arbejdstegning', 'DXF og bukkeplan'];
+// Isometrisk stregtegning af beslaget over sin udfoldning.
+// Bruges som plakat/fallback for 3D-modellen (vises før WebGL er klar, og hvis WebGL mangler).
 ---
-<figure class="hv" aria-label="Isometrisk tegning af et bukket stålbeslag over dets udfoldning med mål. Til højre processens trin fra skitse til DXF og bukkeplan.">
+<div class="hv" aria-hidden="true">
   <svg class="hv__svg" viewBox="165 -10 470 610" aria-hidden="true">
 <g class="layer-flat">
 <path class="plane" d="M300.0 337.5 L572.8 495.0 L464.5 557.5 L191.7 400.0 Z"/>
@@ -37,41 +35,17 @@ const stages = ['Skitse eller fil', '3D-model', 'Arbejdstegning', 'DXF og bukkep
 <text class="dimt" x="349.8" y="62.5">90</text>
 </g>
   </svg>
-  <ol class="hv__stages" aria-hidden="true">
-    {stages.map((s, i) => <li style={`--i:${i}`}><span>{s}</span></li>)}
-  </ol>
-</figure>
+</div>
 
 <style>
-  .hv { position: relative; margin: 0; display: grid; grid-template-columns: 1fr; align-items: center; }
-  @media (min-width: 40rem) { .hv { grid-template-columns: 1fr 10.5rem; gap: 1rem; } }
-  .hv__svg { width: 100%; height: auto; overflow: visible; }
-  .hv :global(.f) { fill: #fff; stroke: #0e0e10; stroke-width: 1.25; stroke-linejoin: round; }
-  .hv :global(.hole) { fill: #f7f7f5; stroke: #0e0e10; stroke-width: 1; }
-  .hv :global(.plane) { fill: rgba(255,118,33,.04); stroke: #b9b7b0; stroke-width: 1; }
-  .hv :global(.layer-flat .hole) { fill: none; stroke: #b9b7b0; }
+  .hv { position: absolute; inset: 0; }
+  .hv__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hv :global(.f) { fill: var(--c-white); stroke: var(--c-ink); stroke-width: 1.25; stroke-linejoin: round; }
+  .hv :global(.hole) { fill: var(--c-paper); stroke: var(--c-ink); stroke-width: 1; }
+  .hv :global(.plane) { fill: color-mix(in srgb, var(--c-orange) 5%, transparent); stroke: var(--c-line-strong); stroke-width: 1; }
+  .hv :global(.layer-flat .hole) { fill: none; stroke: var(--c-line-strong); }
   .hv :global(.bend) { stroke: var(--c-orange); stroke-width: 1.4; stroke-dasharray: 6 5; }
-  .hv :global(.guide) { stroke: #c9c7c0; stroke-width: 1; stroke-dasharray: 3 5; }
+  .hv :global(.guide) { stroke: var(--c-line-strong); stroke-width: 1; stroke-dasharray: 3 5; }
   .hv :global(.dim) { stroke: var(--c-orange); stroke-width: 1; fill: none; }
-  .hv :global(.dimt) { font: 500 12px var(--font-mono); fill: #6e6e73; text-anchor: middle; }
-
-  .hv__stages { display: none; list-style: none; margin: 0; padding: 0 0 0 1.25rem; position: relative; }
-  @media (min-width: 40rem) { .hv__stages { display: grid; gap: 2.75rem; } }
-  .hv__stages::before { content: ""; position: absolute; left: 0; top: .4rem; bottom: .4rem; width: 1px; background: #d6d4ce; }
-  .hv__stages li { position: relative; font: 500 .75rem/1.2 var(--font-mono); color: #8a8a8f; }
-  .hv__stages li::before { content: ""; position: absolute; left: -1.25rem; top: .45rem; width: .75rem; height: 1px; background: #d6d4ce; }
-  .hv__stages span { display: inline-block; padding: .2rem .4rem; border-radius: 4px; animation: stage 12s infinite; animation-delay: calc(var(--i) * 3s); }
-  @keyframes stage { 0%, 25% { background: var(--c-orange-soft); color: #0e0e10; } 26%, 100% { background: transparent; color: #8a8a8f; } }
-
-  .hv :global(.layer-part), .hv :global(.layer-flat), .hv :global(.layer-dims) { opacity: 0; animation: rise .9s cubic-bezier(.2,.7,.2,1) forwards; }
-  .hv :global(.layer-flat) { animation-delay: .1s; }
-  .hv :global(.layer-part) { animation-delay: .35s; }
-  .hv :global(.layer-dims) { animation-delay: .9s; }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hv :global(.layer-part), .hv :global(.layer-flat), .hv :global(.layer-dims) { animation: none; opacity: 1; }
-    .hv__stages span { animation: none; }
-    .hv__stages li:last-child span { background: var(--c-orange-soft); color: #0e0e10; }
-  }
+  .hv :global(.dimt) { font: 500 12px var(--font-mono); fill: var(--c-muted); text-anchor: middle; }
 </style>

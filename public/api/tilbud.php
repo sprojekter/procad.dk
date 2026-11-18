@@ -58,7 +58,7 @@ if (empty($_POST) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
 }
 
 // --- Spam: honeypot + tidsfælde ---
-if (!empty($_POST['_gotcha'])) {
+if (!empty($_POST['_gotcha']) || !empty($_POST['_honey'])) {
     respond(true); // lad som om alt gik godt
 }
 $ts = (int)($_POST['_ts'] ?? 0);
@@ -91,15 +91,15 @@ if ($config['turnstile_secret'] !== '') {
 $clean = static fn(string $k, int $max = 300): string =>
     trim(mb_substr(str_replace(["\r", "\0"], '', (string)($_POST[$k] ?? '')), 0, $max));
 
-$navn        = $clean('navn', 120);
-$firma       = $clean('firma', 160);
+$navn        = $clean('Navn', 120);
+$firma       = $clean('Firma', 160);
 $email       = $clean('email', 200);
-$telefon     = $clean('telefon', 40);
-$ydelse      = $clean('ydelse', 60);
-$dato        = $clean('leveringsdato', 20);
-$beskrivelse = trim(mb_substr((string)($_POST['beskrivelse'] ?? ''), 0, 8000));
-$side        = $clean('_side', 200);
-$samtykke    = ($_POST['samtykke'] ?? '') === 'ja';
+$telefon     = $clean('Telefon', 40);
+$ydelse      = $clean('Ydelse', 60);
+$dato        = $clean('Tidsplan', 40);
+$beskrivelse = trim(mb_substr((string)($_POST['Beskrivelse'] ?? ''), 0, 8000));
+$side        = $clean('Side', 200);
+$samtykke    = in_array($_POST['Samtykke'] ?? '', ['Ja', 'ja'], true);
 
 $errors = [];
 if ($navn === '') $errors[] = 'navn';
@@ -114,24 +114,29 @@ if ($errors) {
 $allowedExt = ['pdf', 'dxf', 'dwg', 'step', 'stp', 'iges', 'igs', 'jpg', 'jpeg', 'png', 'heic', 'webp', 'zip'];
 $attachments = [];
 $total = 0;
-if (!empty($_FILES['filer']) && is_array($_FILES['filer']['name'])) {
-    $count = count($_FILES['filer']['name']);
-    if ($count > 15) respond(false, 'Maks. 15 filer pr. forespørgsel.', 422);
-    for ($i = 0; $i < $count; $i++) {
-        $err = $_FILES['filer']['error'][$i];
-        if ($err === UPLOAD_ERR_NO_FILE) continue;
-        if ($err !== UPLOAD_ERR_OK) respond(false, 'En fil kunne ikke uploades. Prøv igen eller send den på mail.', 400);
-        $name = basename((string)$_FILES['filer']['name'][$i]);
-        $ext  = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowedExt, true)) respond(false, "Filtypen .$ext er ikke tilladt.", 415);
-        $size = (int)$_FILES['filer']['size'][$i];
-        $total += $size;
-        if ($total > $config['max_total_bytes']) respond(false, 'Filerne fylder mere end 25 MB.', 413);
-        $tmp = $_FILES['filer']['tmp_name'][$i];
-        if (!is_uploaded_file($tmp)) continue;
-        $safe = preg_replace('/[^A-Za-z0-9._-]+/', '_', $name) ?: "fil-$i.$ext";
-        $attachments[] = ['name' => $safe, 'data' => (string)file_get_contents($tmp)];
+// Normalisér alle filfelter (attachment1, attachment2 … eller filer[]) til én liste
+$incoming = [];
+foreach ($_FILES as $field) {
+    if (is_array($field['name'])) {
+        foreach ($field['name'] as $i => $n) {
+            $incoming[] = ['name' => $n, 'error' => $field['error'][$i], 'size' => $field['size'][$i], 'tmp' => $field['tmp_name'][$i]];
+        }
+    } else {
+        $incoming[] = ['name' => $field['name'], 'error' => $field['error'], 'size' => $field['size'], 'tmp' => $field['tmp_name']];
     }
+}
+if (count($incoming) > 15) respond(false, 'Maks. 15 filer pr. forespørgsel.', 422);
+foreach ($incoming as $i => $fil) {
+    if ($fil['error'] === UPLOAD_ERR_NO_FILE) continue;
+    if ($fil['error'] !== UPLOAD_ERR_OK) respond(false, 'En fil kunne ikke uploades. Prøv igen eller send den på mail.', 400);
+    $name = basename((string)$fil['name']);
+    $ext  = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExt, true)) respond(false, "Filtypen .$ext er ikke tilladt.", 415);
+    $total += (int)$fil['size'];
+    if ($total > $config['max_total_bytes']) respond(false, 'Filerne fylder mere end 25 MB.', 413);
+    if (!is_uploaded_file($fil['tmp'])) continue;
+    $safe = preg_replace('/[^A-Za-z0-9._-]+/', '_', $name) ?: "fil-$i.$ext";
+    $attachments[] = ['name' => $safe, 'data' => (string)file_get_contents($fil['tmp'])];
 }
 
 // --- Mail ---
@@ -151,7 +156,7 @@ $body .= "Firma:       " . ($firma ?: '-') . "\n";
 $body .= "E-mail:      $email\n";
 $body .= "Telefon:     " . ($telefon ?: '-') . "\n";
 $body .= "Ydelse:      $ydelseTxt\n";
-$body .= "Ønsket dato: " . ($dato ?: '-') . "\n";
+$body .= "Tidsplan:    " . ($dato ?: '-') . "\n";
 $body .= "Sendt fra:   " . ($side ?: '-') . "\n";
 $body .= "Filer:       " . (count($attachments) ? implode(', ', array_column($attachments, 'name')) : 'ingen') . "\n\n";
 $body .= "Beskrivelse:\n" . str_repeat('-', 40) . "\n$beskrivelse\n\n";

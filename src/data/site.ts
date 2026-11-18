@@ -32,7 +32,9 @@ export const site = {
   formatsOut: ['PDF', 'DXF', 'DWG', 'STEP', 'IGES'],
   responseHours: 24,
 
-  formEndpoint: import.meta.env.PUBLIC_FORM_ENDPOINT || '/api/tilbud.php',
+  // Tilbudsformularen. Standard: FormSubmit (gratis, virker på GitHub Pages, filer op til 10 MB).
+  // På Simply.com kan den sættes til '/api/tilbud.php' (PHP, filer op til 25 MB).
+  formEndpoint: import.meta.env.PUBLIC_FORM_ENDPOINT || 'https://formsubmit.co/kontakt@procad.dk', // [UDFYLD] rigtig e-mail
   turnstileSiteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '',
   gtmId: import.meta.env.PUBLIC_GTM_ID || '',
 };

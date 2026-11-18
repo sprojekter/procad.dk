@@ -15,7 +15,7 @@ const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.dat
     title="Før og efter"
     lead="Hver case viser udgangspunktet, det jeg leverede, og hvad det betød for kunden. Kundenavne vises kun med tilladelse."
   />
-  <section class="section">
+  <section class="section section--tight">
     <div class="container">
       <div class="case-grid">
         {cases.map((c) => <CaseCard entry={c} headingLevel="h2" />)}

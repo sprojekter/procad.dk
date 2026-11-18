@@ -23,10 +23,19 @@ deliverables:
   - Filer i STEP, IGES og native format
 formats: [STEP, IGES, native fil, PDF]
 image:
-  alt: Gammel papirtegning ved siden af den nye 3D-model på skærm
+  src: https://images.unsplash.com/photo-1769147339214-076740872485
+  alt: Bearbejdede metaldele på tekniske tegninger
   spec: 3:2, 1600×1067 px, JPG/PNG
   motif: Gulnet papirtegning med blyantsrettelser til venstre, samme emne som 3D-model på en skærm til højre
   prompt: "Split composition: an old yellowed paper engineering drawing with pencil corrections on the left, and on the right a monitor showing a clean grey 3D CAD model of the same machined steel part, workshop desk, calipers on the table, natural light, realistic photo, muted palette with one orange accent, no people"
+audience:
+  - "Værksteder med et arkiv af papirtegninger, der skal bruges igen"
+  - "Virksomheder, der skal genbestille en del, som ingen længere har tegninger på"
+  - "Iværksættere med en produktidé, der skal gøres klar til et værksted"
+needs:
+  - "Skitse, foto, gammel tegning eller emnet selv"
+  - "De vigtigste mål – eller adgang til at måle op"
+  - "Hvad modellen skal bruges til (produktion, tilbud, visualisering)"
 faq:
   - q: Kan I modellere en reservedel ud fra det fysiske emne?
     a: Ja, hvis emnet kan opmåles med skydelære og målebånd. Send fotos med mål, eller aftal at sende emnet. Komplekse fritformer kræver 3D-scanning, som jeg kan henvise til.
@@ -34,23 +43,4 @@ faq:
     a: "[UDFYLD: fx SolidWorks og Inventor]. Du får altid neutrale filer (STEP/IGES), så du ikke er bundet til et bestemt program."
 ---
 
-## Hvad du får
-
 En 3D-model er grundlaget for alt det andet: arbejdstegninger, skærefiler, styklister og visualiseringer. Når modellen er bygget rigtigt, kan den ændres senere uden at starte forfra.
-
-- **Konvertering** af gamle papir- eller PDF-tegninger til moderne CAD
-- **Modellering** ud fra skitser, fotos og opmålte emner
-- **Pladedele** bygget som pladedele, så udfoldningen passer
-- **Samlinger** med rigtige relationer, så du kan tjekke, at tingene passer sammen
-
-## Til hvem
-
-- **Værksteder** med et arkiv af papirtegninger, der skal bruges igen
-- **Virksomheder**, der skal genbestille en del, som ingen længere har tegninger på
-- **Iværksættere** med en produktidé, der skal gøres klar til et værksted
-
-## Det skal jeg bruge fra dig
-
-1. Skitse, foto, gammel tegning eller emnet selv
-2. De vigtigste mål – eller adgang til at måle op
-3. Hvad modellen skal bruges til (produktion, tilbud, visualisering)

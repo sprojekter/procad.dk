@@ -1,222 +1,314 @@
 ---
-// Tilbudsformular. Sender multipart/form-data til site.formEndpoint
-// (PHP på Simply.com som standard – eller Formspree/Basin på Vercel/Netlify).
-// Spambeskyttelse: honeypot (_gotcha) + tidsfælde + valgfri Cloudflare Turnstile.
-// Ved succes: dataLayer-hændelse "generate_lead" og videre til /tak/.
+// Tilbudsformular (v3). Opgaven først, kontaktoplysninger til sidst.
+// Sender som almindelig formular (multipart) til site.formEndpoint:
+//  - FormSubmit (standard, virker på GitHub Pages): filer op til 10 MB i alt
+//  - /api/tilbud.php på Simply.com: filer op til 25 MB i alt
+// Spam: honeypot (_honey) + FormSubmit/Turnstile. Ved afsendelse: dataLayer "generate_lead" → /tak/.
 import { getCollection } from 'astro:content';
 import { site } from '../data/site';
 
 interface Props {
   id?: string;
-  compact?: boolean;          // kort version til ydelsessider (landingssider)
-  preselect?: string;         // ydelse-id der vælges på forhånd
+  compact?: boolean;    // kort version (ydelsessider/landingssider)
+  preselect?: string;   // ydelse-id der vælges på forhånd
   heading?: string;
   submitLabel?: string;
 }
 const { id = 'tilbud', compact = false, preselect = '', heading, submitLabel = 'Send forespørgsel' } = Astro.props;
 const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
+const endpoint = site.formEndpoint;
+const isFormSubmit = endpoint.includes('formsubmit.co');
+const maxMB = isFormSubmit ? 10 : 25;
 const accept = '.pdf,.dxf,.dwg,.step,.stp,.iges,.igs,.jpg,.jpeg,.png,.heic,.webp,.zip';
 const f = (n: string) => `${id}-${n}`;
+const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned', 'Ingen hast'];
 ---
 <form
-  class:list={['quote', { 'quote--compact': compact }]}
+  class:list={['qf', { 'qf--compact': compact }]}
   id={id}
-  action={site.formEndpoint}
+  action={endpoint}
   method="post"
   enctype="multipart/form-data"
   novalidate
   data-quote-form
+  data-max-mb={maxMB}
 >
-  {heading && <h2 class="quote__heading">{heading}</h2>}
+  {heading && <h2 class="qf__heading">{heading}</h2>}
 
-  <div class="quote__grid">
-    <div class="field">
-      <label for={f('navn')}>Navn</label>
-      <input class="input" id={f('navn')} name="navn" type="text" autocomplete="name" required />
-    </div>
-    <div class="field">
-      <label for={f('firma')}>Firma <span class="hint">(valgfrit)</span></label>
-      <input class="input" id={f('firma')} name="firma" type="text" autocomplete="organization" />
-    </div>
-    <div class="field">
-      <label for={f('email')}>E-mail</label>
-      <input class="input" id={f('email')} name="email" type="email" autocomplete="email" required />
-    </div>
-    <div class="field">
-      <label for={f('telefon')}>Telefon <span class="hint">(valgfrit)</span></label>
-      <input class="input" id={f('telefon')} name="telefon" type="tel" autocomplete="tel" inputmode="tel" />
-    </div>
+  <div class="qf__errors" role="alert" aria-live="assertive" tabindex="-1" hidden data-errors></div>
 
-    {compact ? (
-      <input type="hidden" name="ydelse" value={preselect} />
-    ) : (
-      <div class="field">
-        <label for={f('ydelse')}>Hvad skal du have lavet?</label>
-        <select class="input" id={f('ydelse')} name="ydelse" required>
-          <option value="">Vælg ydelse</option>
-          {services.map((s) => <option value={s.id} selected={s.id === preselect}>{s.data.navTitle}</option>)}
-          <option value="andet">Andet / ved ikke endnu</option>
-        </select>
+  {compact && preselect ? (
+    <input type="hidden" name="Ydelse" value={services.find((s) => s.id === preselect)?.data.navTitle ?? preselect} />
+  ) : (
+    <fieldset class="qf__set">
+      <legend class="qf__legend">Hvad skal du have lavet?</legend>
+      <div class="chips" role="radiogroup">
+        {services.map((s) => (
+          <label class="chip">
+            <input type="radio" name="Ydelse" value={s.data.navTitle} checked={s.id === preselect} />
+            <span>{s.data.navTitle}</span>
+          </label>
+        ))}
+        <label class="chip"><input type="radio" name="Ydelse" value="Ved ikke endnu" /><span>Ved ikke endnu</span></label>
       </div>
-    )}
-    {!compact && (
-      <div class="field">
-        <label for={f('dato')}>Ønsket leveringsdato <span class="hint">(valgfrit)</span></label>
-        <input class="input" id={f('dato')} name="leveringsdato" type="date" />
+    </fieldset>
+  )}
+
+  <div class="field">
+    <label for={f('besk')}>Beskriv opgaven <span class="req" aria-hidden="true">*</span></label>
+    <textarea class="input" id={f('besk')} name="Beskrivelse" rows={compact ? 3 : 4} required data-msg="Skriv et par linjer om opgaven."
+      placeholder="Fx: 40 stk. bukket beslag i 3 mm S235. Har en skitse med mål. Skal bruge DXF til laser."></textarea>
+  </div>
+
+  <div class="field">
+    <span class="qf__label" id={f('filer-label')}>Filer <span class="hint">valgfrit</span></span>
+    <label class="dropzone" for={f('filer')} data-dropzone>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4m-4.5 4.5L12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      <span><strong>Træk filer hertil</strong> eller <u>vælg filer</u></span>
+      <span class="hint">PDF, DXF, DWG, STEP, IGES, billeder eller ZIP – maks. {maxMB} MB i alt</span>
+      <input id={f('filer')} type="file" multiple accept={accept} aria-labelledby={f('filer-label')} data-files />
+    </label>
+    <ul class="qf__files" data-file-list aria-live="polite"></ul>
+    <div class="qf__meter" hidden data-meter><span data-meter-bar></span></div>
+    <span class="field-error" data-file-error></span>
+  </div>
+
+  {!compact && (
+    <fieldset class="qf__set">
+      <legend class="qf__legend">Hvornår skal du bruge det? <span class="hint">valgfrit</span></legend>
+      <div class="chips chips--sm">
+        {deadlines.map((d) => <label class="chip"><input type="radio" name="Tidsplan" value={d} /><span>{d}</span></label>)}
       </div>
-    )}
+    </fieldset>
+  )}
 
-    <div class="field quote__full">
-      <label for={f('beskrivelse')}>Beskriv opgaven</label>
-      <textarea class="input" id={f('beskrivelse')} name="beskrivelse" rows={compact ? 4 : 6} required aria-describedby={f('beskrivelse-hint')}></textarea>
-      <span class="hint" id={f('beskrivelse-hint')}>Fx materiale og tykkelse, antal, hvilken maskine filen skal bruges i, og hvad du har i forvejen.</span>
+  <div class="qf__grid">
+    <div class="field">
+      <label for={f('navn')}>Navn <span class="req" aria-hidden="true">*</span></label>
+      <input class="input" id={f('navn')} name="Navn" type="text" autocomplete="name" required data-msg="Skriv dit navn." />
     </div>
-
-    <div class="field quote__full">
-      <span class="quote__label" id={f('filer-label')}>Upload filer <span class="hint">(valgfrit, maks. 25 MB i alt)</span></span>
-      <label class="dropzone" for={f('filer')}>
-        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 20V6m-6 6l6-6 6 6M5 23h18" fill="none" stroke="currentColor" stroke-width="2.4" /></svg>
-        <span><strong>Træk filer hertil</strong> eller klik for at vælge</span>
-        <span class="mono hint">PDF, DXF, DWG, STEP, IGES, billeder, ZIP</span>
-        <input id={f('filer')} name="filer[]" type="file" multiple accept={accept} aria-labelledby={f('filer-label')} aria-describedby={f('filer-fejl')} />
-      </label>
-      <ul class="file-list" aria-live="polite" data-file-list></ul>
-      <span class="field-error" id={f('filer-fejl')} data-file-error></span>
+    <div class="field">
+      <label for={f('email')}>E-mail <span class="req" aria-hidden="true">*</span></label>
+      <input class="input" id={f('email')} name="email" type="email" autocomplete="email" inputmode="email" required data-msg="Skriv en gyldig e-mail, fx navn@firma.dk." />
+    </div>
+    <div class="field">
+      <label for={f('tlf')}>Telefon <span class="hint">valgfrit</span></label>
+      <input class="input" id={f('tlf')} name="Telefon" type="tel" autocomplete="tel" inputmode="tel" />
+    </div>
+    <div class="field">
+      <label for={f('firma')}>Firma <span class="hint">valgfrit</span></label>
+      <input class="input" id={f('firma')} name="Firma" type="text" autocomplete="organization" />
     </div>
   </div>
 
-  <!-- Honeypot: skjult for mennesker -->
-  <div class="hp" aria-hidden="true">
-    <label for={f('hp')}>Udfyld ikke dette felt</label>
-    <input id={f('hp')} type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
-  </div>
-  <input type="hidden" name="_ts" value="" data-ts />
-  <input type="hidden" name="_side" value={Astro.url.pathname} />
-
+  <!-- Spambeskyttelse og opsætning -->
+  <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  {isFormSubmit && <input type="hidden" name="_captcha" value="false" />}
+  {isFormSubmit && <input type="hidden" name="_template" value="table" />}
+  <input type="hidden" name="_subject" value="Ny tilbudsforespørgsel fra procad.dk" />
+  <input type="hidden" name="_next" value="" data-next />
+  <input type="hidden" name="Side" value={Astro.url.pathname} />
   {site.turnstileSiteKey && <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey} data-language="da"></div>}
 
-  <label class="check quote__consent">
-    <input type="checkbox" name="samtykke" value="ja" required aria-describedby={f('samtykke-fejl')} />
-    <span>Jeg accepterer, at ProCAD bruger mine oplysninger og filer til at besvare min forespørgsel. Se <a href="/privatlivspolitik/" class="link">privatlivspolitikken</a>.</span>
+  <label class="check qf__consent">
+    <input type="checkbox" name="Samtykke" value="Ja" required data-msg="Sæt hak for at sende." />
+    <span>ProCAD må bruge mine oplysninger og filer til at besvare forespørgslen. <a href="/privatlivspolitik/" class="qf__policy">Privatlivspolitik</a></span>
   </label>
-  <span class="field-error" id={f('samtykke-fejl')}></span>
 
-  <div class="quote__submit">
-    <button type="submit" class="btn btn-primary">{submitLabel}</button>
-    <p class="hint">Du får svar inden for {site.responseHours} timer på hverdage. Filerne behandles fortroligt.</p>
+  <div class="qf__submit">
+    <button type="submit" class="btn btn-primary qf__btn" data-submit>
+      <span class="qf__spinner" aria-hidden="true"></span>
+      <span data-label>{submitLabel}</span>
+    </button>
+    <p class="hint">Svar inden for {site.responseHours} timer på hverdage. Filerne behandles fortroligt.</p>
   </div>
-  <p class="quote__status field-error" role="alert" data-status></p>
 </form>
 
 {site.turnstileSiteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 
 <style>
-  .quote { display: grid; gap: 1.25rem; }
-  .quote__heading { font-size: var(--fs-2xl); }
-  .quote__grid { display: grid; gap: 1rem; }
-  @media (min-width: 40rem) { .quote__grid { grid-template-columns: 1fr 1fr; } .quote__full { grid-column: 1 / -1; } }
-  .quote--compact .quote__grid { grid-template-columns: 1fr; }
-  .quote--compact .quote__full { grid-column: auto; }
-  .quote__label { font-weight: 600; font-size: var(--fs-sm); }
-  .quote__submit { display: grid; gap: .6rem; justify-items: start; }
-  .quote__submit .btn { min-width: 14rem; }
-  .quote__status:empty, .field-error:empty { display: none; }
+  .qf { display: grid; gap: 1.25rem; }
+  .qf__heading { font-size: var(--fs-xl); letter-spacing: -0.025em; }
+  .qf__set { border: 0; padding: 0; margin: 0; display: grid; gap: .6rem; }
+  .qf__legend, .qf__label { font-weight: 500; font-size: var(--fs-sm); color: var(--c-ink); padding: 0; }
+  .req { color: var(--c-orange); }
+  .qf__grid { display: grid; gap: 1rem; }
+  @media (min-width: 40rem) { .qf__grid { grid-template-columns: 1fr 1fr; } }
+  .qf--compact .qf__grid { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 30rem) { .qf--compact .qf__grid { grid-template-columns: 1fr; } }
+
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .chip span { display: inline-flex; align-items: center; min-height: 2.5rem; padding: .45rem .95rem; border: 1px solid var(--c-field); border-radius: 999px; font-size: .9375rem; color: var(--c-ink); background: var(--c-white); transition: border-color .15s ease, background-color .15s ease, color .15s ease; cursor: pointer; }
+  .chips--sm .chip span { min-height: 2.25rem; font-size: .875rem; padding: .35rem .85rem; }
+  .chip:hover span { border-color: var(--c-ink); }
+  .chip input:checked + span { background: var(--c-ink); color: var(--c-on-ink); border-color: var(--c-ink); }
+  .chip input:focus-visible + span { box-shadow: var(--ring); }
+
+  .qf__files { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .qf__files:empty { display: none; }
+  .qf__files li { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; padding: .3rem .35rem .3rem .7rem; border: 1px solid var(--c-line); background: var(--c-paper); border-radius: 999px; font-size: var(--fs-xs); color: var(--c-ink); }
+  .qf__files li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14rem; }
+  .qf__files li small { color: var(--c-muted); }
+  .qf__files button { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 0; background: transparent; color: var(--c-muted); cursor: pointer; }
+  .qf__files button:hover { background: var(--c-line); color: var(--c-ink); }
+  .qf__meter { height: 4px; background: var(--c-line); border-radius: 99px; overflow: hidden; }
+  .qf__meter span { display: block; height: 100%; width: 0; background: var(--c-ink); transition: width .3s var(--ease); }
+  .qf__meter.is-over span { background: var(--c-danger); }
+
+  .qf__errors { padding: .85rem 1rem; border-radius: var(--r-md); border: 1px solid color-mix(in srgb, var(--c-danger) 40%, transparent); background: color-mix(in srgb, var(--c-danger) 8%, var(--c-white)); font-size: var(--fs-sm); color: var(--c-ink); }
+  .qf__errors ul { margin: .35rem 0 0; padding-left: 1.1rem; }
+  .qf__errors a { color: var(--c-ink); }
+  .qf__consent { color: var(--c-muted); }
+  .qf__policy { color: var(--c-ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--c-line-strong); }
+  .qf__submit { display: grid; gap: .6rem; justify-items: start; }
+  .qf__btn { min-width: 13rem; }
+  .qf--compact .qf__btn { width: 100%; }
+  .qf__spinner { display: none; width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: qf-spin .7s linear infinite; }
+  .qf.is-sending .qf__spinner { display: inline-block; }
+  .qf.is-sending .qf__btn { pointer-events: none; opacity: .85; }
+  @keyframes qf-spin { to { transform: rotate(360deg); } }
+  .field-error:empty { display: none; }
 </style>
 
 <script>
-  const MAX = 25 * 1024 * 1024;
   const OK_EXT = ['pdf', 'dxf', 'dwg', 'step', 'stp', 'iges', 'igs', 'jpg', 'jpeg', 'png', 'heic', 'webp', 'zip'];
-  const MSG: Record<string, string> = {
-    navn: 'Skriv dit navn.',
-    email: 'Skriv en gyldig e-mailadresse, fx navn@firma.dk.',
-    ydelse: 'Vælg hvad du skal have lavet – eller "Andet".',
-    beskrivelse: 'Beskriv kort opgaven, så jeg kan give en pris.',
-    samtykke: 'Sæt hak for at sende forespørgslen.',
-  };
+  const fmt = (b: number) => (b >= 1048576 ? `${(b / 1048576).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(b / 1024))} kB`);
 
   document.querySelectorAll<HTMLFormElement>('[data-quote-form]').forEach((form) => {
-    const ts = form.querySelector<HTMLInputElement>('[data-ts]');
-    if (ts) ts.value = String(Date.now());
-    const fileInput = form.querySelector<HTMLInputElement>('input[type="file"]');
-    const list = form.querySelector<HTMLUListElement>('[data-file-list]');
-    const fileErr = form.querySelector<HTMLElement>('[data-file-error]');
-    const status = form.querySelector<HTMLElement>('[data-status]');
-    const zone = form.querySelector<HTMLElement>('.dropzone');
+    const MAX = Number(form.dataset.maxMb || 10) * 1048576;
+    const input = form.querySelector<HTMLInputElement>('[data-files]')!;
+    const list = form.querySelector<HTMLUListElement>('[data-file-list]')!;
+    const fileErr = form.querySelector<HTMLElement>('[data-file-error]')!;
+    const meter = form.querySelector<HTMLElement>('[data-meter]')!;
+    const bar = form.querySelector<HTMLElement>('[data-meter-bar]')!;
+    const zone = form.querySelector<HTMLElement>('[data-dropzone]')!;
+    const errors = form.querySelector<HTMLElement>('[data-errors]')!;
+    const draftKey = `procad-draft-${form.id}`;
+    let files: File[] = [];
 
-    const fmt = (b: number) => (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.ceil(b / 1024)} kB`);
-
-    function checkFiles(): boolean {
-      if (!fileInput || !list || !fileErr) return true;
-      const files = Array.from(fileInput.files || []);
+    // ---------- Filer: tilføj, vis som chips, fjern ----------
+    const renderFiles = () => {
       list.innerHTML = '';
-      let total = 0; let bad = '';
-      files.forEach((file) => {
+      let total = 0;
+      files.forEach((file, i) => {
         total += file.size;
-        const ext = file.name.split('.').pop()?.toLowerCase() || '';
-        if (!OK_EXT.includes(ext)) bad = file.name;
         const li = document.createElement('li');
-        li.textContent = `${file.name} (${fmt(file.size)})`;
+        li.innerHTML = `<span></span><small>${fmt(file.size)}</small><button type="button" aria-label="Fjern ${file.name.replace(/"/g, '')}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>`;
+        (li.querySelector('span') as HTMLElement).textContent = file.name;
+        li.querySelector('button')!.addEventListener('click', () => { files.splice(i, 1); renderFiles(); });
         list.appendChild(li);
       });
-      let msg = '';
-      if (bad) msg = `Filtypen i "${bad}" kan ikke sendes. Pak den i en ZIP-fil, eller send den på mail.`;
-      else if (total > MAX) msg = `Filerne fylder ${fmt(total)}. Maks. 25 MB – send store filer via WeTransfer-link i beskrivelsen.`;
-      fileErr.textContent = msg;
-      fileInput.setAttribute('aria-invalid', msg ? 'true' : 'false');
-      return !msg;
-    }
-    fileInput?.addEventListener('change', checkFiles);
-    zone?.addEventListener('dragover', () => zone.classList.add('is-dragover'));
-    zone?.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
-    zone?.addEventListener('drop', () => zone.classList.remove('is-dragover'));
+      meter.hidden = files.length === 0;
+      bar.style.width = `${Math.min(100, (total / MAX) * 100)}%`;
+      meter.classList.toggle('is-over', total > MAX);
+      fileErr.textContent = total > MAX ? `Filerne fylder ${fmt(total)} – maks. ${fmt(MAX)}. Fjern en fil, eller indsæt et WeTransfer-link i beskrivelsen.` : '';
+    };
+    const addFiles = (incoming: FileList | File[]) => {
+      const bad: string[] = [];
+      Array.from(incoming).forEach((file) => {
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        if (!OK_EXT.includes(ext)) { bad.push(file.name); return; }
+        if (!files.some((f) => f.name === file.name && f.size === file.size)) files.push(file);
+      });
+      renderFiles();
+      if (bad.length) fileErr.textContent = `${bad.join(', ')} kan ikke sendes. Pak filen i en ZIP, eller send den på mail.`;
+    };
+    input.addEventListener('change', () => { addFiles(input.files || []); input.value = ''; });
+    ['dragenter', 'dragover'].forEach((t) => zone.addEventListener(t, (e) => { e.preventDefault(); zone.classList.add('is-dragover'); }));
+    ['dragleave', 'drop'].forEach((t) => zone.addEventListener(t, () => zone.classList.remove('is-dragover')));
+    zone.addEventListener('drop', (e) => { e.preventDefault(); if ((e as DragEvent).dataTransfer?.files) addFiles((e as DragEvent).dataTransfer!.files); });
 
-    function setError(el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, msg: string) {
-      const id = `${el.id}-fejl`;
-      let err = document.getElementById(id);
-      if (el.type === 'checkbox') err = form.querySelector(`#${form.id}-samtykke-fejl`);
+    // ---------- Kladde: gem tekstfelter lokalt ----------
+    const fields = () => Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[type=text], input[type=email], input[type=tel], textarea, input[type=radio]'));
+    try {
+      const d = JSON.parse(localStorage.getItem(draftKey) || '{}');
+      fields().forEach((el) => {
+        if (el.name.startsWith('_') || !(el.name in d)) return;
+        if (el.type === 'radio') (el as HTMLInputElement).checked = d[el.name] === el.value;
+        else el.value = d[el.name];
+      });
+    } catch {}
+    let t: number | undefined;
+    form.addEventListener('input', () => {
+      clearTimeout(t);
+      t = window.setTimeout(() => {
+        const d: Record<string, string> = {};
+        new FormData(form).forEach((v, k) => { if (typeof v === 'string' && !k.startsWith('_') && k !== 'Samtykke' && k !== 'Side') d[k] = v; });
+        try { localStorage.setItem(draftKey, JSON.stringify(d)); } catch {}
+      }, 400);
+    });
+
+    // ---------- Validering ----------
+    const fieldError = (el: HTMLInputElement | HTMLTextAreaElement) => {
+      const ok = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.value.trim() !== '' && el.checkValidity();
+      const msg = ok ? '' : el.dataset.msg || 'Udfyld feltet.';
+      el.setAttribute('aria-invalid', String(!ok));
+      let err = document.getElementById(`${el.id || el.name}-err`);
       if (!err) {
         err = document.createElement('span');
-        err.id = id; err.className = 'field-error';
-        el.insertAdjacentElement('afterend', err);
-        el.setAttribute('aria-describedby', [el.getAttribute('aria-describedby'), id].filter(Boolean).join(' '));
+        err.id = `${el.id || el.name}-err`;
+        err.className = 'field-error';
+        (el.type === 'checkbox' ? el.closest('label')! : el).insertAdjacentElement('afterend', err);
+        el.setAttribute('aria-describedby', err.id);
       }
       err.textContent = msg;
-      el.setAttribute('aria-invalid', msg ? 'true' : 'false');
-    }
+      return msg;
+    };
+    const required = () => Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]'));
+    required().forEach((el) => {
+      el.addEventListener('blur', () => { if (el.dataset.touched || el.value) { el.dataset.touched = '1'; fieldError(el); } });
+      el.addEventListener('input', () => { if (el.getAttribute('aria-invalid') === 'true') fieldError(el); });
+      el.addEventListener('change', () => { if (el.type === 'checkbox') fieldError(el); });
+    });
 
-    function validate(): boolean {
-      let first: HTMLElement | null = null;
-      form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[required]').forEach((el) => {
-        const ok = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.checkValidity() && el.value.trim() !== '';
-        setError(el, ok ? '' : MSG[el.name] || 'Udfyld feltet.');
-        if (!ok && !first) first = el;
-      });
-      const filesOk = checkFiles();
-      if (!filesOk && !first) first = fileInput;
-      (first as HTMLElement | null)?.focus();
-      return !first;
-    }
-
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (status) status.textContent = '';
-      if (!validate()) return;
-      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-      const label = btn?.textContent || '';
-      if (btn) { btn.disabled = true; btn.textContent = 'Sender …'; }
-      try {
-        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || data.ok === false) throw new Error(data.error || 'Serveren svarede med en fejl.');
-        const ydelse = (form.elements.namedItem('ydelse') as HTMLInputElement | null)?.value || 'ukendt';
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        (window as any).dataLayer.push({ event: 'generate_lead', form_id: form.id, ydelse, side: location.pathname });
-        try { sessionStorage.setItem('procad-lead', '1'); } catch {}
-        setTimeout(() => { location.href = (document.documentElement.dataset.base || '') + '/tak/'; }, 300);
-      } catch (err) {
-        if (status) status.textContent = `Forespørgslen blev ikke sendt: ${(err as Error).message} Prøv igen, eller skriv direkte til kontakt@procad.dk.`;
-        if (btn) { btn.disabled = false; btn.textContent = label; }
+      const problems: { el: HTMLElement; msg: string }[] = [];
+      required().forEach((el) => { const m = fieldError(el); if (m) problems.push({ el, msg: m }); });
+      const total = files.reduce((n, f) => n + f.size, 0);
+      if (total > MAX) problems.push({ el: input, msg: fileErr.textContent || 'Filerne er for store.' });
+
+      if (problems.length) {
+        errors.hidden = false;
+        errors.innerHTML = `<strong>Ret ${problems.length === 1 ? 'dette' : 'disse ' + problems.length + ' ting'}, før du sender:</strong><ul></ul>`;
+        const ul = errors.querySelector('ul')!;
+        problems.forEach((p) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${p.el.id}`; a.textContent = p.msg;
+          a.addEventListener('click', (ev) => { ev.preventDefault(); p.el.focus(); });
+          li.appendChild(a); ul.appendChild(li);
+        });
+        errors.focus();
+        return;
       }
+      errors.hidden = true;
+
+      // Filer: én input pr. fil (attachment1, attachment2 …) – virker med FormSubmit og PHP
+      form.querySelectorAll('input[data-generated]').forEach((n) => n.remove());
+      files.forEach((file, i) => {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        const el = document.createElement('input');
+        el.type = 'file'; el.name = `attachment${i + 1}`; el.hidden = true; el.dataset.generated = '1';
+        el.files = dt.files;
+        form.appendChild(el);
+      });
+
+      // Videre til takkesiden efter afsendelse
+      const base = document.documentElement.dataset.base || '';
+      (form.querySelector('[data-next]') as HTMLInputElement).value = `${location.origin}${base}/tak/`;
+
+      const ydelse = (form.querySelector('input[name="Ydelse"]:checked, input[type=hidden][name="Ydelse"]') as HTMLInputElement | null)?.value || 'ukendt';
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({ event: 'generate_lead', form_id: form.id, ydelse, files: files.length });
+      try { sessionStorage.setItem('procad-lead', '1'); localStorage.removeItem(draftKey); } catch {}
+
+      form.classList.add('is-sending');
+      (form.querySelector('[data-label]') as HTMLElement).textContent = 'Sender …';
+      HTMLFormElement.prototype.submit.call(form);
     });
   });
 </script>

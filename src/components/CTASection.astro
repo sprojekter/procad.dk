@@ -40,15 +40,19 @@ const {
 </section>
 
 <style>
-  .cta__panel { position: relative; overflow: hidden; border-radius: var(--r-xl); padding: clamp(2rem, 1rem + 5vw, 5rem); display: grid; gap: 3rem; }
+  .cta__panel { position: relative; overflow: hidden; border-radius: var(--r-xl); padding: clamp(1.5rem, 1rem + 4vw, 4rem); display: grid; gap: 2.5rem; }
   .cta__panel::before { content: ""; position: absolute; inset: auto -20% -60% auto; width: 60rem; height: 40rem; background: radial-gradient(closest-side, rgba(255,118,33,.16), transparent); pointer-events: none; }
   .cta__panel > * { position: relative; }
-  @media (min-width: 64rem) { .cta__panel--form { grid-template-columns: 5fr 6fr; align-items: start; } }
+  @media (min-width: 64rem) { .cta__panel--form { grid-template-columns: 4fr 6fr; align-items: start; } }
   .cta__copy h2 { max-width: 16ch; }
   .cta__copy .lead { margin-top: 1.25rem; }
   .cta__points { list-style: none; padding: 0; margin: 2.25rem 0 0; display: grid; gap: .9rem; font-size: var(--fs-sm); color: var(--c-dark-text); }
   .cta__points li { display: flex; align-items: center; gap: .85rem; }
   .cta__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.25rem; }
-  .cta__form { background: var(--c-white); color: var(--c-body); border-radius: var(--r-lg); padding: clamp(1.25rem, 3vw, 2rem); }
-  .cta__form :global(h2), .cta__form :global(label) { color: var(--c-ink); }
+  .cta__form { background: var(--c-white); color: var(--c-body); border: 1px solid var(--c-line); border-radius: var(--r-lg); padding: clamp(1.25rem, 3vw, 2rem); }
+  /* Formularen er en lys flade inde i det mørke panel: nulstil de mørke regler */
+  .cta__form :global(h2), .cta__form :global(label), .cta__form :global(legend) { color: var(--c-ink); }
+  .cta__form :global(.btn-primary) { background: var(--c-ink); color: var(--c-on-ink); }
+  .cta__form :global(.field-error) { color: var(--c-danger); }
+  .cta__form :global(.hint) { color: var(--c-muted); }
 </style>
