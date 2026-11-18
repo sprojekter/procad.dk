@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroDrawing from '../components/HeroDrawing.astro';
-import HexIcon from '../components/HexIcon.astro';
+import HeroVisual from '../components/HeroVisual.astro';
+import Icon from '../components/Icon.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import CaseCard from '../components/CaseCard.astro';
 import FaqList from '../components/FaqList.astro';
@@ -11,6 +11,7 @@ import { site } from '../data/site';
 import { faq } from '../data/faq';
 
 const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
+const serviceIcons = ['ruler', 'file', 'cube', 'doc'] as const;
 const featured = (await getCollection('cases')).filter((c) => c.data.featured).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
 const homeFaq = faq.filter((f) => f.home);
 ---
@@ -18,51 +19,51 @@ const homeFaq = faq.filter((f) => f.home);
   title="Produktionsklare CAD-tegninger til metalbearbejdning | ProCAD"
   description="CAD-tegner med baggrund fra værkstedet. Arbejdstegninger, DXF/STEP til laser, kantbuk og CNC, 3D-modellering og styklister. Fast pris og svar inden 24 timer."
 >
-  <!-- 1. Hero -->
+  <!-- Hero -->
   <section class="hero grid-paper">
     <div class="container hero__grid">
       <div class="hero__copy">
-        <p class="hero__problem">Venter produktionen på tegninger?</p>
-        <h1>Produktionsklare CAD-tegninger til metalbearbejdning</h1>
+        <a href="/kontakt/" class="pill"><span class="pill__tag">Fast pris</span> Send en fil – få svar inden 24 timer <span aria-hidden="true">›</span></a>
+        <h1>Produktionsklare CAD-tegninger til metal&shy;bearbejdning.</h1>
         <p class="lead">Arbejdstegninger, DXF- og STEP-filer, 3D-modeller og styklister – lavet af en tegner, der kommer fra værkstedet og ved, hvad operatøren skal bruge.</p>
         <div class="hero__actions">
           <a href="/kontakt/" class="btn btn-primary">Få et tilbud</a>
           <a href="/cases/" class="btn btn-secondary">Se cases</a>
         </div>
-        <p class="hero__note mono">Send skitse, foto, PDF, DXF eller STEP. Fast pris inden 24 timer.</p>
       </div>
       <div class="hero__visual">
-        <HeroDrawing />
+        <HeroVisual />
       </div>
     </div>
   </section>
 
-  <!-- 2. Tillidsbjælke -->
-  <section class="trust bg-dark on-dark" aria-label="Det kan du regne med">
+  <!-- Tillidsbjælke -->
+  <section class="trust" aria-label="Det kan du regne med">
     <ul class="container trust__list">
-      <li><HexIcon icon="cad" tone="dark" size={44} /><span><strong>Software</strong><span class="mono">{site.software.join(', ')}</span></span></li>
-      <li><HexIcon icon="file" tone="dark" size={44} /><span><strong>Filformater</strong><span class="mono">DXF, DWG, STEP, IGES, PDF</span></span></li>
-      <li><HexIcon icon="clock" tone="dark" size={44} /><span><strong>Svar inden for 24 timer</strong><span class="mono">på hverdage</span></span></li>
-      <li><HexIcon icon="lock" tone="dark" size={44} /><span><strong>NDA ved behov</strong><span class="mono">dine filer er fortrolige</span></span></li>
+      <li><span class="trust__k">Software</span><span class="trust__v">{site.software.join(', ')}</span></li>
+      <li><span class="trust__k">Filformater</span><span class="trust__v">DXF, DWG, STEP, IGES, PDF</span></li>
+      <li><span class="trust__k">Svartid</span><span class="trust__v">Inden for 24 timer</span></li>
+      <li><span class="trust__k">Fortrolighed</span><span class="trust__v">NDA ved behov</span></li>
     </ul>
   </section>
 
-  <!-- 3. Ydelser -->
+  <!-- Ydelser -->
   <section class="section" aria-labelledby="ydelser-h">
     <div class="container">
-      <div class="section-head">
-        <h2 id="ydelser-h">Fra skitse til fil, maskinen kan læse</h2>
-        <p class="lead">Fire ydelser, der hænger sammen. Du kan købe én af dem – eller få det hele samlet ét sted.</p>
+      <div class="head">
+        <p class="kicker">Ydelser</p>
+        <h2 id="ydelser-h">Fra skitse til en fil, maskinen kan læse.</h2>
+        <p class="lead">Fire ydelser, der hænger sammen. Køb én af dem – eller få det hele samlet ét sted.</p>
       </div>
       <ul class="services">
-        {services.map((s) => (
-          <li class="service">
-            <a href={`/ydelser/${s.id}/`} class="service__link">
-              <p class="service__problem">{s.data.problem}</p>
+        {services.map((s, i) => (
+          <li>
+            <a href={`/ydelser/${s.id}/`} class="service card card--hover">
+              <Icon icon={serviceIcons[i % serviceIcons.length]} />
               <h3 class="service__title">{s.data.navTitle}</h3>
               <p class="service__desc">{s.data.intro}</p>
-              <p class="service__formats mono">{s.data.formats.join(' / ')}</p>
-              <span class="link" aria-hidden="true">Se ydelsen</span>
+              <p class="service__formats">{s.data.formats.join(' / ')}</p>
+              <span class="link" aria-hidden="true">Læs mere</span>
             </a>
           </li>
         ))}
@@ -70,119 +71,129 @@ const homeFaq = faq.filter((f) => f.home);
     </div>
   </section>
 
-  <!-- 4. Proces -->
-  <section class="section bg-paper" aria-labelledby="proces-h">
+  <!-- Proces -->
+  <section class="section bg-white border-y" aria-labelledby="proces-h">
     <div class="container">
-      <div class="section-head">
-        <h2 id="proces-h">Sådan foregår det</h2>
-        <p class="lead">Fem trin fra din fil til færdig tegning. Du ved hele vejen, hvad det koster, og hvornår du får det.</p>
+      <div class="head head--split">
+        <div>
+          <p class="kicker">Proces</p>
+          <h2 id="proces-h">Fem trin. Ingen overraskelser.</h2>
+        </div>
+        <p class="lead">Du ved hele vejen, hvad det koster, og hvornår du får tegningerne.</p>
       </div>
       <ProcessSteps />
-      <p class="section-foot"><a href="/proces/" class="link">Se processen i detaljer</a></p>
+      <p class="foot"><a href="/proces/" class="link">Se processen i detaljer</a></p>
     </div>
   </section>
 
-  <!-- 5. Cases -->
+  <!-- Cases -->
   <section class="section" aria-labelledby="cases-h">
     <div class="container">
-      <div class="section-head">
-        <h2 id="cases-h">Før og efter</h2>
-        <p class="lead">Det bedste bevis er resultatet. Her kan du se, hvad kunder sendte – og hvad de fik tilbage.</p>
+      <div class="head head--split">
+        <div>
+          <p class="kicker">Cases</p>
+          <h2 id="cases-h">Før og efter.</h2>
+        </div>
+        <p class="lead">Det bedste bevis er resultatet: hvad kunderne sendte, og hvad de fik tilbage.</p>
       </div>
       <div class="cases">
         {featured.map((c) => <CaseCard entry={c} />)}
       </div>
-      <p class="section-foot"><a href="/cases/" class="link">Se alle cases</a></p>
+      <p class="foot"><a href="/cases/" class="link">Se alle cases</a></p>
     </div>
   </section>
 
-  <!-- 6. Hvorfor ProCAD -->
-  <section class="section why grid-paper" aria-labelledby="why-h">
-    <div class="container why__grid">
-      <div class="why__main sheet">
-        <h2 id="why-h">Tegnet af en, der har stået ved maskinen</h2>
-        <p class="lead">[UDFYLD: 2–3 sætninger om din baggrund – fx uddannet smed/maskinarbejder, år på værksted, hvilke maskiner du har arbejdet med.] Derfor tegner jeg mål, som de bliver produceret og kontrolleret, og jeg spørger hellere én gang for meget end at levere en tegning, der skal rettes på gulvet.</p>
-        <ul class="why__points">
-          <li><strong>Dansk og personligt.</strong> Du taler med den, der tegner. Ingen sprogbarrierer og ingen mellemled.</li>
-          <li><strong>Danske standarder.</strong> Tegnet efter DS/EN ISO – tolerancer, svejsesymboler og overfladekrav, som danske værksteder kender dem.</li>
-          <li><strong>Din tegningsramme.</strong> Tegningerne kan laves med jeres egen ramme, logo og nummerering, så de ligner resten af arkivet.</li>
+  <!-- Hvorfor ProCAD (mørk) -->
+  <section class="section why bg-dark" aria-labelledby="why-h">
+    <div class="container">
+      <div class="why__top">
+        <h2 id="why-h">Tegnet af en, der har stået ved maskinen.</h2>
+        <p class="lead">[UDFYLD: 1–2 sætninger om din baggrund – fx uddannet smed, år på værksted.] Derfor sætter jeg mål, som de bliver produceret og kontrolleret – og spørger hellere én gang for meget.</p>
+      </div>
+      <ul class="why__grid">
+        <li class="why__item"><Icon icon="chat" /><h3>Dansk og personligt</h3><p>Du taler med den, der tegner. Ingen sprogbarrierer og ingen mellemled.</p></li>
+        <li class="why__item"><Icon icon="ruler" /><h3>Danske standarder</h3><p>DS/EN ISO for tolerancer, svejsesymboler og overfladekrav – som danske værksteder kender dem.</p></li>
+        <li class="why__item"><Icon icon="layers" /><h3>Din tegningsramme</h3><p>Tegninger med jeres egen ramme, logo og nummerering, så de passer ind i arkivet.</p></li>
+      </ul>
+      <div class="modes">
+        <h3 class="modes__h">Tre måder at samarbejde på</h3>
+        <ul class="modes__list">
+          <li><strong>Hele opgaven</strong><span>Fra skitse til færdige tegninger og filer.</span></li>
+          <li><strong>I modellerer, jeg tegner</strong><span>I sender 3D-modellen, jeg laver produktionstegningerne.</span></li>
+          <li><strong>Ekstra kapacitet</strong><span>En ekstra tegner i travle perioder – timepris eller timebank.</span></li>
         </ul>
-        <a href="/om/" class="link">Mød manden bag ProCAD</a>
-      </div>
-      <div class="why__modes">
-        <h3>Tre måder at samarbejde på</h3>
-        <ol class="modes">
-          <li><span class="mono">A</span><div><strong>Hele opgaven</strong><p>Fra skitse til færdige tegninger og filer.</p></div></li>
-          <li><span class="mono">B</span><div><strong>I modellerer, jeg tegner</strong><p>I sender 3D-modellen, jeg laver produktionstegningerne.</p></div></li>
-          <li><span class="mono">C</span><div><strong>Ekstra kapacitet</strong><p>En ekstra tegner i travle perioder – på timepris eller timebank.</p></div></li>
-        </ol>
-        <a href="/priser/" class="link">Sådan prissætter jeg</a>
+        <div class="modes__links">
+          <a href="/om/" class="link">Om ProCAD</a>
+          <a href="/priser/" class="link">Sådan prissætter jeg</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 7. FAQ-uddrag -->
+  <!-- FAQ -->
   <section class="section" aria-labelledby="faq-h">
     <div class="container faq-wrap">
       <div>
-        <h2 id="faq-h">Det spørger kunderne typisk om</h2>
-        <p class="lead">Pris, leveringstid, filformater og fortrolighed.</p>
-        <p class="section-foot"><a href="/faq/" class="link">Se alle spørgsmål</a></p>
+        <p class="kicker">Spørgsmål</p>
+        <h2 id="faq-h">Det spørger kunderne typisk om.</h2>
+        <p class="foot"><a href="/faq/" class="link">Se alle spørgsmål</a></p>
       </div>
       <FaqList items={homeFaq} />
     </div>
   </section>
 
-  <!-- 8. Afsluttende CTA med upload -->
   <CTASection withForm />
 </BaseLayout>
 
 <style>
-  .hero { border-bottom: 2px solid #000; padding-block: clamp(2.5rem, 2rem + 4vw, 6rem); }
-  .hero__grid { display: grid; gap: 2.5rem; align-items: center; }
-  @media (min-width: 64rem) { .hero__grid { grid-template-columns: 1fr 1.05fr; gap: 3.5rem; } }
-  .hero__problem { font-family: var(--font-mono); font-size: var(--fs-sm); display: inline-block; background: #000; color: #fff; padding: .3rem .7rem; margin-bottom: 1.25rem; }
-  .hero h1 { max-width: 14ch; }
-  .hero .lead { margin-top: 1.25rem; }
-  .hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
-  .hero__note { margin-top: 1.25rem; color: var(--c-steel); font-size: var(--fs-xs); }
+  .hero { padding-block: clamp(3rem, 2rem + 6vw, 7.5rem) clamp(3rem, 2rem + 4vw, 6rem); overflow: hidden; }
+  .hero__grid { display: grid; gap: 3rem; align-items: center; }
+  @media (min-width: 64rem) { .hero__grid { grid-template-columns: 1.15fr 1fr; gap: 3rem; } }
+  .hero h1 { margin-top: 1.75rem; font-size: clamp(2.6rem, 1.3rem + 3.6vw, 4rem); }
+  .hero .lead { margin-top: 1.5rem; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.25rem; }
 
-  .trust { border-bottom: 2px solid #000; }
-  .trust__list { list-style: none; margin: 0 auto; display: grid; gap: 1.25rem; padding-block: 1.75rem; }
-  @media (min-width: 40rem) { .trust__list { grid-template-columns: 1fr 1fr; } }
+  .trust { border-block: 1px solid var(--c-line); background: var(--c-white); }
+  .trust__list { list-style: none; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; }
   @media (min-width: 64rem) { .trust__list { grid-template-columns: repeat(4, 1fr); } }
-  .trust li { display: flex; align-items: center; gap: .9rem; }
-  .trust strong { display: block; color: #fff; font-weight: 700; }
-  .trust .mono { display: block; color: var(--c-steel-light); font-size: var(--fs-xs); }
+  .trust li { display: grid; gap: .2rem; padding: 1.5rem 1.25rem 1.5rem 0; }
+  @media (min-width: 64rem) { .trust li + li { border-left: 1px solid var(--c-line); padding-left: 1.75rem; } }
+  .trust__k { font-size: var(--fs-xs); color: var(--c-muted); }
+  .trust__v { font-weight: 500; color: var(--c-ink); font-size: var(--fs-sm); }
 
-  .section-head { display: grid; gap: 1rem; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
-  @media (min-width: 64rem) { .section-head { grid-template-columns: 1fr 1fr; align-items: end; gap: 3rem; } }
-  .section-foot { margin-top: 2rem; }
+  .head { display: grid; gap: .25rem; margin-bottom: clamp(2.5rem, 4vw, 4rem); max-width: 46rem; }
+  .head .lead { margin-top: 1rem; }
+  .head--split { max-width: none; }
+  @media (min-width: 64rem) { .head--split { grid-template-columns: 1fr 1fr; align-items: end; gap: 4rem; } .head--split .lead { margin: 0; } }
+  .foot { margin-top: 2.5rem; }
 
-  .services { list-style: none; padding: 0; margin: 0; display: grid; border-top: 2px solid #000; border-left: 2px solid #000; }
+  .services { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
   @media (min-width: 48rem) { .services { grid-template-columns: 1fr 1fr; } }
-  .service { border-right: 2px solid #000; border-bottom: 2px solid #000; }
-  .service__link { display: grid; gap: .75rem; align-content: start; height: 100%; padding: clamp(1.5rem, 3vw, 2.5rem); text-decoration: none; color: inherit; transition: background-color .15s ease; }
-  .service__link:hover { background: var(--c-paper); }
-  .service__problem { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--c-steel); }
-  .service__title { font-size: var(--fs-2xl); font-weight: 700; }
-  .service__desc { max-width: 52ch; }
-  .service__formats { font-size: var(--fs-xs); border-top: 1px solid var(--c-rule); padding-top: .75rem; margin-top: .25rem; }
+  .service { display: grid; gap: .75rem; align-content: start; height: 100%; padding: clamp(1.5rem, 3vw, 2.25rem); text-decoration: none; color: inherit; }
+  .service__title { margin-top: .75rem; font-size: var(--fs-xl); letter-spacing: -0.025em; }
+  .service__desc { color: var(--c-muted); max-width: 48ch; }
+  .service__formats { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--c-muted); }
+  .service .link { margin-top: .5rem; font-size: var(--fs-sm); }
 
-  .cases { display: grid; gap: 1.5rem; }
+  .cases { display: grid; gap: 1rem; }
   @media (min-width: 56rem) { .cases { grid-template-columns: repeat(3, 1fr); } }
 
-  .why__grid { display: grid; gap: 2rem; }
-  @media (min-width: 64rem) { .why__grid { grid-template-columns: 1.5fr 1fr; align-items: start; } }
-  .why__main { padding: clamp(1.5rem, 4vw, 3rem); display: grid; gap: 1.25rem; }
-  .why__points { list-style: none; padding: 0; margin: .5rem 0; display: grid; gap: 1rem; }
-  .why__points li { padding-left: 1.25rem; border-left: 3px solid var(--c-orange); max-width: 60ch; }
-  .why__modes { background: #fff; border: 2px solid #000; padding: clamp(1.5rem, 3vw, 2rem); display: grid; gap: 1.25rem; }
-  .modes { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
-  .modes li { display: grid; grid-template-columns: 2.25rem 1fr; gap: .9rem; align-items: start; }
-  .modes .mono { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 2px solid #000; font-weight: 500; }
-  .modes p { font-size: var(--fs-sm); color: var(--c-steel); }
+  .why__top { display: grid; gap: 1.5rem; max-width: 52rem; }
+  .why__grid { list-style: none; padding: 0; margin: clamp(3rem, 5vw, 4.5rem) 0 0; display: grid; gap: 2rem; }
+  @media (min-width: 56rem) { .why__grid { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; } }
+  .why__item { display: grid; gap: .75rem; align-content: start; padding-top: 1.5rem; border-top: 1px solid var(--c-dark-line); }
+  .why__item h3 { margin-top: .5rem; }
+  .why__item p { color: var(--c-dark-muted); font-size: var(--fs-sm); }
+  .modes { margin-top: clamp(3rem, 5vw, 4.5rem); background: var(--c-ink-2); border: 1px solid var(--c-dark-line); border-radius: var(--r-lg); padding: clamp(1.5rem, 3vw, 2.5rem); }
+  .modes__h { font-size: var(--fs-lg); }
+  .modes__list { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 1.25rem; }
+  @media (min-width: 56rem) { .modes__list { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+  .modes__list li { display: grid; gap: .25rem; align-content: start; }
+  .modes__list strong { color: #fff; font-weight: 500; }
+  .modes__list span { color: var(--c-dark-muted); font-size: var(--fs-sm); }
+  .modes__links { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.75rem; font-size: var(--fs-sm); }
 
-  .faq-wrap { display: grid; gap: 2rem; }
-  @media (min-width: 64rem) { .faq-wrap { grid-template-columns: 1fr 1.6fr; gap: 4rem; } }
+  .faq-wrap { display: grid; gap: 2.5rem; }
+  .faq-wrap h2 { font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem); }
+  @media (min-width: 64rem) { .faq-wrap { grid-template-columns: 1fr 1.5fr; gap: 5rem; } }
 </style>

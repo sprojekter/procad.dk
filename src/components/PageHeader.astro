@@ -4,10 +4,10 @@ import type { Crumb } from '../data/types';
 interface Props { crumbs: Crumb[]; title: string; lead?: string; problem?: string }
 const { crumbs, title, lead, problem } = Astro.props;
 ---
-<header class="page-header grid-paper">
+<header class="ph-head grid-paper">
   <div class="container">
     <Breadcrumbs items={crumbs} />
-    {problem && <p class="page-header__problem">{problem}</p>}
+    {problem && <p class="kicker ph-head__kicker">{problem}</p>}
     <h1>{title}</h1>
     {lead && <p class="lead">{lead}</p>}
     <slot />
@@ -15,9 +15,9 @@ const { crumbs, title, lead, problem } = Astro.props;
 </header>
 
 <style>
-  .page-header { border-bottom: 2px solid #000; padding-block: 2rem clamp(2.5rem, 5vw, 4.5rem); }
-  .page-header h1 { margin-top: 1.5rem; max-width: 20ch; }
-  .page-header .lead { margin-top: 1.25rem; }
-  .page-header__problem { margin-top: 1.5rem; font-family: var(--font-mono); font-size: var(--fs-sm); display: inline-block; background: #000; color: #fff; padding: .3rem .7rem; }
-  .page-header__problem + h1 { margin-top: 1rem; }
+  .ph-head { padding-block: 2rem clamp(3rem, 2rem + 5vw, 6rem); }
+  .ph-head h1 { margin-top: clamp(2.5rem, 2rem + 3vw, 4.5rem); max-width: 18ch; font-size: clamp(2.5rem, 1.5rem + 4vw, 4.25rem); }
+  .ph-head__kicker { margin: clamp(2.5rem, 2rem + 3vw, 4.5rem) 0 0; }
+  .ph-head__kicker + h1 { margin-top: 1rem; }
+  .ph-head .lead { margin-top: 1.5rem; }
 </style>

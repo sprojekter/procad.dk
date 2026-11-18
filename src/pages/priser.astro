@@ -74,23 +74,24 @@ import CTASection from '../components/CTASection.astro';
 </BaseLayout>
 
 <style>
-  .models { list-style: none; padding: 0; margin: 0; display: grid; border: 2px solid #000; }
-  @media (min-width: 56rem) { .models { grid-template-columns: 1.2fr 1fr 1fr; } }
-  .model { padding: clamp(1.5rem, 3vw, 2.25rem); display: grid; gap: .75rem; align-content: start; }
-  .model + .model { border-top: 2px solid #000; }
-  @media (min-width: 56rem) { .model + .model { border-top: 0; border-left: 2px solid #000; } }
-  .model--main { background: var(--c-orange); }
-  .model h2 { font-size: var(--fs-2xl); }
-  .model__fit { font-size: var(--fs-xs); }
-  .model__price { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-xl); }
+  .models { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+  @media (min-width: 56rem) { .models { grid-template-columns: 1.15fr 1fr 1fr; } }
+  .model { padding: clamp(1.75rem, 3vw, 2.25rem); display: grid; gap: .75rem; align-content: start; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); }
+  .model--main { background: var(--c-ink); border-color: var(--c-ink); color: var(--c-dark-text); }
+  .model--main h2 { color: #fff; }
+  .model--main .model__fit { color: var(--c-orange); }
+  .model h2 { font-size: var(--fs-xl); letter-spacing: -0.025em; }
+  .model__fit { font-size: var(--fs-sm); color: var(--c-muted); font-family: var(--font-sans); }
+  .model__price { font-size: var(--fs-2xl); font-weight: 600; letter-spacing: -0.03em; color: var(--c-ink); }
   .vat { margin-top: 1rem; font-size: var(--fs-sm); }
-  .price-grid { display: grid; gap: 3rem; margin-top: 4rem; }
-  @media (min-width: 64rem) { .price-grid { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+  .price-grid { display: grid; gap: 3rem; margin-top: 5rem; }
+  @media (min-width: 64rem) { .price-grid { grid-template-columns: 1fr 1fr; gap: 5rem; } }
   .price-grid .prose h2:first-child { margin-top: 0; }
-  .ex-h { font-size: var(--fs-2xl); margin-bottom: 1.25rem; }
-  .ex { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: var(--fs-sm); }
-  .ex th, .ex td { padding: .75rem 1rem; text-align: left; border-bottom: 1px solid #000; }
-  .ex th { font-family: var(--font-mono); font-weight: 500; background: var(--c-paper); }
-  .ex td:last-child { font-family: var(--font-mono); white-space: nowrap; }
+  .ex-h { font-size: var(--fs-2xl); letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+  .ex { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--fs-sm); background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-lg); overflow: hidden; }
+  .ex th, .ex td { padding: .9rem 1.1rem; text-align: left; border-bottom: 1px solid var(--c-line); }
+  .ex tr:last-child td { border-bottom: 0; }
+  .ex th { color: var(--c-muted); font-weight: 500; background: var(--c-paper); }
+  .ex td:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--c-ink); font-weight: 500; }
   .ex-note { margin-top: .75rem; font-size: var(--fs-xs); }
 </style>

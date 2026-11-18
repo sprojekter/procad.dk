@@ -1,18 +1,11 @@
-# 7. Logo – forslag A: "Det bukkede P"
+# 7. Logo (v2) – "Det bukkede P"
 
-Filer: `public/logo.svg` (sort), `public/logo-hvid.svg` (til mørk baggrund), `public/favicon.svg` (kun mærket).
+Filer: `public/logo.svg`, `public/logo-hvid.svg`, `public/favicon.svg` og i kundemappen under `Til-kunden/logo/`.
 
-## Idé
+- **Mærke:** Et P bukket af én orange pladestrimmel (stamme, 90°-buk med radius og en bue med en lille åbning) i en mørk flise med afrundede hjørner.
+- **Ordmærke:** "ProCAD" i Inter Display Semibold, konverteret til kurver. Det kræver ingen font for at se rigtigt ud.
+- **Versioner:** primær (lys baggrund), hvid (mørk baggrund), mærke alene samt mærke med hvid eller orange flise.
+- **Frirum:** halvdelen af flisens højde. **Mindste størrelse:** 24 px / 8 mm. Under det bruges kun mærket.
+- Farverne, proportionerne og afstanden mellem mærke og ordmærke må ikke ændres.
 
-- **Mærket:** et P tegnet som *én bukket pladestrimmel* – stammen, to 90°-buk og en radius. Det er præcis det, ProCAD laver tegninger til.
-- **Sekskanten** (skjoldformen) fra det oprindelige logo bevares, så genkendeligheden er der stadig. Den er fyldt sort, så det orange P står stærkt både på lys og mørk baggrund og fungerer som favicon i 16 px.
-- **Ordmærket:** PRO massiv + CAD i outline – det oprindelige logos outline-typografi, men kun på halvdelen, så det er læseligt i små størrelser.
-- **Målelinjen** under ordmærket (bruges i footer og større formater) knytter logoet til tegningsmotivet.
-
-## Til ejeren
-
-- Det oprindelige logo kan stadig bruges – erstat blot de tre SVG-filer og `src/components/Logo.astro`.
-- Før logoet bruges på tryk (visitkort, bil, arbejdstøj): åbn `logo.svg` i Affinity Designer/Illustrator, installér fonten **Barlow Condensed Bold** (gratis, Google Fonts), og konvertér teksten til kurver.
-- Farver: orange `#FF7621`, sort `#000000`. Hvid version på grafit `#111111`.
-- Frirum: mindst halvdelen af sekskantens højde hele vejen rundt.
-- Mindste størrelse: 24 px høj (skærm), 8 mm (tryk). Under det bruges kun mærket.
+Se brandmanualen for regler om forkert brug, farver til tryk og tone of voice.

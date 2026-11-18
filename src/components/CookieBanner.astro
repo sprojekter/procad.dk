@@ -2,7 +2,7 @@
 // GDPR-venligt cookiebanner med Google Consent Mode v2.
 // Ligeværdige knapper ("Accepter alle" og "Kun nødvendige") jf. Datatilsynets vejledning.
 ---
-<div class="cookie on-dark" id="cookie-banner" role="dialog" aria-modal="false" aria-labelledby="cookie-title" hidden>
+<div class="cookie" id="cookie-banner" role="dialog" aria-modal="false" aria-labelledby="cookie-title" hidden>
   <div class="cookie__inner">
     <div class="cookie__text">
       <h2 id="cookie-title" class="cookie__title">Cookies på procad.dk</h2>
@@ -24,12 +24,12 @@
 </div>
 
 <style>
-  .cookie { position: fixed; z-index: 60; left: 1rem; right: 1rem; bottom: 1rem; max-width: 56rem; margin-inline: auto; background: var(--c-graphite); color: #eee; border: 2px solid #000; box-shadow: var(--shadow-hard-orange); }
+  .cookie { position: fixed; z-index: 60; left: 1rem; right: 1rem; bottom: 1rem; max-width: 46rem; margin-inline: auto; background: var(--c-white); color: var(--c-body); border: 1px solid var(--c-line); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); }
   .cookie[hidden] { display: none; }
-  .cookie__inner { display: grid; gap: 1rem; padding: 1.25rem; }
-  @media (min-width: 48rem) { .cookie__inner { grid-template-columns: 1fr auto; align-items: end; padding: 1.5rem; } }
-  .cookie__title { font-size: var(--fs-xl); color: #fff; margin-bottom: .4rem; }
-  .cookie p { font-size: var(--fs-sm); max-width: 60ch; }
+  .cookie__inner { display: grid; gap: 1.25rem; padding: 1.5rem; }
+  @media (min-width: 48rem) { .cookie__inner { grid-template-columns: 1fr auto; align-items: end; } }
+  .cookie__title { font-size: var(--fs-lg); margin-bottom: .35rem; }
+  .cookie p { font-size: var(--fs-sm); color: var(--c-muted); max-width: 52ch; }
   .cookie__prefs { display: grid; gap: .6rem; margin-top: 1rem; }
   .cookie__prefs[hidden] { display: none; }
   .cookie__actions { display: grid; gap: .5rem; }

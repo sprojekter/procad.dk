@@ -1,50 +1,54 @@
 ---
-// Afsluttende CTA – findes nederst på alle sider (ingen blindgyder).
-// withForm=true viser hele tilbudsformularen (forside og kontakt).
+// Afsluttende CTA – mørkt panel nederst på alle sider (ingen blindgyder).
 import QuoteForm from './QuoteForm.astro';
-import HexIcon from './HexIcon.astro';
+import Icon from './Icon.astro';
 import { site } from '../data/site';
 interface Props { heading?: string; text?: string; withForm?: boolean; preselect?: string; ctaHref?: string }
 const {
-  heading = 'Send din tegning, skitse eller fil',
-  text = 'DXF, STEP, PDF eller et foto af en skitse på et stykke pap. Du får en fast pris, før jeg går i gang.',
+  heading = 'Send din tegning, skitse eller fil.',
+  text = 'DXF, STEP, PDF eller et foto af en skitse. Du får en fast pris, før jeg går i gang.',
   withForm = false,
   preselect = '',
   ctaHref = '/kontakt/',
 } = Astro.props;
 ---
-<section class="cta bg-dark on-dark section" aria-labelledby="cta-heading">
-  <div class="container cta__grid">
-    <div class="cta__copy">
-      <h2 id="cta-heading">{heading}</h2>
-      <p class="lead cta__lead">{text}</p>
-      <ul class="cta__points">
-        <li><HexIcon icon="clock" tone="dark" size={40} /> Svar inden for {site.responseHours} timer på hverdage</li>
-        <li><HexIcon icon="price" tone="dark" size={40} /> Fast pris – ingen overraskelser</li>
-        <li><HexIcon icon="lock" tone="dark" size={40} /> Fortroligt. NDA, hvis du har brug for det</li>
-      </ul>
-      {!withForm && (
-        <div class="cta__actions">
-          <a href={ctaHref} class="btn btn-primary">Send din fil og få en pris</a>
-          <a href={`mailto:${site.email}`} class="btn btn-secondary">Skriv en mail</a>
+<section class="cta section" aria-labelledby="cta-heading">
+  <div class="container">
+    <div class:list={['cta__panel bg-dark', { 'cta__panel--form': withForm }]}>
+      <div class="cta__copy">
+        <h2 id="cta-heading">{heading}</h2>
+        <p class="lead">{text}</p>
+        <ul class="cta__points">
+          <li><Icon icon="clock" /> Svar inden for {site.responseHours} timer på hverdage</li>
+          <li><Icon icon="price" /> Fast pris – ingen overraskelser</li>
+          <li><Icon icon="lock" /> Fortroligt. NDA, hvis du har brug for det</li>
+        </ul>
+        {!withForm && (
+          <div class="cta__actions">
+            <a href={ctaHref} class="btn btn-primary">Få et tilbud</a>
+            <a href={`mailto:${site.email}`} class="btn btn-secondary">Skriv en mail</a>
+          </div>
+        )}
+      </div>
+      {withForm && (
+        <div class="cta__form">
+          <QuoteForm id="tilbud-cta" preselect={preselect} submitLabel="Send og få en fast pris" />
         </div>
       )}
     </div>
-    {withForm && (
-      <div class="cta__form">
-        <QuoteForm id="tilbud-cta" preselect={preselect} submitLabel="Send og få en fast pris" />
-      </div>
-    )}
   </div>
 </section>
 
 <style>
-  .cta { border-top: 4px solid var(--c-orange); }
-  .cta__grid { display: grid; gap: 3rem; }
-  @media (min-width: 64rem) { .cta__grid:has(.cta__form) { grid-template-columns: 5fr 7fr; align-items: start; } }
-  .cta__lead { color: #e2e2de; margin-top: 1rem; }
-  .cta__points { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; gap: .9rem; }
-  .cta__points li { display: flex; align-items: center; gap: .9rem; }
-  .cta__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
-  .cta__form { background: #181818; border: 2px solid #3a3a3a; padding: clamp(1.25rem, 3vw, 2rem); }
+  .cta__panel { position: relative; overflow: hidden; border-radius: var(--r-xl); padding: clamp(2rem, 1rem + 5vw, 5rem); display: grid; gap: 3rem; }
+  .cta__panel::before { content: ""; position: absolute; inset: auto -20% -60% auto; width: 60rem; height: 40rem; background: radial-gradient(closest-side, rgba(255,118,33,.16), transparent); pointer-events: none; }
+  .cta__panel > * { position: relative; }
+  @media (min-width: 64rem) { .cta__panel--form { grid-template-columns: 5fr 6fr; align-items: start; } }
+  .cta__copy h2 { max-width: 16ch; }
+  .cta__copy .lead { margin-top: 1.25rem; }
+  .cta__points { list-style: none; padding: 0; margin: 2.25rem 0 0; display: grid; gap: .9rem; font-size: var(--fs-sm); color: var(--c-dark-text); }
+  .cta__points li { display: flex; align-items: center; gap: .85rem; }
+  .cta__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.25rem; }
+  .cta__form { background: var(--c-white); color: var(--c-body); border-radius: var(--r-lg); padding: clamp(1.25rem, 3vw, 2rem); }
+  .cta__form :global(h2), .cta__form :global(label) { color: var(--c-ink); }
 </style>

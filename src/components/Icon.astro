@@ -1,0 +1,26 @@
+---
+// Linjeikoner (1,6 px streg, afrundede ender) i en lille flise. Se brandmanualen, afsnit Ikoner.
+interface Props { icon: 'upload' | 'clock' | 'chat' | 'price' | 'check' | 'file' | 'lock' | 'cad' | 'layers' | 'ruler' | 'doc' | 'cube'; tile?: boolean; size?: number }
+const { icon, tile = true, size = 20 } = Astro.props;
+const d: Record<string, string> = {
+  upload: 'M12 15V4m-4.5 4.5L12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3 2',
+  chat: 'M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6Z',
+  price: 'M3.5 12.5 11.5 4.5H19.5V12.5L11.5 20.5ZM15.5 8.5h.01',
+  check: 'M5 12.5l4.5 4.5L19 7.5',
+  file: 'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5ZM14 3v5h5M9 13h6M9 17h4',
+  lock: 'M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3',
+  cad: 'M4 20 20 4M4 20h6M4 20v-6M14 4h6v6',
+  layers: 'M12 3 3 8l9 5 9-5-9-5ZM3 13l9 5 9-5M3 17.5l9 5 9-5',
+  ruler: 'M3 16 16 3l5 5L8 21l-5-5ZM7 12l2 2M10 9l2 2M13 6l2 2',
+  doc: 'M6 3h12v18H6zM9 8h6M9 12h6M9 16h3',
+  cube: 'M12 3 20 7.5v9L12 21l-8-4.5v-9L12 3ZM12 12l8-4.5M12 12v9M12 12 4 7.5',
+};
+---
+{tile ? (
+  <span class="icon-tile" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d={d[icon]} /></svg>
+  </span>
+) : (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={d[icon]} /></svg>
+)}

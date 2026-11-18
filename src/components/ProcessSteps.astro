@@ -1,18 +1,17 @@
 ---
-import HexIcon from './HexIcon.astro';
 import { processSteps } from '../data/process';
 interface Props { detailed?: boolean }
 const { detailed = false } = Astro.props;
 ---
 <ol class:list={['steps', { 'steps--detailed': detailed }]}>
   {processSteps.map((s, i) => (
-    <li class="step reveal" style={`transition-delay:${i * 70}ms`}>
+    <li class="step reveal" style={`transition-delay:${i * 60}ms`}>
       <div class="step__head">
-        <HexIcon label={String(i + 1)} tone={i === 0 ? 'orange' : 'light'} size={52} />
+        <span class="step__num">{String(i + 1).padStart(2, '0')}</span>
         <span class="step__line" aria-hidden="true"></span>
       </div>
       <h3 class="step__title">{s.title}</h3>
-      <p class="step__promise mono">{s.promise}</p>
+      <p class="step__promise">{s.promise}</p>
       <p class="step__text">{detailed ? s.details : s.text}</p>
     </li>
   ))}
@@ -20,17 +19,20 @@ const { detailed = false } = Astro.props;
 
 <style>
   .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 2rem; }
-  @media (min-width: 56rem) { .steps { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; } }
-  .steps--detailed { grid-template-columns: 1fr !important; gap: 0; }
-  .step__head { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
-  .step__line { flex: 1; height: 0; border-top: 2px dashed #000; }
-  .step:last-child .step__line { border-top-style: solid; border-color: var(--c-orange); }
-  .step__title { font-size: var(--fs-xl); }
-  .step__promise { color: var(--c-steel); margin: .35rem 0 .6rem; font-size: var(--fs-xs); }
-  .step__text { font-size: var(--fs-sm); }
-  .steps--detailed .step { display: grid; grid-template-columns: 4rem 1fr; column-gap: 1.5rem; padding: 2rem 0; border-top: 2px solid #000; }
-  .steps--detailed .step__head { grid-row: span 3; flex-direction: column; margin: 0; }
+  @media (min-width: 56rem) { .steps:not(.steps--detailed) { grid-template-columns: repeat(5, 1fr); gap: 1.5rem; } }
+  .step__head { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
+  .step__num { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-ink); display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--c-white); border: 1px solid var(--c-line); }
+  .step:first-child .step__num { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+  .step__line { flex: 1; height: 1px; background: var(--c-line-strong); }
+  .step:last-child .step__line { background: linear-gradient(90deg, var(--c-orange), transparent); }
+  .step__title { font-size: var(--fs-lg); }
+  .step__promise { font-size: var(--fs-sm); color: var(--c-ink); font-weight: 500; margin: .2rem 0 .6rem; }
+  .step__text { font-size: var(--fs-sm); color: var(--c-muted); }
+
+  .steps--detailed { gap: 0; }
+  .steps--detailed .step { display: grid; grid-template-columns: 3.5rem 1fr; column-gap: 1.25rem; padding: 2rem 0; border-top: 1px solid var(--c-line); }
+  .steps--detailed .step__head { grid-row: span 3; margin: 0; align-items: flex-start; }
   .steps--detailed .step__line { display: none; }
+  .steps--detailed .step__title { font-size: var(--fs-2xl); letter-spacing: -0.03em; }
   .steps--detailed .step__text { font-size: var(--fs-base); max-width: var(--measure); }
-  .steps--detailed .step__title { font-size: var(--fs-2xl); }
 </style>

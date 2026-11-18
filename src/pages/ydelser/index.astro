@@ -26,7 +26,7 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
               <Media src={s.data.image.src} alt={s.data.image.alt} spec={s.data.image.spec} ratio="3 / 2" />
             </div>
             <div class="svc__body">
-              <p class="mono muted">{s.data.problem}</p>
+              <p class="kicker" style="margin:0">{s.data.problem}</p>
               <h2 class="svc__title"><a href={`/ydelser/${s.id}/`}>{s.data.title}</a></h2>
               <p>{s.data.intro}</p>
               <ul class="svc__deliv">
@@ -44,15 +44,15 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
 </BaseLayout>
 
 <style>
-  .svc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
-  .svc { display: grid; gap: 1.5rem; padding-block: 2.5rem; border-top: 2px solid #000; }
-  .svc:last-child { border-bottom: 2px solid #000; }
-  @media (min-width: 56rem) { .svc { grid-template-columns: 1fr 1.3fr; gap: 3rem; align-items: center; } }
-  .svc__body { display: grid; gap: 1rem; justify-items: start; }
-  .svc__title { font-size: var(--fs-3xl); }
+  .svc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+  .svc { display: grid; gap: 1.5rem; padding: clamp(1rem, 2vw, 1.25rem); background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); }
+  @media (min-width: 56rem) { .svc { grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: center; } }
+  .svc__body { display: grid; gap: 1rem; justify-items: start; padding: .5rem .75rem 1rem; }
+  .svc__title { font-size: var(--fs-2xl); letter-spacing: -0.03em; }
   .svc__title a { text-decoration: none; }
-  .svc__title a:hover { text-decoration: underline; text-decoration-color: var(--c-orange); text-decoration-thickness: 3px; }
-  .svc__deliv { list-style: none; padding: 0; margin: 0; display: grid; gap: .4rem; font-size: var(--fs-sm); }
+  .svc__title a:hover { color: #000; }
+  .svc__body > p:not(.mono) { color: var(--c-muted); }
+  .svc__deliv { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; font-size: var(--fs-sm); }
   .svc__deliv li { padding-left: 1.25rem; position: relative; }
-  .svc__deliv li::before { content: ""; position: absolute; left: 0; top: .7em; width: .7rem; height: 2px; background: var(--c-orange); }
+  .svc__deliv li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
 </style>

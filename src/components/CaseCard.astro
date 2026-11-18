@@ -6,39 +6,39 @@ const { entry, headingLevel = 'h3' } = Astro.props;
 const d = entry.data;
 const H = headingLevel;
 ---
-<article class="case-card">
-  <a href={`/cases/${entry.id}/`} class="case-card__link">
-    <div class="case-card__pair">
-      <div class="case-card__half">
-        <Media src={d.before.src} alt={d.before.alt} spec={d.before.spec} ratio="4 / 3" />
-        <span class="case-card__tag mono">Før</span>
+<article class="cc card card--hover">
+  <a href={`/cases/${entry.id}/`} class="cc__link">
+    <div class="cc__pair">
+      <div class="cc__half">
+        <Media src={d.before.src} alt={d.before.alt} ratio="1 / 1" />
+        <span class="cc__tag">Før</span>
       </div>
-      <div class="case-card__half">
-        <Media src={d.after.src} alt={d.after.alt} spec={d.after.spec} ratio="4 / 3" />
-        <span class="case-card__tag case-card__tag--after mono">Efter</span>
+      <div class="cc__half">
+        <Media src={d.after.src} alt={d.after.alt} ratio="1 / 1" />
+        <span class="cc__tag cc__tag--after">Efter</span>
       </div>
     </div>
-    <div class="case-card__body">
-      <p class="mono muted">{d.industry}{d.example && ' (eksempel)'}</p>
-      <H class="case-card__title">{d.title}</H>
-      <p>{d.summary}</p>
+    <div class="cc__body">
+      <p class="cc__meta">{d.industry}{d.example && ' (eksempel)'}</p>
+      <H class="cc__title">{d.title}</H>
+      <p class="cc__sum">{d.summary}</p>
       <span class="link">Læs casen</span>
     </div>
   </a>
 </article>
 
 <style>
-  .case-card { border: 2px solid #000; background: #fff; }
-  .case-card__link { display: grid; text-decoration: none; color: inherit; height: 100%; }
-  .case-card__pair { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid #000; }
-  .case-card__half { position: relative; }
-  .case-card__half + .case-card__half { border-left: 2px solid #000; }
-  .case-card__half :global(.ph__label) { font-size: 10px; }
-  .case-card__half :global(.ph__label span) { display: none; }
-  .case-card__tag { position: absolute; top: .5rem; left: .5rem; background: #fff; border: 1px solid #000; padding: .1rem .45rem; font-size: var(--fs-xs); }
-  .case-card__tag--after { background: var(--c-orange); }
-  .case-card__body { padding: 1.25rem; display: grid; gap: .6rem; align-content: start; }
-  .case-card__title { font-size: var(--fs-xl); }
-  .case-card__link:hover .link { text-decoration-thickness: 4px; }
-  .case-card__link:hover { box-shadow: var(--shadow-hard-orange); }
+  .cc { overflow: hidden; }
+  .cc__link { display: grid; text-decoration: none; color: inherit; height: 100%; }
+  .cc__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px 6px 0; }
+  .cc__half { position: relative; }
+  .cc__half :global(.ph) { border-radius: 14px; }
+  .cc__half :global(.ph__label) { display: none; }
+  .cc__tag { position: absolute; top: .6rem; left: .6rem; background: rgba(255,255,255,.9); backdrop-filter: blur(6px); border-radius: 999px; padding: .15rem .6rem; font-size: var(--fs-xs); font-weight: 500; color: var(--c-ink); }
+  .cc__tag--after { background: var(--c-ink); color: #fff; }
+  .cc__body { padding: 1.4rem 1.5rem 1.6rem; display: grid; gap: .5rem; align-content: start; }
+  .cc__meta { font-size: var(--fs-xs); color: var(--c-muted); }
+  .cc__title { font-size: var(--fs-lg); }
+  .cc__sum { font-size: var(--fs-sm); color: var(--c-muted); }
+  .cc .link { margin-top: .4rem; font-size: var(--fs-sm); }
 </style>

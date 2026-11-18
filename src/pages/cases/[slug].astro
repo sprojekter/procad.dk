@@ -38,11 +38,11 @@ const service = await getEntry('ydelser', d.service);
       <div class="ba">
         <figure class="ba__item reveal">
           <Media src={d.before.src} alt={d.before.alt} spec={d.before.spec} motif={d.before.motif} ratio="4 / 3" eager />
-          <figcaption><span class="ba__tag mono">Før</span> {d.before.alt}</figcaption>
+          <figcaption><span class="ba__tag">Før</span> {d.before.alt}</figcaption>
         </figure>
         <figure class="ba__item reveal">
           <Media src={d.after.src} alt={d.after.alt} spec={d.after.spec} motif={d.after.motif} ratio="4 / 3" />
-          <figcaption><span class="ba__tag ba__tag--after mono">Efter</span> {d.after.alt}</figcaption>
+          <figcaption><span class="ba__tag ba__tag--after">Efter</span> {d.after.alt}</figcaption>
         </figure>
       </div>
 
@@ -75,24 +75,25 @@ const service = await getEntry('ydelser', d.service);
 </BaseLayout>
 
 <style>
-  .case-meta { margin-top: 2rem; max-width: 40rem; }
-  .example-note { margin-top: 1.5rem; padding: .75rem 1rem; border: 2px dashed #000; background: #fff4ec; font-size: var(--fs-sm); }
-  .ba { display: grid; gap: 1.5rem; }
+  .case-meta { margin-top: 2.5rem; max-width: 40rem; }
+  .example-note { margin-top: 1.5rem; padding: .85rem 1.1rem; border: 1px solid #ffd2b3; border-radius: var(--r-md); background: #fff4ec; font-size: var(--fs-sm); color: var(--c-ink); }
+  .ba { display: grid; gap: 1rem; }
   @media (min-width: 48rem) { .ba { grid-template-columns: 1fr 1fr; } }
-  .ba__item { margin: 0; border: 2px solid #000; }
-  .ba__item figcaption { padding: .75rem 1rem; border-top: 2px solid #000; font-size: var(--fs-sm); display: flex; gap: .75rem; align-items: baseline; }
-  .ba__tag { border: 1px solid #000; padding: .05rem .45rem; font-size: var(--fs-xs); }
-  .ba__tag--after { background: var(--c-orange); }
-  .story { list-style: none; padding: 0; margin: 4rem 0 0; display: grid; gap: 2.5rem; counter-reset: s; }
-  @media (min-width: 56rem) { .story { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
-  .story li { border-top: 3px solid #000; padding-top: 1.25rem; counter-increment: s; }
+  .ba__item { margin: 0; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); padding: 8px; box-shadow: var(--shadow-sm); }
+  .ba__item figcaption { padding: .9rem .6rem .5rem; font-size: var(--fs-sm); color: var(--c-muted); display: flex; gap: .7rem; align-items: baseline; }
+  .ba__tag { border-radius: 999px; padding: .1rem .6rem; font-size: var(--fs-xs); font-weight: 500; background: var(--c-paper); color: var(--c-ink); border: 1px solid var(--c-line); }
+  .ba__tag--after { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+  .story { list-style: none; padding: 0; margin: 5rem 0 0; display: grid; gap: 2.5rem; counter-reset: s; }
+  @media (min-width: 56rem) { .story { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; } }
+  .story li { border-top: 1px solid var(--c-line-strong); padding-top: 1.5rem; counter-increment: s; }
   .story li:last-child { border-top-color: var(--c-orange); }
-  .story h2 { font-size: var(--fs-2xl); margin-bottom: .75rem; }
-  .story h2::before { content: counter(s) " "; font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--c-steel); vertical-align: middle; margin-right: .5rem; }
-  .quote-block { margin: 4rem 0 0; padding-left: 1.5rem; border-left: 4px solid var(--c-orange); max-width: 50rem; }
-  .quote-block p { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 600; line-height: 1.2; }
-  .quote-block footer { margin-top: 1rem; color: var(--c-steel); }
-  .case-prose { margin-top: 3rem; }
+  .story h2 { font-size: var(--fs-xl); letter-spacing: -0.025em; margin-bottom: .75rem; }
+  .story h2::before { content: "0" counter(s); display: block; font: 500 var(--fs-xs) var(--font-mono); color: var(--c-muted); margin-bottom: .75rem; }
+  .story p { color: var(--c-muted); }
+  .quote-block { margin: 5rem 0 0; max-width: 50rem; }
+  .quote-block p { font-size: var(--fs-2xl); font-weight: 500; letter-spacing: -0.03em; line-height: 1.25; color: var(--c-ink); }
+  .quote-block footer { margin-top: 1rem; color: var(--c-muted); }
+  .case-prose { margin-top: 3.5rem; }
   .gallery { display: grid; gap: 1rem; margin-top: 3rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
   .case-service { margin-top: 3rem; }
 </style>

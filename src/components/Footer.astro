@@ -5,24 +5,22 @@ import { site } from '../data/site';
 const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - b.data.order);
 const year = new Date().getFullYear();
 ---
-<footer class="footer bg-dark on-dark">
-  <div class="container footer__grid">
-    <div class="footer__brand">
-      <Logo inverted dimension />
-      <p class="footer__tagline">{site.tagline}</p>
-      <p class="muted">CAD-tegninger og teknisk dokumentation til metalbearbejdning. Tegnet i Danmark efter DS/EN ISO.</p>
+<footer class="ftr">
+  <div class="container ftr__grid">
+    <div class="ftr__brand">
+      <Logo />
+      <p class="ftr__tagline">{site.tagline}</p>
+      <p class="muted ftr__desc">CAD-tegninger og teknisk dokumentation til metalbearbejdning. Tegnet i Danmark efter DS/EN ISO.</p>
     </div>
-
     <nav aria-label="Ydelser">
-      <h2 class="footer__h">Ydelser</h2>
+      <h2 class="ftr__h">Ydelser</h2>
       <ul>
         {services.map((s) => <li><a href={`/ydelser/${s.id}/`}>{s.data.navTitle}</a></li>)}
         <li><a href="/priser/">Priser</a></li>
       </ul>
     </nav>
-
-    <nav aria-label="Om ProCAD">
-      <h2 class="footer__h">ProCAD</h2>
+    <nav aria-label="ProCAD">
+      <h2 class="ftr__h">ProCAD</h2>
       <ul>
         <li><a href="/cases/">Cases</a></li>
         <li><a href="/proces/">Sådan arbejder jeg</a></li>
@@ -30,42 +28,38 @@ const year = new Date().getFullYear();
         <li><a href="/faq/">Spørgsmål og svar</a></li>
       </ul>
     </nav>
-
     <div>
-      <h2 class="footer__h">Kontakt</h2>
+      <h2 class="ftr__h">Kontakt</h2>
       <ul>
         <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
         <li><a href={site.phoneHref}>{site.phone}</a></li>
-        <li class="muted">{site.address.city}</li>
         <li class="muted">CVR {site.cvr}</li>
       </ul>
-      <a href="/kontakt/" class="btn btn-primary btn-sm footer__cta">Send din fil</a>
     </div>
   </div>
-
-  <div class="container footer__bottom">
-    <p class="mono">© {year} ProCAD</p>
+  <div class="container ftr__bottom">
+    <p>© {year} ProCAD</p>
     <ul>
       <li><a href="/privatlivspolitik/">Privatlivspolitik</a></li>
       <li><a href="/cookiepolitik/">Cookiepolitik</a></li>
-      <li><button type="button" class="footer__cookie" data-cookie-settings>Cookie-indstillinger</button></li>
+      <li><button type="button" class="ftr__cookie" data-cookie-settings>Cookie-indstillinger</button></li>
     </ul>
   </div>
 </footer>
 
 <style>
-  .footer { padding-block: 4rem 2rem; border-top: 4px solid var(--c-orange); }
-  .footer__grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
-  @media (min-width: 48rem) { .footer__grid { grid-template-columns: 1.4fr 1fr 1fr 1.1fr; } }
-  .footer__tagline { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 600; color: #fff; margin: 1.25rem 0 .5rem; }
-  .footer__h { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 500; color: var(--c-steel-light); margin-bottom: .9rem; }
-  .footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
-  .footer a { color: #fff; text-decoration: none; }
-  .footer a:hover { text-decoration: underline; text-decoration-color: var(--c-orange); text-underline-offset: 4px; }
-  .footer .btn-primary { color: #000; }
-  .footer__cta { margin-top: 1.25rem; }
-  .footer__bottom { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #333; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; font-size: var(--fs-sm); }
-  .footer__bottom ul { display: flex; flex-wrap: wrap; gap: 1.25rem; }
-  .footer__cookie { background: none; border: 0; padding: 0; color: #fff; font: inherit; cursor: pointer; }
-  .footer__cookie:hover { text-decoration: underline; text-decoration-color: var(--c-orange); }
+  .ftr { padding-block: 4.5rem 2rem; border-top: 1px solid var(--c-line); background: var(--c-paper); font-size: var(--fs-sm); }
+  .ftr__grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 48rem) { .ftr__grid { grid-template-columns: 1.6fr 1fr 1fr 1.1fr; } }
+  .ftr__brand :global(svg) { height: 26px; width: auto; }
+  .ftr__tagline { margin-top: 1.25rem; font-weight: 500; color: var(--c-ink); }
+  .ftr__desc { margin-top: .35rem; max-width: 30ch; }
+  .ftr__h { font-size: var(--fs-sm); font-weight: 500; color: var(--c-ink); letter-spacing: 0; margin-bottom: .9rem; }
+  .ftr ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; }
+  .ftr a { color: var(--c-muted); text-decoration: none; transition: color .15s ease; }
+  .ftr a:hover { color: var(--c-ink); }
+  .ftr__bottom { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--c-line); display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; color: var(--c-muted); }
+  .ftr__bottom ul { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+  .ftr__cookie { background: none; border: 0; padding: 0; color: var(--c-muted); font: inherit; cursor: pointer; }
+  .ftr__cookie:hover { color: var(--c-ink); }
 </style>
