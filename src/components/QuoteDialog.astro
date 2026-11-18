@@ -8,7 +8,7 @@ import QuoteForm from './QuoteForm.astro';
   <div class="qd__inner">
     <header class="qd__head">
       <span class="qd__grip" aria-hidden="true"></span>
-      <h2 id="qd-title" class="qd__title">Få en fast pris</h2>
+      <h2 id="qd-title" class="qd__title" tabindex="-1">Få en fast pris</h2>
       <button type="button" class="qd__close" data-close-quote aria-label="Luk">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
@@ -26,7 +26,7 @@ import QuoteForm from './QuoteForm.astro';
   @keyframes qd-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
   .qd__head { position: sticky; top: 0; z-index: 2; display: grid; grid-template-columns: 1fr auto; align-items: center; padding: .75rem 0 .5rem; background: var(--c-white); }
   .qd__grip { display: none; }
-  .qd__title { font-size: var(--fs-lg); letter-spacing: -0.02em; }
+  .qd__title { font-size: var(--fs-lg); letter-spacing: -0.02em; outline: none; }
   .qd__close { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1px solid var(--c-line); background: var(--c-paper); color: var(--c-ink); cursor: pointer; }
   .qd__lead { font-size: var(--fs-sm); color: var(--c-muted); margin-top: -.25rem; }
   @media (min-width: 48rem) {
@@ -57,7 +57,9 @@ import QuoteForm from './QuoteForm.astro';
       document.documentElement.classList.add('qd-open');
       history.pushState({ quoteDialog: true }, '');
       if (files?.length) window.dispatchEvent(new CustomEvent('procad:quote-files', { detail: files }));
-      (dlg.querySelector('textarea') as HTMLElement | null)?.focus();
+      // Touch: fokus på overskriften, så tastaturet ikke dækker filknapperne. Mus/tastatur: direkte i beskrivelsen.
+      const coarse = window.matchMedia('(pointer: coarse)').matches;
+      (dlg.querySelector<HTMLElement>(coarse ? '#qd-title' : 'textarea'))?.focus();
     };
     const close = (fromHistory = false) => {
       if (!dlg.open) return;
@@ -78,7 +80,12 @@ import QuoteForm from './QuoteForm.astro';
     });
     dlg.querySelector('[data-close-quote]')!.addEventListener('click', () => close());
     dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); }); // Escape
-    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); }); // klik på baggrunden
+    // Klik på baggrunden lukker – men kun hvis klikket også STARTEDE på baggrunden (ikke ved tekstmarkering, der slippes udenfor)
+    let downOnBackdrop = false;
+    dlg.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === dlg; });
+    dlg.addEventListener('click', (e) => { if (e.target === dlg && downOnBackdrop) close(); downOnBackdrop = false; });
+    // Gendannet fra cachen (tilbage fra tak-siden): luk dialogen
+    window.addEventListener('pageshow', (e) => { if (e.persisted && dlg.open) { dlg.close(); document.documentElement.classList.remove('qd-open'); } });
     window.addEventListener('popstate', () => close(true));
   }
 </script>

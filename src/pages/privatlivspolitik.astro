@@ -11,7 +11,7 @@ const updated = '[UDFYLD: dato]';
       <p><em>Skabelon – skal gennemgås af ejeren før lancering. Det er ikke juridisk rådgivning.</em></p>
 
       <h2>Dataansvarlig</h2>
-      <p>ProCAD, CVR {site.cvr}. E-mail: <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+      <p>ProCAD v/ {site.owner.name}, CVR {site.cvr}. E-mail: <a href={`mailto:${site.email}`}>{site.email}</a>. Telefon: <a href={site.phoneHref}>{site.phone}</a>.</p>
 
       <h2>Hvilke oplysninger jeg behandler</h2>
       <ul>
@@ -22,23 +22,29 @@ const updated = '[UDFYLD: dato]';
 
       <h2>Formål og retsgrundlag</h2>
       <ul>
-        <li>At besvare din forespørgsel og give et tilbud – GDPR art. 6, stk. 1, litra b (forberedelse af en aftale).</li>
+        <li>At besvare din forespørgsel og give et tilbud – GDPR art. 6, stk. 1, litra b (forberedelse af en aftale). Henvender du dig på vegne af en virksomhed, sker det også efter litra f (legitim interesse i at besvare henvendelsen).</li>
         <li>At løse opgaven og fakturere – litra b og c (bogføringsloven).</li>
-        <li>Statistik og annoncemåling – litra a (dit samtykke), som du kan trække tilbage via <em>Cookie-indstillinger</em> nederst på siden.</li>
+        <li>Statistik og annoncemåling – litra a (dit samtykke). Du kan til enhver tid trække samtykket tilbage via <em>Cookie-indstillinger</em> nederst på siden, uden at det påvirker den behandling, der er sket før.</li>
       </ul>
+      <p>Navn og e-mail er nødvendige, for at jeg kan svare dig. Resten er frivilligt. Der træffes ingen automatiske afgørelser.</p>
 
       <h2>Dine filer og tegninger</h2>
       <p>Filer, du sender, bruges kun til at vurdere og løse din opgave. De deles ikke med andre og behandles fortroligt. Ønsker du en fortrolighedsaftale (NDA), skriver jeg gerne under.</p>
 
       <h2>Hvor længe oplysningerne gemmes</h2>
       <ul>
-        <li>Forespørgsler, der ikke bliver til en opgave: slettes efter [UDFYLD: fx 12 måneder].</li>
+        <li>Forespørgsler, der ikke bliver til en opgave: slettes efter 6 måneder. [UDFYLD: bekræft]</li>
         <li>Opgaver og fakturaer: gemmes i 5 år efter regnskabsårets udløb (bogføringsloven).</li>
-        <li>Tegninger og filer: gemmes efter aftale med dig [UDFYLD].</li>
+        <li>Tegninger og filer: slettes 3 år efter levering, medmindre vi aftaler andet – fx hvis du vil have, at jeg gemmer dem til genbestilling. [UDFYLD: bekræft]</li>
       </ul>
 
       <h2>Databehandlere</h2>
-      <p>Jeg bruger leverandører til at drive sitet og min e-mail. De behandler kun oplysninger efter mine instrukser: [UDFYLD: fx Simply.com (hosting og e-mail), Google (Analytics/Ads – kun med samtykke), Formspree/Basin hvis brugt, Cloudflare Turnstile hvis brugt].</p>
+      <p>Jeg bruger leverandører til at drive sitet og min e-mail. De behandler kun oplysninger efter mine instrukser:</p>
+      <ul>
+        <li><strong>Simply.com A/S</strong> – hosting af sitet, tilbudsformularen og e-mail (servere i EU).</li>
+        <li><strong>Google Ireland Ltd.</strong> – Analytics og Ads, kun hvis du har givet samtykke. Data kan blive overført til USA på grundlag af EU-US Data Privacy Framework.</li>
+        <li><strong>Cloudflare</strong> – spambeskyttelse af formularen, kun hvis den er slået til. [UDFYLD: slet linjen, hvis den ikke bruges]</li>
+      </ul>
 
       <h2>Dine rettigheder</h2>
       <p>Du har ret til indsigt, berigtigelse, sletning, begrænsning, dataportabilitet og til at gøre indsigelse. Skriv til <a href={`mailto:${site.email}`}>{site.email}</a>. Du kan klage til Datatilsynet, <a href="https://www.datatilsynet.dk" rel="noopener">datatilsynet.dk</a>.</p>

@@ -56,6 +56,10 @@ jobs:
       - name: Tilpas links til base-sti
         run: node scripts/apply-base.mjs
 
+      # PHP kører ikke på GitHub Pages – undgå at mailer-scriptet udgives som tekst
+      - name: Fjern PHP fra forhåndsvisningen
+        run: rm -rf dist/api
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

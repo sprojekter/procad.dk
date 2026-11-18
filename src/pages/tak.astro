@@ -9,10 +9,13 @@ import { site } from '../data/site';
         <span class="thanks__icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
         <h1>Tak – din forespørgsel er sendt</h1>
         <p class="lead">Jeg kigger på dit materiale og vender tilbage inden for {site.responseHours} timer på hverdage, enten med spørgsmål eller en fast pris.</p>
-        <p>Haster det? Ring på <a href={site.phoneHref} class="link">{site.phone}</a>.</p>
+        <ul class="thanks__next">
+          <li>Glemte du en fil eller et mål? Send det til <a href={`mailto:${site.email}`} class="link">{site.email}</a>, så lægger jeg det sammen med din forespørgsel.</li>
+          <li>Har du ikke hørt fra mig inden {site.responseHours} timer på hverdage, så ring på <a href={site.phoneHref} class="link">{site.phone}</a> – så er noget gået galt undervejs.</li>
+        </ul>
         <div class="thanks__actions">
-          <a href="/cases/" class="btn btn-primary">Se cases imens</a>
-          <a href="/" class="btn btn-secondary">Til forsiden</a>
+          <a href="/" class="btn btn-primary">Til forsiden</a>
+          <a href="/proces/" class="btn btn-secondary">Sådan arbejder jeg</a>
         </div>
       </div>
     </div>
@@ -34,5 +37,8 @@ import { site } from '../data/site';
   .thanks { min-height: 60vh; display: grid; align-items: center; }
   .thanks__icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--c-orange-soft); color: var(--c-ink); }
   .thanks__box { max-width: 44rem; margin-inline: auto; padding: clamp(1.5rem, 5vw, 3.5rem); display: grid; gap: 1.25rem; justify-items: start; }
+  .thanks__next { margin: 0; padding-left: 1.1rem; display: grid; gap: .5rem; color: var(--c-body); }
+  /* Bundbaren skal ikke stå og bede om en ny fil lige efter afsendelse */
+  :global(body:has(.thanks) .dock) { display: none; }
   .thanks__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .75rem; }
 </style>

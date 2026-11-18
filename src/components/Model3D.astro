@@ -76,7 +76,8 @@ import HeroVisual from './HeroVisual.astro';
   .m3d__dims { position: absolute; inset: 0; pointer-events: none; }
   .m3d__dims :global(.m3d__dim) { position: absolute; left: 0; top: 0; font: 500 .75rem var(--font-mono); color: var(--c-ink); background: var(--c-white); border: 1px solid var(--c-line-strong); padding: .1rem .4rem; border-radius: 6px; white-space: nowrap; transition: opacity .25s ease; will-change: transform; }
   .m3d__dims :global(.m3d__dim--accent) { border-color: var(--c-orange); color: var(--c-orange); }
-  .m3d:not(.is-ready) .m3d__angle { visibility: hidden; }
+  /* Kontroller vises (og kan fokuseres) først, når 3D kører – ellers står stregtegningen alene */
+  .m3d:not(.is-ready) :is(.m3d__angle, .m3d__bar .seg, .m3d__tools) { visibility: hidden; }
   .m3d__angle { display: inline-flex; align-items: center; gap: .6rem; flex: 1 1 9rem; min-width: 8rem; max-width: 14rem; }
   .m3d__angle input { flex: 1; accent-color: var(--c-orange); min-height: 2rem; cursor: pointer; }
   .m3d__angle output { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-ink); min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }

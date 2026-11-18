@@ -20,7 +20,10 @@ interface Props {
 
 const { title, description, ogImage = '/og.png', schema = [], noindex: noindexProp = false } = Astro.props;
 const noindex = noindexProp || import.meta.env.PUBLIC_NOINDEX === 'true'; // forhåndsvisning på GitHub Pages
-const canonical = new URL(Astro.url.pathname, site.url).href;
+// Canonical peger altid på procad.dk uden forhåndsvisningens base-sti (/procad.dk/ på GitHub Pages)
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const cleanPath = basePath && Astro.url.pathname.startsWith(basePath) ? Astro.url.pathname.slice(basePath.length) || '/' : Astro.url.pathname;
+const canonical = new URL(cleanPath, site.url).href;
 const fullTitle = title.includes('ProCAD') ? title : `${title} | ProCAD`;
 const ogUrl = new URL(ogImage, site.url).href;
 const gtmId = site.gtmId;
@@ -36,9 +39,13 @@ const orgSchema = {
   logo: `${site.url}/logo.svg`,
   image: `${site.url}/og.png`,
   email: site.email,
-  telephone: site.phone,
-  vatID: site.cvr,
-  areaServed: { '@type': 'Country', name: 'Danmark' },
+  telephone: site.phoneHref.replace('tel:', ''),
+  vatID: `DK${site.cvr}`,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Region Sjælland' },
+    { '@type': 'AdministrativeArea', name: 'Region Hovedstaden' },
+    { '@type': 'Country', name: 'Danmark' },
+  ],
   address: {
     '@type': 'PostalAddress',
     addressCountry: site.address.country,

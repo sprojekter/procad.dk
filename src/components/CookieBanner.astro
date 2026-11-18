@@ -6,7 +6,7 @@
   <div class="cookie__inner">
     <div class="cookie__text">
       <h2 id="cookie-title" class="cookie__title">Cookies på procad.dk</h2>
-      <p>Jeg bruger kun nødvendige cookies, medmindre du siger ja til statistik og marketing. Så kan jeg se, hvilke sider der bliver brugt, og måle annoncer. <a href="/cookiepolitik/" class="link">Læs cookiepolitikken</a>.</p>
+      <p>Jeg bruger kun nødvendige cookies, medmindre du siger ja til statistik og marketing. Så kan jeg se, hvilke sider der bliver brugt, og måle annoncer. Statistik og marketing leveres af Google, og data kan blive overført til USA. <a href="/cookiepolitik/" class="link">Læs cookiepolitikken</a>.</p>
 
       <form class="cookie__prefs" id="cookie-prefs" hidden>
         <label class="check"><input type="checkbox" checked disabled /> <span><strong>Nødvendige</strong> – får sitet og formularen til at virke.</span></label>
@@ -17,7 +17,7 @@
     <div class="cookie__actions">
       <button type="button" class="btn btn-secondary btn-sm" data-consent="all">Accepter alle</button>
       <button type="button" class="btn btn-secondary btn-sm" data-consent="necessary">Kun nødvendige</button>
-      <button type="button" class="btn btn-secondary btn-sm" data-consent="toggle" aria-expanded="false" aria-controls="cookie-prefs">Vælg selv</button>
+      <button type="button" class="btn btn-secondary btn-sm cookie__more" data-consent="toggle" aria-expanded="false" aria-controls="cookie-prefs">Vælg selv</button>
       <button type="button" class="btn btn-secondary btn-sm" data-consent="save" hidden>Gem mit valg</button>
     </div>
   </div>
@@ -34,6 +34,15 @@
   .cookie__prefs[hidden] { display: none; }
   .cookie__actions { display: grid; gap: .5rem; }
   .cookie__actions [hidden] { display: none; }
+  /* Mobil: ligger over bundbaren, to knapper side om side, "Vælg selv" som tekstlink */
+  @media (max-width: 63.99rem) {
+    .cookie { left: .5rem; right: .5rem; bottom: calc(4.5rem + env(safe-area-inset-bottom)); max-height: calc(100dvh - 6rem); overflow-y: auto; }
+    .cookie__inner { padding: 1.1rem; gap: .9rem; }
+    .cookie__actions { grid-template-columns: 1fr 1fr; }
+    .cookie__actions .btn { min-height: 2.75rem; }
+    .cookie__more { grid-column: 1 / -1; background: none; border: 0; box-shadow: none; text-decoration: underline; color: var(--c-ink); }
+    .cookie__actions [data-consent="save"] { grid-column: 1 / -1; }
+  }
 </style>
 
 <script>
@@ -46,12 +55,22 @@
   function read(): Consent | null {
     try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; }
   }
+  // Sletter Google-cookies, når et samtykke trækkes tilbage
+  function clearGoogleCookies() {
+    const host = location.hostname.replace(/^www\./, '');
+    document.cookie.split(';').map((c) => c.split('=')[0].trim()).filter((n) => /^(_ga|_gid|_gcl|_gat)/.test(n)).forEach((n) => {
+      [location.hostname, '.' + host, ''].forEach((d) => { document.cookie = `${n}=; Max-Age=0; path=/;${d ? ` domain=${d};` : ''}`; });
+    });
+  }
   function save(analytics: boolean, marketing: boolean) {
+    const before = read();
+    const withdrawn = !!before && ((before.analytics && !analytics) || (before.marketing && !marketing));
     const c: Consent = { v: 1, analytics, marketing, ts: new Date().toISOString() };
     try { localStorage.setItem(KEY, JSON.stringify(c)); } catch {}
     (window as any).procadApplyConsent?.(c);
     (window as any).dataLayer?.push({ event: 'consent_update', consent_analytics: analytics, consent_marketing: marketing });
     if (banner) banner.hidden = true;
+    if (withdrawn) { clearGoogleCookies(); location.reload(); }
   }
   function open() {
     if (!banner) return;
@@ -63,7 +82,9 @@
     banner.hidden = false;
   }
 
-  if (!read()) open();
+  // Spørg igen, hvis der ikke er svaret, eller svaret er mere end 12 måneder gammelt
+  const prev = read();
+  if (!prev || Date.now() - Date.parse(prev.ts) > 365 * 24 * 3600 * 1000) open();
   btn('all')?.addEventListener('click', () => save(true, true));
   btn('necessary')?.addEventListener('click', () => save(false, false));
   btn('toggle')?.addEventListener('click', (e) => {
@@ -73,6 +94,7 @@
     t.setAttribute('aria-expanded', String(show));
     t.hidden = show;
     const s = btn('save'); if (s) s.hidden = !show;
+    if (show) (prefs?.querySelector<HTMLInputElement>('input[name="analytics"]'))?.focus(); // fokus må ikke forsvinde med knappen
   });
   btn('save')?.addEventListener('click', () => {
     const a = (prefs?.elements.namedItem('analytics') as HTMLInputElement)?.checked ?? false;

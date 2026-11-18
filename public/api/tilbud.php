@@ -10,6 +10,7 @@
  */
 
 declare(strict_types=1);
+date_default_timezone_set('Europe/Copenhagen');
 
 $config = [
     'to'               => 'kontakt@procad.dk',
@@ -62,7 +63,9 @@ if (!empty($_POST['_gotcha']) || !empty($_POST['_honey'])) {
     respond(true); // lad som om alt gik godt
 }
 $ts = (int)($_POST['_ts'] ?? 0);
-if ($ts > 0 && (time() * 1000 - $ts) < $config['min_seconds'] * 1000) {
+$elapsed = time() * 1000 - $ts;
+// Kun "for hurtig" tæller som spam. Negativ tid = brugerens ur går foran serveren → lad den passere.
+if ($ts > 0 && $elapsed >= 0 && $elapsed < $config['min_seconds'] * 1000) {
     respond(true);
 }
 
@@ -113,7 +116,7 @@ if ($errors) {
 }
 
 // --- Filer ---
-$allowedExt = ['pdf', 'dxf', 'dwg', 'step', 'stp', 'iges', 'igs', 'jpg', 'jpeg', 'png', 'heic', 'webp', 'zip'];
+$allowedExt = ['pdf', 'dxf', 'dwg', 'step', 'stp', 'iges', 'igs', 'jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'zip'];
 $attachments = [];
 $total = 0;
 // Normalisér alle filfelter (attachment1, attachment2 … eller filer[]) til én liste

@@ -15,7 +15,7 @@ const d = entry.data;
 const { Content } = await render(entry);
 const service = await getEntry('ydelser', d.service);
 ---
-<BaseLayout title={`${d.title} | Case | ProCAD`} description={d.metaDescription}>
+<BaseLayout title={`${d.title} | ProCAD`} description={d.metaDescription}>
   <PageHeader
     crumbs={[{ label: 'Cases', href: '/cases/' }, { label: d.title, href: `/cases/${entry.id}/` }]}
     title={d.title}

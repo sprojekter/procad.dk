@@ -32,7 +32,7 @@ for (const [name, url, ratio] of photos) {
     const file = new URL(`${name}${suffix}.webp`, root);
     try { await access(file); continue; } catch {}
     try {
-      const res = await fetch(`${url}?auto=format&fm=webp&fit=crop&crop=entropy&q=72&w=${width}&h=${Math.round(width * ratio)}`);
+      const res = await fetch(`${url}?fm=webp&fit=crop&crop=entropy&q=72&w=${width}&h=${Math.round(width * ratio)}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       await writeFile(file, Buffer.from(await res.arrayBuffer()));
       console.log('✓', `${name}${suffix}.webp`);

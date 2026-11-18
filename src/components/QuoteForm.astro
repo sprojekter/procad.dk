@@ -17,7 +17,9 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
 const endpoint = site.formEndpoint;
 const isFormSubmit = endpoint.includes('formsubmit.co');
 const maxMB = isFormSubmit ? 10 : 15;
-const accept = '.pdf,.dxf,.dwg,.step,.stp,.iges,.igs,.jpg,.jpeg,.png,.heic,.webp,.zip';
+const accept = '.pdf,.dxf,.dwg,.step,.stp,.iges,.igs,.jpg,.jpeg,.png,.heic,.heif,.webp,.zip';
+// Absolut tak-URL, så også afsendelse uden JS lander på vores egen tak-side
+const thanksUrl = new URL(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/tak/`, Astro.site ?? site.url).href;
 const f = (n: string) => `${id}-${n}`;
 const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned', 'Ingen hast'];
 ---
@@ -34,12 +36,12 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
 >
   {heading && <h2 class="qf__heading">{heading}</h2>}
 
-  <div class="qf__progress" aria-hidden="true" data-progress>
-    <span data-progress-label>Trin 1 af 2: Opgaven</span>
-    <span class="qf__bar"><span data-progress-bar></span></span>
+  <div class="qf__progress" data-progress>
+    <span data-progress-label aria-live="polite">Trin 1 af 2: Opgaven</span>
+    <span class="qf__bar" aria-hidden="true"><span data-progress-bar></span></span>
   </div>
 
-  <div class="qf__errors" role="alert" tabindex="-1" hidden data-errors></div>
+  <div class="qf__errors" tabindex="-1" hidden data-errors></div>
 
   <!-- Trin 1: Opgaven -->
   <fieldset class="qf__step is-active" data-step="1">
@@ -59,19 +61,13 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
     </div>
 
     <div class="field">
-      <label for={f('besk')}>Beskriv opgaven</label>
-      <textarea class="input" id={f('besk')} name="Beskrivelse" rows="3"
-        placeholder="Fx 40 stk. bukket beslag i 3 mm S235. Skal bruge DXF til laser."></textarea>
-    </div>
-
-    <div class="field">
       <span class="qf__label" id={f('filer-l')}>Filer, skitse eller foto</span>
       <div class="qf__pick">
         <label class="dropzone" data-dropzone>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4m-4.5 4.5L12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
           <span class="qf__pick-fine"><strong>Træk filer hertil</strong> eller <u>vælg filer</u></span>
           <span class="qf__pick-coarse"><strong>Vælg filer</strong></span>
-          <input type="file" name="attachment" multiple accept={accept} aria-labelledby={f('filer-l')} data-files />
+          <input type="file" name="attachment[]" multiple accept={accept} aria-labelledby={f('filer-l')} data-files />
         </label>
         <label class="btn btn-secondary qf__camera">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
@@ -83,6 +79,12 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       <ul class="qf__files" data-file-list aria-live="polite"></ul>
       <div class="qf__meter" hidden data-meter><span data-meter-bar></span></div>
       <span class="field-error" data-file-error></span>
+    </div>
+
+    <div class="field">
+      <label for={f('besk')}>Beskriv opgaven</label>
+      <textarea class="input" id={f('besk')} name="Beskrivelse" rows="3"
+        placeholder="Fx 40 stk. bukket beslag i 3 mm S235. Skal bruge DXF til laser."></textarea>
     </div>
 
     <div class="field">
@@ -131,7 +133,7 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       </div>
     </div>
 
-    <p class="qf__privacy">Dine oplysninger og filer bruges kun til at besvare forespørgslen og deles ikke. <a href="/privatlivspolitik/">Privatlivspolitik</a></p>
+    <p class="qf__privacy">Jeg bruger dine oplysninger og filer til at besvare din henvendelse og give et tilbud. De opbevares hos min hostingudbyder og sælges eller videregives ikke. <a href="/privatlivspolitik/">Læs privatlivspolitikken</a></p>
 
     <div class="qf__actions">
       <button type="button" class="btn btn-secondary" data-prev-step data-js-only>Tilbage</button>
@@ -149,7 +151,7 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
   {isFormSubmit && <input type="hidden" name="_captcha" value="false" />}
   {isFormSubmit && <input type="hidden" name="_template" value="table" />}
   <input type="hidden" name="_subject" value="Ny tilbudsforespørgsel fra procad.dk" />
-  <input type="hidden" name="_next" value="" data-next />
+  <input type="hidden" name="_next" value={thanksUrl} data-next />
   <input type="hidden" name="Side" value={Astro.url.pathname} data-side />
   {site.turnstileSiteKey && <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey} data-language="da"></div>}
 </form>
@@ -181,7 +183,7 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
   .chip span { display: inline-flex; align-items: center; min-height: 2.75rem; padding: .4rem 1rem; border: 1px solid var(--c-field); border-radius: 999px; font-size: .9375rem; color: var(--c-ink); background: var(--c-white); transition: border-color .15s ease, background-color .15s ease, color .15s ease; cursor: pointer; }
   .chip:hover span { border-color: var(--c-ink); }
   .chip input:checked + span { background: var(--c-ink); color: var(--c-on-ink); border-color: var(--c-ink); }
-  .chip input:focus-visible + span { box-shadow: var(--ring); }
+  .chip input:focus-visible + span { outline: 2px solid var(--c-focus); outline-offset: 2px; }
 
   /* Filvalg: træk-og-slip på mus, knapper på touch */
   .qf__pick { display: grid; gap: .5rem; }
@@ -278,7 +280,7 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       const bad: string[] = [];
       Array.from(incoming).forEach((file) => {
         const ext = file.name.split('.').pop()?.toLowerCase() || '';
-        if (!OK_EXT.includes(ext) && !file.type.startsWith('image/')) { bad.push(file.name); return; }
+        if (!OK_EXT.includes(ext)) { bad.push(file.name); return; }
         if (files.length >= MAX_FILES) { bad.push(file.name); return; }
         if (!files.some((f) => f.name === file.name && f.size === file.size)) files.push(file);
       });
@@ -293,6 +295,9 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
     if (form.dataset.dialog) window.addEventListener('procad:quote-files', (e) => addFiles((e as CustomEvent<File[]>).detail));
 
     // ---------- Kladde ----------
+    // Kun opgavefelterne gemmes lokalt – aldrig navn, e-mail, telefon eller firma.
+    const PERSONAL = ['Navn', 'email', 'Telefon', 'Firma'];
+    try { const old = JSON.parse(localStorage.getItem(draftKey) || '{}'); PERSONAL.forEach((k) => delete old[k]); localStorage.setItem(draftKey, JSON.stringify(old)); } catch {}
     const textFields = () => Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[type=text], input[type=email], input[type=tel], input[type=url], textarea, input[type=radio]'));
     try {
       const d = JSON.parse(localStorage.getItem(draftKey) || '{}');
@@ -307,7 +312,7 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       clearTimeout(t);
       t = window.setTimeout(() => {
         const d: Record<string, string> = {};
-        new FormData(form).forEach((v, k) => { if (typeof v === 'string' && !k.startsWith('_') && k !== 'Side') d[k] = v; });
+        new FormData(form).forEach((v, k) => { if (typeof v === 'string' && !k.startsWith('_') && !PERSONAL.includes(k) && k !== 'Side') d[k] = v; });
         try { localStorage.setItem(draftKey, JSON.stringify(d)); } catch {}
       }, 400);
     });
@@ -338,8 +343,9 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       problems.forEach((p) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `#${p.el.id}`; a.textContent = p.msg;
-        a.addEventListener('click', (ev) => { ev.preventDefault(); p.el.focus(); });
+        const target = p.el.matches('input, textarea, button, select') ? p.el : p.el.querySelector<HTMLElement>('input, button');
+        a.href = target?.id ? `#${target.id}` : '#'; a.textContent = p.msg;
+        a.addEventListener('click', (ev) => { ev.preventDefault(); target?.focus(); });
         li.appendChild(a); errors.querySelector('ul')!.appendChild(li);
       });
       errors.focus();
@@ -373,6 +379,13 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       if (r) r.checked = true;
     });
 
+    // Tilbage-knappen fra tak-siden kan gendanne siden fra cachen med knappen låst i "Sender …"
+    window.addEventListener('pageshow', (e) => {
+      if (!e.persisted) return;
+      form.classList.remove('is-sending');
+      (form.querySelector('[data-label]') as HTMLElement).textContent = 'Send og få fast pris';
+    });
+
     // ---------- Afsendelse ----------
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -395,7 +408,7 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
       };
       const fail = (msg: string) => { resetBtn(); showErrors([{ el: form.querySelector('[data-submit]') as HTMLElement, msg }]); };
       const fd = new FormData(form);
-      fd.delete('attachment');
+      fd.delete('attachment[]');
       files.forEach((file, i) => fd.append(`attachment${i + 1}`, file));
       const action = new URL(form.action, location.href);
       const sameOrigin = action.origin === location.origin;

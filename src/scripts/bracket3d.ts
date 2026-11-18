@@ -170,7 +170,8 @@ export function initBracket(root: HTMLElement) {
       float axis(float v) { return 1.0 - min(abs(v) / fwidth(v), 1.0); }
       void main() {
         float d = length(vPos.xz);
-        float fade = 1.0 - smoothstep(uRadius * 0.35, uRadius, d);
+        float r = max(uRadius, 1.0);
+        float fade = 1.0 - smoothstep(r * 0.35, r, d);
         float minor = grid(vPos.xz, 10.0) * uMinor;
         float major = grid(vPos.xz, 50.0) * uMajor;
         float ax = max(axis(vPos.x), axis(vPos.z));
@@ -179,6 +180,7 @@ export function initBracket(root: HTMLElement) {
         float alpha = max(a, ax * 0.75) * fade;
         if (alpha < 0.004) discard;
         gl_FragColor = vec4(col, alpha);
+        #include <colorspace_fragment>
       }`,
   });
   const grid = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600), gridMat);
@@ -398,7 +400,7 @@ export function initBracket(root: HTMLElement) {
   function kick() { if (!raf) { prev = performance.now(); raf = requestAnimationFrame(frame); } }
   function frame(now: number) {
     raf = 0;
-    const dt = Math.min(0.05, (now - prev) / 1000);
+    const dt = Math.max(0, Math.min(0.05, (now - prev) / 1000));
     prev = now;
     if (intro.length && now > introAt && Math.abs(fold - target) < 0.001) { setTarget(intro.shift()!); introAt = now + 2200; }
     let moving = false;

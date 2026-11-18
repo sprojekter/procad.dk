@@ -17,7 +17,9 @@ import PageHeader from '../components/PageHeader.astro';
       <table>
         <thead><tr><th>Navn</th><th>Udbyder</th><th>Formål</th><th>Kategori</th><th>Udløb</th></tr></thead>
         <tbody>
-          <tr><td>procad-consent</td><td>procad.dk</td><td>Husker dit cookievalg (localStorage)</td><td>Nødvendig</td><td>Indtil du sletter det</td></tr>
+          <tr><td>procad-consent</td><td>procad.dk</td><td>Husker dit cookievalg (localStorage)</td><td>Nødvendig</td><td>12 måneder – derefter spørger jeg igen</td></tr>
+          <tr><td>procad-theme</td><td>procad.dk</td><td>Husker, om du har valgt lyst eller mørkt tema (localStorage)</td><td>Nødvendig</td><td>Indtil du sletter det</td></tr>
+          <tr><td>procad-draft-*</td><td>procad.dk</td><td>Gemmer en kladde af opgavebeskrivelsen, hvis du lukker formularen (ikke navn, e-mail eller telefon)</td><td>Nødvendig</td><td>Slettes, når du sender</td></tr>
           <tr><td>_ga, _ga_*</td><td>Google Analytics</td><td>Skelner mellem besøgende og måler brugen af sitet</td><td>Statistik</td><td>2 år</td></tr>
           <tr><td>_gcl_au</td><td>Google Ads</td><td>Måler konverteringer fra annoncer</td><td>Marketing</td><td>90 dage</td></tr>
           <tr><td>[UDFYLD]</td><td>Cloudflare Turnstile</td><td>Spambeskyttelse af formularen (kun hvis aktiveret)</td><td>Nødvendig</td><td>Session</td></tr>
@@ -25,7 +27,7 @@ import PageHeader from '../components/PageHeader.astro';
       </table>
 
       <h2>Google Consent Mode</h2>
-      <p>Sitet bruger Google Consent Mode v2. Indtil du har givet samtykke, indlæses Google Tag Manager ikke, og der sættes ingen statistik- eller marketingcookies.</p>
+      <p>Sitet bruger Google Consent Mode v2. Indtil du har givet samtykke, indlæses Google Tag Manager ikke, og der sættes ingen statistik- eller marketingcookies. Statistik og marketing leveres af Google Ireland Ltd., og data kan blive overført til USA på grundlag af EU-US Data Privacy Framework. Trækker du dit samtykke tilbage, sletter sitet Googles cookies.</p>
     </div>
   </section>
 </BaseLayout>
