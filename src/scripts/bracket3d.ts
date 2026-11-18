@@ -139,6 +139,70 @@ export function initBracket(root: HTMLElement) {
   ground.receiveShadow = true;
   scene.add(ground);
 
+  // CAD-gitter på gulvet: 10 mm fine linjer, 50 mm hovedlinjer og orange X/Z-akser gennem nulpunktet.
+  // Tegnes i én shader, så linjerne er skarpe i alle zoom-niveauer og toner ud mod kanten.
+  const gridMat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    toneMapped: false,
+    uniforms: {
+      uColor: { value: cssColor('--c-ink', '#0e0e10') },
+      uAccent: { value: new THREE.Color(0xff7621) },
+      uRadius: { value: reduce ? 460 : 0 },
+      uMinor: { value: 0.1 },
+      uMajor: { value: 0.24 },
+    },
+    vertexShader: `
+      varying vec3 vPos;
+      void main() {
+        vec4 w = modelMatrix * vec4(position, 1.0);
+        vPos = w.xyz;
+        gl_Position = projectionMatrix * viewMatrix * w;
+      }`,
+    fragmentShader: `
+      uniform vec3 uColor; uniform vec3 uAccent; uniform float uRadius; uniform float uMinor; uniform float uMajor;
+      varying vec3 vPos;
+      float grid(vec2 p, float size) {
+        vec2 c = p / size;
+        vec2 g = abs(fract(c - 0.5) - 0.5) / fwidth(c);
+        return 1.0 - min(min(g.x, g.y), 1.0);
+      }
+      float axis(float v) { return 1.0 - min(abs(v) / fwidth(v), 1.0); }
+      void main() {
+        float d = length(vPos.xz);
+        float fade = 1.0 - smoothstep(uRadius * 0.35, uRadius, d);
+        float minor = grid(vPos.xz, 10.0) * uMinor;
+        float major = grid(vPos.xz, 50.0) * uMajor;
+        float ax = max(axis(vPos.x), axis(vPos.z));
+        float a = max(minor, major);
+        vec3 col = mix(uColor, uAccent, ax);
+        float alpha = max(a, ax * 0.75) * fade;
+        if (alpha < 0.004) discard;
+        gl_FragColor = vec4(col, alpha);
+      }`,
+  });
+  const grid = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600), gridMat);
+  grid.rotation.x = -Math.PI / 2;
+  grid.position.y = 0.05;
+  grid.renderOrder = -1;
+  scene.add(grid);
+  const isDark = () => document.documentElement.dataset.theme === 'dark';
+  const tuneGrid = () => {
+    gridMat.uniforms.uColor.value.copy(cssColor('--c-ink', '#0e0e10'));
+    gridMat.uniforms.uMinor.value = isDark() ? 0.09 : 0.08;
+    gridMat.uniforms.uMajor.value = isDark() ? 0.2 : 0.18;
+  };
+  tuneGrid();
+  // Gitteret "tegnes ud" fra nulpunktet, når modellen starter (én gang)
+  const gridStart = performance.now() + 250;
+  const GRID_MS = 1600;
+  function stepGrid(now: number) {
+    if (reduce) return false;
+    const t = Math.min(1, Math.max(0, (now - gridStart) / GRID_MS));
+    gridMat.uniforms.uRadius.value = 460 * (1 - Math.pow(1 - t, 3));
+    return t < 1;
+  }
+
   // Forudberegn bukket i STEPS trin (0 = fladt, STEPS = 90°), så intet bygges om under animationen.
   const STEPS = 36;
   const box = new THREE.Box3();
@@ -221,7 +285,7 @@ export function initBracket(root: HTMLElement) {
   window.setTimeout(() => { controls.autoRotate = false; }, 9000); // drej kun i starten
 
   // Kantfarve følger temaet
-  new MutationObserver(() => { edgeMat.color.copy(cssColor('--c-ink', '#0e0e10')); if (drawing) applyDrawing(); kick(); })
+  new MutationObserver(() => { edgeMat.color.copy(cssColor('--c-ink', '#0e0e10')); tuneGrid(); if (drawing) applyDrawing(); kick(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   // ---------- Mål (HTML-etiketter, der følger modellen) ----------
@@ -345,10 +409,11 @@ export function initBracket(root: HTMLElement) {
       moving = true;
     }
     const camMoving = stepCamera(dt);
+    const gridMoving = stepGrid(now);
     const changed = controls.update();
     renderer.render(scene, camera);
     placeDims();
-    if (visible && !document.hidden && (moving || camMoving || changed || controls.autoRotate || intro.length)) kick();
+    if (visible && !document.hidden && (moving || camMoving || gridMoving || changed || controls.autoRotate || intro.length)) kick();
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
 

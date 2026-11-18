@@ -7,6 +7,7 @@ import HeroVisual from './HeroVisual.astro';
   <div class="m3d__stage">
     <div class="m3d__fallback"><HeroVisual /></div>
     <canvas class="m3d__canvas" role="img" aria-label="3D-model af et bukket stålbeslag, der kan drejes og foldes ud til sin udfoldning."></canvas>
+    <div class="m3d__marks" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="m3d__dims" data-dims hidden aria-hidden="true"></div>
     <div class="m3d__tools" role="toolbar" aria-label="Visning af 3D-modellen">
       <div class="seg seg--sm" role="group" aria-label="Kameravinkel">
@@ -51,11 +52,11 @@ import HeroVisual from './HeroVisual.astro';
   .m3d__canvas:active { cursor: grabbing; }
   .m3d.is-ready .m3d__canvas { opacity: 1; }
   .m3d.is-ready .m3d__fallback { opacity: 0; }
-  .m3d__hint { position: absolute; left: 1rem; bottom: 1rem; display: inline-flex; align-items: center; gap: .4rem; font-size: var(--fs-xs); color: var(--c-muted); background: color-mix(in srgb, var(--c-white) 85%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--c-line); padding: .3rem .6rem; border-radius: 999px; opacity: 0; transition: opacity .4s ease; }
+  .m3d__hint { position: absolute; left: 1.5rem; bottom: 1.5rem; display: inline-flex; align-items: center; gap: .4rem; font-size: var(--fs-xs); color: var(--c-muted); background: color-mix(in srgb, var(--c-white) 85%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--c-line); padding: .3rem .6rem; border-radius: 999px; opacity: 0; transition: opacity .4s ease; }
   .m3d.is-ready .m3d__hint { opacity: 1; }
   .m3d.is-touched .m3d__hint { opacity: 0; }
   .m3d__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem .9rem; border-top: 1px solid var(--c-line); }
-  .m3d__tools { position: absolute; top: .9rem; right: .9rem; display: flex; gap: .4rem; opacity: 0; transition: opacity .4s ease; }
+  .m3d__tools { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: .4rem; opacity: 0; transition: opacity .4s ease; }
   .m3d.is-ready .m3d__tools { opacity: 1; }
   .m3d__tools .seg, .tool { background: color-mix(in srgb, var(--c-white) 82%, transparent); backdrop-filter: blur(8px); }
   .seg--sm button { padding: .3rem .6rem; font-size: .8125rem; }
@@ -63,6 +64,15 @@ import HeroVisual from './HeroVisual.astro';
   .tool:hover { color: var(--c-ink); }
   .tool[aria-pressed="true"] { color: var(--c-ink); border-color: var(--c-orange); }
   .tool[aria-pressed="true"] svg { color: var(--c-orange); }
+  /* Orange hjørnemærker som på en tegning – "tegner sig ind", når modellen er klar */
+  .m3d__marks { position: absolute; inset: .75rem; pointer-events: none; }
+  .m3d__marks span { position: absolute; width: 18px; height: 18px; border: 0 solid var(--c-orange); opacity: 0; transform: scale(.6); transition: opacity .5s var(--ease), transform .7s var(--ease); }
+  .m3d__marks span:nth-child(1) { top: 0; left: 0; border-top-width: 1.5px; border-left-width: 1.5px; transform-origin: top left; }
+  .m3d__marks span:nth-child(2) { top: 0; right: 0; border-top-width: 1.5px; border-right-width: 1.5px; transform-origin: top right; }
+  .m3d__marks span:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; transform-origin: bottom left; }
+  .m3d__marks span:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; transform-origin: bottom right; }
+  .m3d.is-ready .m3d__marks span { opacity: .85; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .m3d__marks span { transition: none; } }
   .m3d__dims { position: absolute; inset: 0; pointer-events: none; }
   .m3d__dims :global(.m3d__dim) { position: absolute; left: 0; top: 0; font: 500 .75rem var(--font-mono); color: var(--c-ink); background: var(--c-white); border: 1px solid var(--c-line-strong); padding: .1rem .4rem; border-radius: 6px; white-space: nowrap; transition: opacity .25s ease; will-change: transform; }
   .m3d__dims :global(.m3d__dim--accent) { border-color: var(--c-orange); color: var(--c-orange); }
