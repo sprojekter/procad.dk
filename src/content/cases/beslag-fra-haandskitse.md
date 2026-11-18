@@ -20,12 +20,14 @@ facts:
   - label: Leveringstid
     value: "[UDFYLD]"
 before:
-  alt: Håndskitse af beslaget på et stykke pap med mål skrevet med kuglepen
+  src: /images/cases/beslag-fra-haandskitse-foer.webp
+  alt: Hånd, der skitserer med kuglepen i en notesbog  # [UDFYLD] midlertidigt foto – erstat med kundens rigtige før-billede
   spec: 4:3, 1600×1200 px, JPG – rigtigt foto af kundens skitse (med tilladelse)
   motif: Håndtegnet skitse med mål, fotograferet ovenfra på en værkstedsbænk
   prompt: "Top-down photo of a rough hand sketch of an L-shaped bent steel bracket with holes, drawn in blue ballpoint pen on a piece of brown cardboard, handwritten dimensions in millimetres, lying on a scratched steel workbench, a tape measure next to it, natural light, realistic, slightly worn look"
 after:
-  alt: Færdig arbejdstegning af beslaget med udfoldning, mål og tegningshoved
+  src: /images/cases/beslag-fra-haandskitse-efter.webp
+  alt: Tekniske tegninger med geometriske former og projektioner  # [UDFYLD] midlertidigt foto – erstat med ProCADs rigtige leverance
   spec: 4:3, 1600×1200 px, PNG – eksport af den færdige tegning (anonymisér kundedata)
   motif: Den færdige ProCAD-arbejdstegning med sidebillede, udfoldning og tegningshoved
   prompt: "Clean technical CAD drawing sheet of an L-shaped bent steel bracket with side view, flat pattern with dashed orange bend line, dimension arrows and a title block, black lines on white, precise and minimal, flat vector style, high resolution"

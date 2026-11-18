@@ -26,3 +26,14 @@ export const photos = {
     page: 'https://unsplash.com/photos/metal-components-resting-on-engineering-blueprints-qCmbTEsdvOw',
   },
 } as const;
+
+// Øvrige midlertidige fotos (cases og Om) – hentes af scripts/fetch-photos.mjs.
+export const morePhotos = [
+  { file: 'cases/beslag-fra-haandskitse-foer', page: 'https://unsplash.com/photos/person-sketching-on-notebook-using-pen-ee5yWSeHPuw' },
+  { file: 'cases/beslag-fra-haandskitse-efter', page: 'https://unsplash.com/photos/technical-drawings-of-geometric-shapes-and-projections-ZOHihCKWmfU' },
+  { file: 'cases/papirtegning-til-3d-foer', page: 'https://unsplash.com/photos/architectural-blueprints-with-drafting-tools-Yn8D5B8C-eY' },
+  { file: 'cases/papirtegning-til-3d-efter', page: 'https://unsplash.com/photos/black-flat-screen-computer-monitor-hoivM01c-vg' },
+  { file: 'cases/produktide-til-produktion-foer', page: 'https://unsplash.com/photos/open-notebook-with-pen-and-pencils-on-desk-n9AaeihA9HI' },
+  { file: 'cases/produktide-til-produktion-efter', page: 'https://unsplash.com/photos/man-welding-a-black-metal-GAEvM4qvlBk' },
+  { file: 'om/arbejdsplads', page: 'https://unsplash.com/photos/desk-with-laptop-blueprints-and-tools-0dhIl78b__o' },
+] as const;

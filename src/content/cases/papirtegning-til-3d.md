@@ -20,12 +20,14 @@ facts:
   - label: Leveringstid
     value: "[UDFYLD]"
 before:
-  alt: Gulnet papirtegning med blyantsrettelser
+  src: /images/cases/papirtegning-til-3d-foer.webp
+  alt: Gamle tegninger med blyanter, metallineal og tegningsrør  # [UDFYLD] midlertidigt foto – erstat med kundens rigtige før-billede
   spec: 4:3, 1600×1200 px, JPG – scanning eller foto af den gamle tegning
   motif: Den gamle tegning, gerne med synlige rettelser og slid
   prompt: "Photo of an old yellowed paper engineering drawing of a machined steel flange part, faded blueprint lines, handwritten pencil corrections and coffee stain, folded creases, lying on a desk, warm side light, realistic, documentary style"
 after:
-  alt: 3D-model af reservedelen i CAD
+  src: /images/cases/papirtegning-til-3d-efter.webp
+  alt: Teknisk tegning åben i CAD på en computerskærm  # [UDFYLD] midlertidigt foto – erstat med ProCADs rigtige leverance
   spec: 4:3, 1600×1200 px, PNG – skærmbillede/render af 3D-modellen
   motif: Ren grå 3D-model af delen på hvid baggrund, evt. med snit
   prompt: "Clean studio render of a grey machined steel flange part with bolt holes and a keyway, isometric view, soft shadow on white background, subtle orange highlight edge, technical product visualization, high detail"

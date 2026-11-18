@@ -20,12 +20,14 @@ facts:
   - label: Forløb
     value: "[UDFYLD]"
 before:
-  alt: Papmodel og skitser af produktidéen
+  src: /images/cases/produktide-til-produktion-foer.webp
+  alt: Åben notesbog med pen og blyanter på et skrivebord  # [UDFYLD] midlertidigt foto – erstat med kundens rigtige før-billede
   spec: 4:3, 1600×1200 px, JPG
   motif: Prototype i pap og blyantsskitser på et bord
   prompt: "Photo of a rough cardboard prototype of a wall-mounted bracket with pencil sketches and a ruler on a wooden table, maker atmosphere, natural daylight, realistic, honest and unpolished"
 after:
-  alt: Færdigt vægbeslag i rustfrit stål ved siden af tegningen
+  src: /images/cases/produktide-til-produktion-efter.webp
+  alt: Smed, der svejser et emne i sort stål  # [UDFYLD] midlertidigt foto – erstat med ProCADs rigtige leverance
   spec: 4:3, 1600×1200 px, JPG
   motif: Det producerede emne i rustfrit stål oven på den printede arbejdstegning
   prompt: "Finished brushed stainless steel wall bracket lying on top of its printed technical drawing, clean light grey background, soft studio light, crisp reflections, small orange accent, realistic product photo"
