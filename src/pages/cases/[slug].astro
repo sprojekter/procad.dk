@@ -37,7 +37,7 @@ const service = await getEntry('ydelser', d.service);
     <div class="wrap">
       <div class="ba">
         <figure class="ba__item">
-          <Media src={d.before.src} alt={d.before.alt} spec={d.before.spec} motif={d.before.motif} ratio="4 / 3" eager />
+          <Media src={d.before.src} alt={d.before.alt} spec={d.before.spec} motif={d.before.motif} ratio="4 / 3" priority sizes="(min-width: 64rem) 40vw, 100vw" />
           <figcaption><span class="ba__tag">Før</span> {d.before.alt}</figcaption>
         </figure>
         <figure class="ba__item">

@@ -42,10 +42,10 @@ import { site } from '../data/site';
   .ct { padding-block: clamp(1.25rem, 1rem + 2vw, 3.5rem) clamp(2rem, 1.5rem + 3vw, 4rem); }
   .ct__grid { display: grid; gap: 1.5rem; }
   @media (min-width: 64rem) { .ct__grid { grid-template-columns: 1fr 1.3fr; gap: 4rem; align-items: start; } .ct__intro { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
-  .ct h1 { font-size: clamp(1.9rem, 1.2rem + 2.8vw, 3.25rem); }
+  .ct h1 { font-size: var(--fs-h1); }
   .ct__chips { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem 1rem; font-size: var(--fs-sm); color: var(--c-ink); }
   .ct__chips li { display: inline-flex; align-items: center; gap: .35rem; }
-  .ct__chips :global(svg) { color: var(--c-orange); }
+  .ct__chips :global(svg) { color: var(--c-muted); }
   .ct__direct { margin-top: 1.25rem; display: grid; gap: .6rem; }
   .ct__direct .muted { font-size: var(--fs-sm); }
   .ct__btns { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }

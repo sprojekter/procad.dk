@@ -19,5 +19,6 @@ export default defineConfig({
     }),
   ],
   vite: { plugins: [tailwindcss()] },
-  prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
+  // Henter næste side, når musen hviler på et link (hurtigere sideskift)
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
 });

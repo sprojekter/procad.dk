@@ -26,7 +26,7 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
               <Media src={s.data.image.src} alt={s.data.image.alt} spec={s.data.image.spec} ratio="16 / 10" sizes="(min-width: 56rem) 45vw, 100vw" />
             </div>
             <div class="svc__body">
-              <p class="kicker" style="margin:0">{s.data.problem}</p>
+              <p class="kicker svc__kicker">{s.data.problem}</p>
               <h2 class="svc__title"><a href={`/ydelser/${s.id}/`}>{s.data.title}</a></h2>
               <p>{s.data.intro}</p>
               <ul class="svc__deliv">
@@ -52,8 +52,9 @@ const services = (await getCollection('ydelser')).sort((a, b) => a.data.order - 
   .svc__title { font-size: var(--fs-xl); letter-spacing: -0.025em; }
   .svc__title a { text-decoration: none; }
   .svc__title a:hover { opacity: .8; }
+  .svc__kicker { margin: 0; }
   .svc__body > p:not(.kicker) { color: var(--c-muted); font-size: var(--fs-sm); }
   .svc__deliv { list-style: none; padding: 0; margin: 0; display: grid; gap: .4rem; font-size: var(--fs-sm); }
   .svc__deliv li { padding-left: 1.25rem; position: relative; }
-  .svc__deliv li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
+  .svc__deliv li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-muted); }
 </style>

@@ -24,10 +24,9 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
   description="CAD-tegner med baggrund fra værkstedet. Arbejdstegninger, DXF/STEP til laser, kantbuk og CNC, 3D-modellering og styklister. Fast pris og svar inden 24 timer."
 >
   <!-- Hero -->
-  <section class="hero">
+  <section class="hero grid-paper">
     <div class="wrap hero__grid">
       <div class="hero__copy">
-        <p class="pill"><span class="pill__tag">Fast pris</span> Svar inden 24 timer</p>
         <h1>Produktionsklare CAD-tegninger til metal&shy;bearbejdning.</h1>
         <p class="lead">Arbejdstegninger, DXF/STEP, 3D og styklister – fra en tegner, der kommer fra værkstedet.</p>
         <div class="hero__actions">
@@ -35,7 +34,7 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
           <a href="#cases" class="btn btn-secondary hero__alt">Se før og efter</a>
         </div>
         <ul class="hero__trust" aria-label="Det kan du regne med">
-          <li><Icon icon="clock" tile={false} size={16} /> 24 timer</li>
+          <li><Icon icon="clock" tile={false} size={16} /> Svar inden 24 timer</li>
           <li><Icon icon="price" tile={false} size={16} /> Fast pris</li>
           <li><Icon icon="lock" tile={false} size={16} /> NDA</li>
           <li class="hero__trust-wide"><Icon icon="file" tile={false} size={16} /> DXF, DWG, STEP, PDF</li>
@@ -84,7 +83,7 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
   </section>
 
   <!-- Cases -->
-  <section class="section section--tight" id="cases" aria-labelledby="cases-h">
+  <section class="section" id="cases" aria-labelledby="cases-h">
     <div class="wrap">
       <div class="row-head">
         <h2 id="cases-h" class="h2">Før og efter.</h2>
@@ -138,14 +137,13 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
 
 <style>
   /* ---------- Hero ---------- */
-  .hero { padding-block: clamp(1.25rem, .5rem + 3vw, 4rem) clamp(1.5rem, 1rem + 2vw, 3rem); background: radial-gradient(60rem 30rem at 85% -10%, color-mix(in srgb, var(--c-orange) 7%, transparent), transparent 60%); }
+  .hero { padding-block: clamp(1.25rem, .5rem + 3vw, 4rem) clamp(1.5rem, 1rem + 2vw, 3rem); }
   .hero__grid { display: grid; gap: 2rem; align-items: center; }
   .hero__visual { display: none; }
   @media (min-width: 64rem) { .hero__grid { grid-template-columns: 1.05fr 1fr; gap: 3.5rem; } .hero__visual { display: block; } }
   /* Computer: hero fylder første skærm, så næste sektion ikke bliver skåret over midt i fanerne */
   @media (min-width: 64rem) and (min-height: 40rem) { .hero { min-height: calc(100svh - var(--header-h)); display: grid; align-content: center; } }
-  .pill { margin: 0; }
-  .hero h1 { margin-top: 1rem; font-size: clamp(2rem, 1.2rem + 3.4vw, 3.6rem); }
+  .hero h1 { font-size: var(--fs-display); }
   .hero .lead { margin-top: .9rem; }
   .hero__actions { display: grid; gap: .5rem; margin-top: 1.5rem; }
   .hero__cta { min-height: 3.25rem; font-size: 1rem; }
@@ -153,12 +151,12 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
   @media (min-width: 36rem) { .hero__actions { display: flex; flex-wrap: wrap; } .hero__alt { display: inline-flex; } }
   .hero__trust { list-style: none; padding: 0; margin: 1.25rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: var(--fs-sm); color: var(--c-ink); }
   .hero__trust li { display: inline-flex; align-items: center; gap: .35rem; }
-  .hero__trust :global(svg) { color: var(--c-orange); }
+  .hero__trust :global(svg) { color: var(--c-muted); }
   .hero__trust-wide { display: none !important; }
   @media (min-width: 64rem) { .hero__trust-wide { display: inline-flex !important; } }
 
   .section--first { padding-top: clamp(1.5rem, 1rem + 2vw, 3.5rem); }
-  .h2 { font-size: clamp(1.6rem, 1.1rem + 2vw, 2.6rem); letter-spacing: -0.035em; }
+  .h2 { font-size: var(--fs-h2); letter-spacing: -0.035em; }
   .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 1.25rem; }
   .row-head .link { font-size: var(--fs-sm); white-space: nowrap; }
 
@@ -168,30 +166,29 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
   .tile strong { margin-top: .4rem; color: var(--c-ink); font-weight: 600; font-size: .9375rem; line-height: 1.25; }
   .tile span { font-size: var(--fs-xs); color: var(--c-muted); line-height: 1.4; }
   .tabs { display: none; }
-  @media (min-width: 56rem) {
+  @media (min-width: 64rem) {
     .tiles { display: none; }
     .tabs { display: block; margin-top: 1.75rem; }
   }
-  .tabs__list { display: flex; gap: .25rem; padding: 4px; background: var(--c-white); border: 1px solid var(--c-line); border-radius: 14px; width: fit-content; }
-  .tabs__list button { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1rem; border: 0; border-radius: 10px; background: transparent; color: var(--c-muted); font: 500 .9375rem var(--font-sans); cursor: pointer; transition: background-color .2s ease, color .2s ease; }
+  .tabs__list { display: flex; gap: .25rem; padding: 4px; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-md); width: fit-content; }
+  .tabs__list button { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1rem; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--c-muted); font: 500 var(--fs-sm) var(--font-sans); cursor: pointer; transition: background-color .2s var(--ease), color .2s var(--ease); }
   .tabs__list button:hover { color: var(--c-ink); }
   .tabs__list button[aria-selected="true"] { background: var(--c-ink); color: var(--c-on-ink); }
   .tabs__panel { margin-top: 1rem; display: grid; grid-template-columns: 1.1fr 1fr; gap: 2.5rem; align-items: center; padding: 8px 8px 8px 2.25rem; }
   .tabs__panel[hidden] { display: none; }
   .tabs__text { display: grid; gap: .9rem; padding-block: 1.5rem; }
-  .tabs__text h3 { font-size: var(--fs-2xl); letter-spacing: -0.03em; }
+  .tabs__text h3 { font-size: var(--fs-xl); letter-spacing: -0.02em; }
   .tabs__text .kicker { margin: 0; }
   .tabs__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; margin-top: .5rem; }
-  .tabs__panel :global(.media), .tabs__panel :global(.ph) { border-radius: 16px; }
+  .tabs__panel :global(.media), .tabs__panel :global(.ph) { border-radius: var(--r-md); }
   .ticks { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; font-size: var(--fs-sm); }
   .ticks li { position: relative; padding-left: 1.5rem; }
-  .ticks li::before { content: ""; position: absolute; left: .15rem; top: .38em; width: .7rem; height: .38rem; border-left: 1.6px solid var(--c-orange); border-bottom: 1.6px solid var(--c-orange); transform: rotate(-45deg); }
+  .ticks li::before { content: ""; position: absolute; left: .15rem; top: .38em; width: .7rem; height: .38rem; border-left: 1.6px solid var(--c-ink); border-bottom: 1.6px solid var(--c-ink); transform: rotate(-45deg); }
 
   /* ---------- Cases ---------- */
-  .cases { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: .75rem; margin-inline: calc(-1 * clamp(1.25rem, .5rem + 3vw, 2.5rem)); padding: 0 clamp(1.25rem, .5rem + 3vw, 2.5rem) .5rem; scrollbar-width: none; }
-  .cases::-webkit-scrollbar { display: none; }
+  .cases { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: .75rem; margin-inline: calc(-1 * var(--gutter)); padding: 0 var(--gutter) .75rem; scrollbar-width: thin; scrollbar-color: var(--c-line-strong) transparent; }
   .cases > :global(*) { flex: 0 0 min(80%, 20rem); scroll-snap-align: start; }
-  @media (min-width: 56rem) { .cases { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; margin: 0; padding: 0; } }
+  @media (min-width: 64rem) { .cases { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; margin: 0; padding: 0; } }
 
   /* ---------- Hvorfor ---------- */
   .why { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--c-line); display: grid; gap: 1rem; }
@@ -199,24 +196,25 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
   .why__lead strong { color: var(--c-ink); font-weight: 600; }
   .why__lead .link { margin-left: .25rem; }
   .why__list { display: none; list-style: none; padding: 0; margin: 0; }
-  @media (min-width: 56rem) {
+  @media (min-width: 64rem) {
     .why { grid-template-columns: 1fr 1.3fr; align-items: center; gap: 3rem; }
     .why__list { display: flex; flex-wrap: wrap; gap: .5rem; }
-    .why__list li { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem .85rem; border: 1px solid var(--c-line); border-radius: 999px; font-size: var(--fs-sm); color: var(--c-ink); background: var(--c-paper); }
-    .why__list :global(svg) { color: var(--c-orange); }
+    .why__list { gap: .6rem 1.5rem; }
+    .why__list li { display: inline-flex; align-items: center; gap: .45rem; font-size: var(--fs-sm); color: var(--c-ink); }
+    .why__list :global(svg) { color: var(--c-muted); }
   }
 
   /* ---------- FAQ + dropfelt ---------- */
   .faq-cta { display: grid; gap: 2rem; }
   .drop { display: none; }
-  @media (min-width: 56rem) {
+  @media (min-width: 64rem) {
     .faq-cta { grid-template-columns: 1.4fr 1fr; gap: 3rem; align-items: start; }
-    .drop { display: grid; gap: .75rem; justify-items: start; padding: 2rem; border: 1.5px dashed var(--c-field); background: var(--c-white); transition: border-color .2s ease, background-color .2s ease; }
+    .drop { display: grid; gap: .75rem; justify-items: start; padding: 2rem; border: 1.5px dashed var(--c-field); background: var(--c-white); transition: border-color .2s var(--ease), background-color .2s var(--ease); }
     .drop.is-dragover { border-color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 6%, var(--c-white)); }
     .drop h3 { font-size: var(--fs-xl); letter-spacing: -0.02em; }
   }
   .mobile-only { display: block; }
-  @media (min-width: 56rem) { .mobile-only { display: none; } }
+  @media (min-width: 64rem) { .mobile-only { display: none; } }
 </style>
 
 <script>
@@ -240,6 +238,9 @@ const homeFaq = faq.filter((f) => f.home).slice(0, 3);
         if (k === 'ArrowRight' || k === 'ArrowLeft') {
           e.preventDefault();
           select(tabs[(i + (k === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length], true);
+        } else if (k === 'Home' || k === 'End') {
+          e.preventDefault();
+          select(tabs[k === 'Home' ? 0 : tabs.length - 1], true);
         }
       });
     });

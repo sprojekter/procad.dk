@@ -13,27 +13,35 @@ interface Props {
   motif?: string;
   ratio?: string;    // CSS aspect-ratio, fx "16 / 10"
   eager?: boolean;
+  priority?: boolean;  // sidens vigtigste billede (LCP): hentes straks og med høj prioritet
+  decorative?: boolean; // inde i et link med egen tekst: tom alt, så skærmlæsere ikke læser det to gange
   sizes?: string;
   class?: string;
 }
-const { src, alt, spec, motif, ratio = '4 / 3', eager = false, sizes = '(min-width: 64rem) 33vw, 100vw', class: cls = '' } = Astro.props;
+const { src, alt, spec, motif, ratio = '4 / 3', eager = false, priority = false, decorative = false, sizes = '(min-width: 64rem) 33vw, 100vw', class: cls = '' } = Astro.props;
 const pub = (p: string) => join(process.cwd(), 'public', p); // build køres fra projektroden
-const exists = !!src && src.startsWith('/') && existsSync(pub(src));
-const small = exists ? src!.replace(/(\.\w+)$/, '-800$1') : '';
-const hasSmall = exists && existsSync(pub(small));
-const [rw, rh] = ratio.split('/').map((n) => parseFloat(n));
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const exists = !!src && src.startsWith('/') && existsSync(pub(src));
+const [rw, rh] = ratio.split('/').map((n) => parseFloat(n));
+// fetch-photos gemmer stående billeder 25 % smallere (1200/600/300 px) – srcset skal angive de rigtige bredder
+const k = rh / rw > 1 ? 0.75 : 1;
+const variant = (suffix: string) => (exists ? src!.replace(/(\.\w+)$/, `${suffix}$1`) : '');
+const sources = [
+  ['-400', 400], ['-800', 800], ['', 1600],
+].filter(([suf]) => suf === '' || (exists && existsSync(pub(variant(suf as string)))))
+ .map(([suf, w]) => `${base + variant(suf as string)} ${Math.round((w as number) * k)}w`);
 ---
 {exists ? (
   <img
     class:list={['media', cls]}
     src={base + src}
-    srcset={hasSmall ? `${base + small} 800w, ${base + src} 1600w` : undefined}
-    sizes={hasSmall ? sizes : undefined}
-    alt={alt}
-    width={1600}
-    height={Math.round((1600 * rh) / rw)}
-    loading={eager ? 'eager' : 'lazy'}
+    srcset={sources.length > 1 ? sources.join(', ') : undefined}
+    sizes={sources.length > 1 ? sizes : undefined}
+    alt={decorative ? '' : alt}
+    width={Math.round(1600 * k)}
+    height={Math.round((1600 * k * rh) / rw)}
+    loading={eager || priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : undefined}
     decoding="async"
     style={`aspect-ratio:${ratio}`}
   />

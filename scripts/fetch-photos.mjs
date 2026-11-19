@@ -27,7 +27,7 @@ const root = new URL('../public/images/', import.meta.url);
 for (const [name, url, ratio] of photos) {
   const sub = name.split('/')[0];
   await mkdir(new URL(`${sub}/`, root), { recursive: true });
-  for (const [w, suffix] of [[1600, ''], [800, '-800']]) {
+  for (const [w, suffix] of [[1600, ''], [800, '-800'], [400, '-400']]) {
     const width = ratio > 1 ? Math.round(w * 0.75) : w; // stående billeder behøver ikke 1600 bredt
     const file = new URL(`${name}${suffix}.webp`, root);
     try { await access(file); continue; } catch {}

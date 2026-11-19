@@ -25,7 +25,7 @@ const { detailed = false } = Astro.props;
   .step__num { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-ink); display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--c-white); border: 1px solid var(--c-line); }
   .step:first-child .step__num { background: var(--c-ink); color: var(--c-on-ink); border-color: var(--c-ink); }
   .step__line { flex: 1; height: 1px; background: var(--c-line-strong); }
-  .step:last-child .step__line { background: linear-gradient(90deg, var(--c-orange), transparent); }
+  .step:last-child .step__line { background: var(--c-line-strong); }
   .step__title { font-size: var(--fs-lg); }
   .step__promise { font-size: var(--fs-sm); color: var(--c-ink); font-weight: 500; margin: .2rem 0 .6rem; }
   .step__text { font-size: var(--fs-sm); color: var(--c-muted); }

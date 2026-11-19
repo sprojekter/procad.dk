@@ -217,6 +217,8 @@ const deadlines = ['Hurtigst muligt', 'Inden for en uge', 'Inden for en måned',
   .qf__promise { text-align: center; }
   .qf__spinner { display: none; width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: qf-spin .7s linear infinite; }
   .qf.is-sending .qf__spinner { display: inline-block; }
+  /* Spinneren er nødvendig feedback – den må gerne dreje (langsomt) selv med reduceret bevægelse */
+  @media (prefers-reduced-motion: reduce) { .qf__spinner { animation: qf-spin 1.6s linear infinite !important; } }
   .qf.is-sending .qf__send { pointer-events: none; opacity: .85; }
   @keyframes qf-spin { to { transform: rotate(360deg); } }
   .field-error:empty { display: none; }

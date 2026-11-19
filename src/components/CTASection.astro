@@ -30,11 +30,11 @@ const {
   .cta { padding-block: clamp(2rem, 1.5rem + 3vw, 4rem); }
   .cta__strip { display: grid; gap: 1.25rem; align-items: center; padding: clamp(1.5rem, 1rem + 2.5vw, 2.5rem); border-radius: var(--r-xl); background: var(--c-inverse); color: var(--cta-fg); border: 1px solid var(--c-line); }
   @media (min-width: 56rem) { .cta__strip { grid-template-columns: 1fr auto; gap: 2.5rem; } }
-  .cta__copy h2 { color: var(--cta-fg); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); letter-spacing: -0.03em; }
+  .cta__copy h2 { color: var(--cta-fg); font-size: var(--fs-h2-sm); letter-spacing: -0.03em; }
   .cta__copy p { margin-top: .4rem; opacity: .72; font-size: var(--fs-sm); max-width: 42ch; }
   .cta__actions { display: grid; gap: .5rem; }
   @media (min-width: 36rem) { .cta__actions { grid-auto-flow: column; } }
-  .cta__primary { background: var(--c-orange); color: #0e0e10; min-height: 3rem; }
+  .cta__primary { background: var(--c-orange); color: var(--c-inverse); min-height: 3rem; }
   .cta__primary:hover { background: color-mix(in srgb, var(--c-orange) 85%, #fff); }
   .cta__secondary { background: transparent; color: var(--cta-fg); border-color: color-mix(in srgb, var(--cta-fg) 30%, transparent); min-height: 3rem; }
   .cta__secondary:hover { border-color: var(--cta-fg); }

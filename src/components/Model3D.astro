@@ -52,15 +52,15 @@ import HeroVisual from './HeroVisual.astro';
   .m3d__canvas:active { cursor: grabbing; }
   .m3d.is-ready .m3d__canvas { opacity: 1; }
   .m3d.is-ready .m3d__fallback { opacity: 0; }
-  .m3d__hint { position: absolute; left: 1.5rem; bottom: 1.5rem; display: inline-flex; align-items: center; gap: .4rem; font-size: var(--fs-xs); color: var(--c-muted); background: color-mix(in srgb, var(--c-white) 85%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--c-line); padding: .3rem .6rem; border-radius: 999px; opacity: 0; transition: opacity .4s ease; }
+  .m3d__hint { position: absolute; left: 1.5rem; bottom: 1.5rem; display: inline-flex; align-items: center; gap: .4rem; font-size: var(--fs-xs); color: var(--c-muted); background: color-mix(in srgb, var(--c-white) 85%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--c-line); padding: .3rem .6rem; border-radius: 999px; opacity: 0; transition: opacity .4s var(--ease); }
   .m3d.is-ready .m3d__hint { opacity: 1; }
   .m3d.is-touched .m3d__hint { opacity: 0; }
   .m3d__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem .9rem; border-top: 1px solid var(--c-line); }
-  .m3d__tools { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: .4rem; opacity: 0; transition: opacity .4s ease; }
+  .m3d__tools { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: .4rem; opacity: 0; transition: opacity .4s var(--ease); }
   .m3d.is-ready .m3d__tools { opacity: 1; }
   .m3d__tools .seg, .tool { background: color-mix(in srgb, var(--c-white) 82%, transparent); backdrop-filter: blur(8px); }
-  .seg--sm button { padding: .3rem .6rem; font-size: .8125rem; }
-  .tool { display: inline-flex; align-items: center; gap: .35rem; font: 500 .8125rem var(--font-sans); color: var(--c-muted); border: 1px solid var(--c-line); border-radius: 10px; padding: .3rem .65rem; cursor: pointer; transition: color .2s ease, border-color .2s ease, background-color .2s ease; }
+  .seg--sm button { min-height: 2rem; padding: .3rem .6rem; font-size: var(--fs-xs); }
+  .tool { display: inline-flex; align-items: center; gap: .35rem; min-height: 2rem; font: 500 var(--fs-xs) var(--font-sans); color: var(--c-muted); border: 1px solid var(--c-line); border-radius: var(--r-sm); padding: .3rem .65rem; cursor: pointer; transition: color .2s var(--ease), border-color .2s var(--ease), background-color .2s var(--ease); }
   .tool:hover { color: var(--c-ink); }
   .tool[aria-pressed="true"] { color: var(--c-ink); border-color: var(--c-orange); }
   .tool[aria-pressed="true"] svg { color: var(--c-orange); }
@@ -74,8 +74,8 @@ import HeroVisual from './HeroVisual.astro';
   .m3d.is-ready .m3d__marks span { opacity: .85; transform: none; }
   @media (prefers-reduced-motion: reduce) { .m3d__marks span { transition: none; } }
   .m3d__dims { position: absolute; inset: 0; pointer-events: none; }
-  .m3d__dims :global(.m3d__dim) { position: absolute; left: 0; top: 0; font: 500 .75rem var(--font-mono); color: var(--c-ink); background: var(--c-white); border: 1px solid var(--c-line-strong); padding: .1rem .4rem; border-radius: 6px; white-space: nowrap; transition: opacity .25s ease; will-change: transform; }
-  .m3d__dims :global(.m3d__dim--accent) { border-color: var(--c-orange); color: var(--c-orange); }
+  .m3d__dims :global(.m3d__dim) { position: absolute; left: 0; top: 0; font: 500 .75rem var(--font-mono); color: var(--c-ink); background: var(--c-white); border: 1px solid var(--c-line-strong); padding: .1rem .4rem; border-radius: 6px; white-space: nowrap; transition: opacity .25s var(--ease); will-change: transform; }
+  .m3d__dims :global(.m3d__dim--accent) { border-color: var(--c-orange); color: var(--c-ink); }
   /* Kontroller vises (og kan fokuseres) først, når 3D kører – ellers står stregtegningen alene */
   .m3d:not(.is-ready) :is(.m3d__angle, .m3d__bar .seg, .m3d__tools) { visibility: hidden; }
   .m3d__angle { display: inline-flex; align-items: center; gap: .6rem; flex: 1 1 9rem; min-width: 8rem; max-width: 14rem; }
@@ -83,7 +83,7 @@ import HeroVisual from './HeroVisual.astro';
   .m3d__angle output { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-ink); min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
   .m3d__meta { font: 500 var(--fs-xs) var(--font-mono); color: var(--c-muted); }
   .seg { display: inline-flex; padding: 3px; background: var(--c-paper); border: 1px solid var(--c-line); border-radius: 10px; }
-  .seg button { font: 500 .875rem var(--font-sans); color: var(--c-muted); background: transparent; border: 0; padding: .4rem .85rem; border-radius: 7px; cursor: pointer; transition: background-color .2s ease, color .2s ease; }
+  .seg button { font: 500 .875rem var(--font-sans); color: var(--c-muted); background: transparent; border: 0; padding: .4rem .85rem; border-radius: 7px; cursor: pointer; transition: background-color .2s var(--ease), color .2s var(--ease); }
   .seg button[aria-pressed="true"] { background: var(--c-white); color: var(--c-ink); box-shadow: var(--shadow-sm); }
   :global(:root[data-theme="dark"]) .seg button[aria-pressed="true"] { background: var(--c-line-strong); }
 </style>

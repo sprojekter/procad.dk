@@ -17,18 +17,18 @@ import CTASection from '../components/CTASection.astro';
       <ul class="models">
         <li class="model model--main">
           <h2>Fast pris pr. opgave</h2>
-          <p class="model__fit mono">Til de fleste opgaver</p>
+          <p class="model__fit">Til de fleste opgaver</p>
           <p>Du sender materialet, jeg giver en fast pris og en leveringsdato. Mindre rettelser inden for opgaven er med.</p>
         </li>
         <li class="model">
           <h2>Timepris</h2>
-          <p class="model__fit mono">Til løbende og uafklarede opgaver</p>
+          <p class="model__fit">Til løbende og uafklarede opgaver</p>
           <p class="model__price">[UDFYLD] kr./time</p>
           <p>Når omfanget ikke kan fastlægges på forhånd. Du får et estimat og besked, før det overskrides.</p>
         </li>
         <li class="model">
           <h2>Timebank</h2>
-          <p class="model__fit mono">Til ekstra kapacitet</p>
+          <p class="model__fit">Til ekstra kapacitet</p>
           <p class="model__price">[UDFYLD] timer til [UDFYLD] kr.</p>
           <p>Køb et antal timer til en lavere timepris og brug dem, når tegnestuen har travlt.</p>
         </li>
@@ -81,16 +81,15 @@ import CTASection from '../components/CTASection.astro';
 </script>
 
 <style>
-  .models { list-style: none; padding: 0; margin: 0; display: flex; gap: .75rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(-1 * clamp(1.25rem, .5rem + 3vw, 2.5rem)); padding-inline: clamp(1.25rem, .5rem + 3vw, 2.5rem); }
-  .models::-webkit-scrollbar { display: none; }
+  .models { list-style: none; padding: 0; margin: 0; display: flex; gap: .75rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--c-line-strong) transparent; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
   .model { flex: 0 0 min(82%, 20rem); scroll-snap-align: start; padding: 1.5rem; display: grid; gap: .6rem; align-content: start; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); }
   @media (min-width: 56rem) { .models { display: grid; grid-template-columns: 1.15fr 1fr 1fr; overflow: visible; margin: 0; padding: 0; } .model { padding: 2rem; } }
-  .model--main { background: var(--c-ink); border-color: var(--c-ink); color: var(--c-on-ink); }
-  .model--main h2 { color: var(--c-on-ink); }
-  .model--main .model__fit { color: var(--c-orange); }
+  .model--main { background: var(--c-inverse); border-color: var(--c-inverse); color: var(--c-dark-text); }
+  .model--main h2, .model--main .model__price { color: var(--c-dark-fg); }
+  .model--main .model__fit { color: var(--c-orange); } /* orange på inverse: 7:1 i begge temaer */
   .model h2 { font-size: var(--fs-xl); letter-spacing: -0.025em; }
-  .model__fit { font-size: var(--fs-sm); color: var(--c-muted); font-family: var(--font-sans); }
-  .model__price { font-size: var(--fs-xl); font-weight: 600; letter-spacing: -0.02em; color: var(--c-ink); }
+  .model__fit { font-size: var(--fs-sm); color: var(--c-muted); }
+  .model__price { font-size: var(--fs-lg); font-weight: 500; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--c-ink); }
   .model p:last-child { font-size: var(--fs-sm); }
   .price-grid { display: grid; gap: 1.5rem; margin-top: 2rem; }
   @media (min-width: 64rem) { .price-grid { grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 3rem; } }
@@ -102,12 +101,12 @@ import CTASection from '../components/CTASection.astro';
   .acc details[open] summary::after { content: "–"; }
   .dots { list-style: none; padding: 0 0 1rem; margin: 0; display: grid; gap: .45rem; font-size: var(--fs-sm); color: var(--c-body); }
   .dots li { position: relative; padding-left: 1.1rem; }
-  .dots li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-orange); }
+  .dots li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--c-muted); }
   .ex-h { font-size: var(--fs-lg); letter-spacing: -0.02em; margin-bottom: .75rem; }
   .ex { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--fs-sm); background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-lg); overflow: hidden; }
   .ex th, .ex td { padding: .8rem 1rem; text-align: left; border-bottom: 1px solid var(--c-line); }
   .ex tr:last-child td { border-bottom: 0; }
   .ex th { color: var(--c-muted); font-weight: 500; background: var(--c-paper); }
-  .ex td:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--c-ink); font-weight: 500; }
+  .ex td:last-child { font-family: var(--font-mono); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--c-ink); font-weight: 500; }
   .ex-note { margin-top: .6rem; font-size: var(--fs-xs); }
 </style>

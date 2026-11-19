@@ -59,7 +59,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 </header>
 
 <style>
-  .hdr { position: sticky; top: 0; z-index: 50; background: var(--c-header); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s ease; }
+  .hdr { position: sticky; top: 0; z-index: 50; background: var(--c-header); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s var(--ease); }
   .hdr.is-scrolled { border-bottom-color: var(--c-line); }
   .hdr__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); }
   .hdr__logo :global(svg) { height: 28px; width: auto; }
@@ -67,7 +67,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   @media (max-width: 63.99rem) { .hdr__inner { min-height: 3.5rem; } .hdr__logo :global(svg) { height: 24px; } }
 
   /* Mobil: kun logo – navigation ligger i bundbjælkens menu-ark */
-  .hdr { transition: transform .3s var(--ease), border-color .2s ease; }
+  .hdr { transition: transform .3s var(--ease), border-color .2s var(--ease); }
   .hdr.is-away { transform: translateY(-100%); }
   @media (min-width: 64rem) { .hdr.is-away { transform: none; } }
   .nav { display: none; }
@@ -92,14 +92,15 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     .nav { display: flex; flex: 1; justify-content: space-between; align-items: center; padding: 0 0 0 2.5rem; }
     .nav__list { display: flex; align-items: center; gap: .25rem; }
     .nav__item { border: 0; position: relative; flex-wrap: nowrap; }
-    .nav__link { padding: .45rem .7rem; font-size: .9375rem; font-weight: 450; color: var(--c-muted); border-radius: 8px; transition: color .15s ease; }
+    .nav__link { padding: .45rem .7rem; font-size: .9375rem; font-weight: 450; color: var(--c-muted); border-radius: 8px; transition: color .15s var(--ease); }
     .nav__link:hover, .nav__link.is-active { color: var(--c-ink); }
-    .nav__subtoggle { width: 1.25rem; height: 2.25rem; margin-left: -.55rem; }
-    .mega { position: absolute; top: calc(100% + .9rem); left: -1rem; width: 36rem; padding: .6rem; background: var(--c-white); border: 1px solid var(--c-line); border-radius: 18px; box-shadow: var(--shadow-lg); }
+    .nav__subtoggle { width: 1.5rem; height: 2.25rem; margin-left: -.25rem; }
+    .mega { position: absolute; top: calc(100% + .9rem); left: -1rem; width: 36rem; padding: .6rem; background: var(--c-white); border: 1px solid var(--c-line); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); }
     .mega__grid { grid-template-columns: 1fr 1fr; }
     .mega__link:hover { background: var(--c-paper); }
     .mega__foot { display: flex; justify-content: space-between; align-items: center; margin-top: .4rem; padding: .85rem .6rem .4rem; border-top: 1px solid var(--c-line); font-size: var(--fs-sm); }
     .nav__item--sub:hover .mega, .nav__item--sub:focus-within .mega { display: block; }
+    .nav__item--sub.is-dismissed .mega:not(.is-open) { display: none; } /* Esc lukker også hover/fokus-åbning (WCAG 1.4.13) */
     .nav__item--sub:hover::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1rem; }
     .nav__actions { display: flex; align-items: center; gap: .5rem; margin: 0; }
     .nav__contact { display: block; flex: none; }
@@ -126,6 +127,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    const item = sub?.closest('.nav__item--sub');
     if (mega?.classList.contains('is-open')) { mega.classList.remove('is-open'); sub?.setAttribute('aria-expanded', 'false'); sub?.focus(); }
+    item?.classList.add('is-dismissed');
   });
+  const subItem = sub?.closest<HTMLElement>('.nav__item--sub');
+  subItem?.addEventListener('mouseleave', () => subItem.classList.remove('is-dismissed'));
+  subItem?.addEventListener('focusout', (e) => { if (!subItem.contains(e.relatedTarget as Node)) subItem.classList.remove('is-dismissed'); });
 </script>
